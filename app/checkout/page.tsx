@@ -58,6 +58,7 @@ export default function CheckoutPage() {
     try {
       setLoading(true);
       const result = await getShippingRate(payload);
+      console.log("Checkout success:", result);
 
       if (result?.total_shipping_cost) {
         setShippingFee(result.total_shipping_cost);
@@ -172,7 +173,6 @@ export default function CheckoutPage() {
         </div>
 
         <OrderSummary
-        email={email}
           cart={cart}
           subtotal={subtotal}
           shippingFee={shippingFee}

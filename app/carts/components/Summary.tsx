@@ -1,47 +1,28 @@
 "use client";
 
 import CartItem from "@/interfaces/cart";
-import { checkoutStripe } from "@/lib/api/checkout";
 import Image from "next/image";
 
 interface OrderSummaryProps {
-  email: string;
   cart: CartItem[];
   subtotal: number;
   shippingFee?: number;
   discount?: number;
   total: number;
-}
+ }
 
 export default function OrderSummary({
-  email,
   cart,
   subtotal,
   shippingFee = 0,
   discount = 0,
   total,
-}: OrderSummaryProps) {
-
-  const handleCheckout = async () => {
-    try {
-      const items = cart.map((item) => ({
-        id: item.id,
-        qty: item.qty,
-      }));
-
-      const res = await checkoutStripe(email, items, total);
-
-      if (res?.checkout_url) {
-        window.location.href = res.checkout_url;
-      }
-    } catch (err) {
-      console.error("Checkout error:", err);
-    }
-  };
+ }: OrderSummaryProps) {
   return (
     <div className="w-full lg:w-1/3 bg-white rounded-lg shadow-md p-6 h-fit lg:sticky lg:top-8">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">Summary</h3>
 
+      {/* Cart Items */}
       <div className="space-y-4 max-h-60 overflow-y-auto border-b pb-4">
         {cart.map((item) => (
           <div key={item.id} className="flex items-center justify-between">
@@ -65,6 +46,7 @@ export default function OrderSummary({
         ))}
       </div>
 
+      {/* Totals */}
       <div className="mt-4 space-y-2 text-sm text-gray-600">
         <div className="flex justify-between">
           <span>Subtotal</span>
@@ -83,29 +65,35 @@ export default function OrderSummary({
             <span>Discount</span>
             <span>- ${discount.toFixed(2)}</span>
           </div>
-        )}
-
+        )} 
+       
         <div className="border-t border-gray-300 pt-3 flex justify-between font-semibold text-gray-800">
           <span>Total</span>
           <span>${total.toFixed(2)}</span>
         </div>
       </div>
 
+      {/* Payment Methods */}
+      <div className="mt-6 space-y-3">
+        
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="payment" />
+          <span className="text-sm">Stripe</span>
+        </label>
+         
+      </div>
+
+      {/* Terms */}
       <div className="mt-4 flex items-start gap-2">
-        <input type="checkbox" required />
+        <input type="checkbox" />
         <span className="text-xs text-gray-500">
           I have read and agree to the website terms and conditions
         </span>
       </div>
 
-      {shippingFee > 0 && (
-        <button
-          onClick={handleCheckout}
-          className="mt-6 w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-full font-medium cursor-pointer"
-        >
-          Checkout
-        </button>
-      )}
+      <button className="mt-6 w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-full font-medium cursor-pointer">
+        Checkout
+      </button>
     </div>
   );
 }
