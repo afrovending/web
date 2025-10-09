@@ -7,7 +7,6 @@ import {
   ChatBubbleOvalLeftEllipsisIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
-
 export default function Footer() {
   return (
     <footer className="bg-red-700 text-white py-10">
