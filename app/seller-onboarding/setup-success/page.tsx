@@ -7,6 +7,7 @@ import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import confetti from "canvas-confetti";
 import { verifyStripeSession } from "@/lib/api/customer/checkout";
+import { useAuthStore } from "@/store/useAuthStore";
 
 function SuccessContent() {
   const router = useRouter();
@@ -24,12 +25,16 @@ function SuccessContent() {
       return;
     }
 
+    const { clearAuth } = useAuthStore();
+
     const verifyPayment = async () => {
       try {
         const data = await verifyStripeSession(sessionId);
         if (data.status === "paid") {
           setStatus("success");
           triggerConfetti();
+          //  destory the session, force the user to login again
+          clearAuth();
         } else {
           setStatus("error");
         }
