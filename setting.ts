@@ -201,3 +201,9 @@ At Afrovending Online Marketplace, we don't just deliver products — we deliver
 Afrovending Online Marketplace is a modern food and service marketplace designed to make everyday living simpler, faster, and more convenient. We connect customers with a wide range of quality foods, trusted sellers, home services, and essential products — all in one easy-to-use platform.
   `,
 };
+
+// ADD ABOVE RETURN
+export const ROLE_OPTIONS = [
+  { value: "customer", label: "Register as Customer" },
+  { value: "vendor", label: "Register as Seller" },
+];

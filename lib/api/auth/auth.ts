@@ -23,6 +23,18 @@ export async function loginUser(payload: {
   const response = await api.post("/login", payload);
   return response.data;
 }
+export async function registerUser(payload: {
+  name: string;
+  last_name: string;
+  phone: string;
+  email: string;
+  password: string;
+  role: string;
+  device_name: string;
+}) {
+  const response = await api.post("/register", payload);
+  return response.data;
+}
 
 export async function forgetPassword(payload: { email: string }) {
   const response = await api.post("/forget-password", payload);
@@ -30,6 +42,13 @@ export async function forgetPassword(payload: { email: string }) {
 }
 
 export async function confirmResetCode(payload: {
+  email: string;
+  otp: string;
+}) {
+  const response = await api.post("/verify-email", payload);
+  return response.data;
+}
+export async function confirmEmail(payload: {
   email: string;
   otp: string;
 }) {

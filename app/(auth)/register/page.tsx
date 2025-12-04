@@ -5,80 +5,49 @@ import Link from "next/link";
 import Image from "next/image";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import GoogleSignInButton from "@/app/components/common/GoogleSignInButton";
-import { loginUser } from "@/lib/api/auth/auth";
-import { useAuthStore } from "@/store/useAuthStore";
+import { registerUser } from "@/lib/api/auth/auth";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
+import { ROLE_OPTIONS } from "@/setting";
 
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (options: {
-            client_id: string;
-            callback: (response: CredentialResponse) => void;
-            auto_select?: boolean;
-            cancel_on_tap_outside?: boolean;
-          }) => void;
-          prompt: () => void;
-        };
-      };
-    };
-  }
-}
-
-type CredentialResponse = {
-  credential?: string;
-  select_by?: string;
-  clientId?: string;
-};
-
-export default function LoginPage() {
+export default function RegisterPage() {
+  const [name, setName] = useState("");
+  const [last_name, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState("customer");
 
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Detect device/browser info
       const device_name = navigator.userAgent || "web";
 
       const payload = {
+        name,
+        last_name,
+        phone,
         email,
         password,
+        role,
         device_name,
       };
 
-      const result = await loginUser(payload);
-      // Store in Zustand auth store
-      useAuthStore.getState().setAuth(result.token, result.user);
-
-      // Store in cookies
-      document.cookie = `token=${result.token}; path=/;`;
-      document.cookie = `role=${result.user.role}; path=/;`;
-
-      // Redirect based on role
-      const role = result.user.role;
-
-      if (role === "customer") {
-        router.replace("/account");
-      } else if (role === "vendor") {
-        router.replace("/dashboard");
-      } else {
-        // router.replace("/");
+      const response = await registerUser(payload);
+      if (response.status === "success") {
+        sessionStorage.setItem("registerEmail", email);
+        toast.success("Confirm your email to continue");
+        router.replace("/confirm-email");
       }
-
-      toast.success("Welcome Back");
     } catch (error) {
-      let message = "Login failed. Please try again.";
+      let message = "Registration failed. Please try again.";
 
       if (error instanceof AxiosError) {
         if (error.response?.status === 422 && error.response.data?.errors) {
@@ -87,7 +56,6 @@ export default function LoginPage() {
           message = error.response.data.message;
         }
       }
-      console.error("Authentication failed on the server:", error);
 
       toast.error(message);
     } finally {
@@ -97,42 +65,27 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen">
-      {/* Left Column: Image */}
+      {/* Left Column */}
       <div className="relative hidden lg:block h-full w-1/2">
         <Image
           width={1200}
           height={1600}
-          src="account-header.jpg"
+          src="/account-header.jpg"
           alt="A woman in traditional African attire"
           className="w-full h-full object-cover"
-          unoptimized
+          priority
         />
-        <div className="absolute inset-0 bg-gray-50 opacity-10"></div>
+        <div className="absolute inset-0 bg-black opacity-10"></div>
       </div>
 
-      {/* Right Column: Form */}
+      {/* Right Column */}
       <div className="flex items-center justify-center bg-red-50 p-8 sm:p-12 w-full lg:w-1/2">
         <div className="w-full max-w-md">
-          {/* Logo */}
-          <div hidden className="mb-8 flex justify-center">
-            <Link href="/">
-              <Image
-                src="/images/logo.svg"
-                alt="African Market Hub"
-                width={180}
-                height={40}
-                style={{ height: "40px" }}
-                priority
-                unoptimized
-              />
-            </Link>
-          </div>
-
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 text-center">
-            Log in
+            Create Your Account
           </h1>
 
-          {/* Google Button (Priority) */}
+          {/* Google Login */}
           <div className="mb-6">
             <GoogleSignInButton />
           </div>
@@ -146,14 +99,45 @@ export default function LoginPage() {
             <div className="grow border-t border-gray-300"></div>
           </div>
 
-          {/* Login Form */}
-          <form onSubmit={handleLogin} className="space-y-4 text-gray-700">
+          {/* Form */}
+          <form onSubmit={handleRegister} className="space-y-4 text-gray-700">
+            {/* Firstname */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                First Name
+              </label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="input"
+                placeholder="John"
+              />
+            </div>
+
+            {/* Lastname */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Last Name
+              </label>
+              <input
+                type="text"
+                required
+                value={last_name}
+                onChange={(e) => setLastName(e.target.value)}
+                className="input"
+                placeholder="Doe"
+              />
+            </div>
+
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium  mb-1">Email</label>
+              <label className="block text-sm font-medium mb-1">Email</label>
               <input
                 type="email"
                 required
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input"
@@ -161,8 +145,45 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Password */}
+            {/* Phone */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="input"
+                placeholder="+254712345678"
+              />
+            </div>
+            {/* Role Selection */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Choose Account Type
+              </label>
 
+              <div className="space-y-2">
+                {ROLE_OPTIONS.map((opt) => (
+                  <label
+                    key={opt.value}
+                    className="flex items-center gap-3 p-3 border rounded-md cursor-pointer bg-white hover:bg-gray-50"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={role === opt.value}
+                      onChange={() => setRole(opt.value)}
+                      className="h-4 w-4 text-red-600 border-gray-300 rounded cursor-pointer"
+                    />
+                    <span className="text-sm text-gray-700">{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Password */}
             <div>
               <label className="block text-sm font-medium mb-1">Password</label>
               <div className="relative">
@@ -170,7 +191,7 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder="••••••••"
                   className="input"
                   required
                 />
@@ -186,30 +207,23 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
-              <div className="text-right mt-1">
-                <Link
-                  href="/forget-password"
-                  className="text-sm text-red-800 hover:underline"
-                >
-                  Forgot Password?
-                </Link>
-              </div>
             </div>
+
             {/* Submit */}
             <button
               type="submit"
               disabled={loading}
               className="btn btn-primary w-full!"
             >
-              {loading ? "Logging in..." : "Log in"}
+              {loading ? "Processing..." : "Register"}
             </button>
 
             <button
               type="button"
               className="btn btn-gray w-full"
-              onClick={() => router.push("/register")}
+              onClick={() => router.push("/login")}
             >
-              Register
+              Back to Login
             </button>
           </form>
         </div>
