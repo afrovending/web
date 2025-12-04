@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { ContinueWithGoogle } from "./api/auth/login";
+import { ContinueWithGoogle } from "./api/auth/auth";
 import toast from "react-hot-toast";
 import router from "next/router";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -59,7 +59,7 @@ export default function GoogleOneTap() {
         if (role === "customer") {
           router.push("/account");
         } else if (role === "vendor") {
-          router.push("/dashboard"); 
+          router.push("/dashboard");
         } else {
           router.push("/"); // fallback
         }

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
-import { ContinueWithGoogle } from "@/lib/api/auth/login";
+import { ContinueWithGoogle } from "@/lib/api/auth/auth";
 import { useAuthStore } from "@/store/useAuthStore";
 
 interface GoogleUserPayload {
@@ -63,21 +63,21 @@ export default function GoogleSignInButton() {
 
       // API Call
       const result = await ContinueWithGoogle(payload);
-      useAuthStore.getState().setAuth(result.token, result.user); 
-      
+      useAuthStore.getState().setAuth(result.token, result.user);
+
       document.cookie = `token=${result.token}; path=/;`;
       document.cookie = `role=${result.user.role}; path=/;`;
 
       const role = result.user.role;
 
       if (role === "customer") {
-        router.push("/account"); 
+        router.push("/account");
       } else if (role === "vendor") {
         router.push("/dashboard");
       } else {
-        // router.push("/"); 
+        // router.push("/");
       }
-      toast.success("Welcome Back" );
+      toast.success("Welcome Back");
     } catch (error) {
       console.error("Authentication failed on the server:", error);
       toast.error("Login failed. Please try again.");
@@ -139,10 +139,10 @@ export default function GoogleSignInButton() {
   }
 
   return (
-    <div className="flex flex-col items-center p-6 bg-white rounded-xl shadow-lg">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">
+    <div className="flex flex-col items-center p-6 card">
+      {/* <h2 className="text-xl font-semibold mb-4 text-gray-800">
         Sign in to your account
-      </h2>
+      </h2> */}
 
       <div id="g_id_signin" className="mb-4"></div>
     </div>

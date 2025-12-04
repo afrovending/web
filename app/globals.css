@@ -57,7 +57,7 @@ body,
 }
 
 /* ------------------------------
-   PRIMARY BUTTON (Orange)
+   PRIMARY BUTTON (red)
 ------------------------------ */
 .btn-primary {
   @apply bg-red-800 hover:bg-red-500 text-white;

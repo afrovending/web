@@ -177,9 +177,9 @@ const AboutPageContent: React.FC = () => {
           </p>
           <div className="max-w-4xl mx-auto p-4 bg-red-50 rounded-lg border-l-4 border-red-600">
             <p className="text-md text-gray-800 italic">
-              &quot;Ayokah Foods & Services is a modern, people-focused food and
-              service marketplace created to make everyday living simpler,
-              faster, and more convenient.&quot;
+              &quot;Afrovending Online Marketplace is a modern, people-focused
+              food and service marketplace created to make everyday living
+              simpler, faster, and more convenient.&quot;
             </p>
           </div>
         </header>

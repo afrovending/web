@@ -109,8 +109,8 @@ const TermsContent: React.FC = () => {
           </h2>
           <p className="text-gray-700">
             All content, branding, logos, designs, and materials are owned by
-            Ayokah Foods & Services. You may access content only for personal,
-            non-commercial purposes.
+            Afrovending Online Marketplace. You may access content only for
+            personal, non-commercial purposes.
           </p>
         </section>
 

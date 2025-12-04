@@ -14,11 +14,11 @@ const ShippingPage: React.FC = () => {
             Shipping & Delivery
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-            At Ayokah Foods & Services, we take pride in ensuring that your
-            orders, whether groceries, food, or services, are delivered safely,
-            on time, and transparently. Our shipping and tracking system,
-            powered by EasyPost, guarantees accurate and efficient delivery to
-            your doorstep.
+            At Afrovending Online Marketplace, we take pride in ensuring that
+            your orders, whether groceries, food, or services, are delivered
+            safely, on time, and transparently. Our shipping and tracking
+            system, powered by EasyPost, guarantees accurate and efficient
+            delivery to your doorstep.
           </p>
         </header>
 
@@ -30,9 +30,10 @@ const ShippingPage: React.FC = () => {
               <h2 className="text-2xl font-bold">Reliable Shipping</h2>
             </div>
             <p className="text-gray-700">
-              Every product from Ayokah Foods & Services is carefully packed and
-              shipped with trusted carriers through EasyPost. We monitor every
-              shipment to ensure it reaches you securely and promptly.
+              Every product from Afrovending Online Marketplace is carefully
+              packed and shipped with trusted carriers through EasyPost. We
+              monitor every shipment to ensure it reaches you securely and
+              promptly.
             </p>
           </div>
 
@@ -68,7 +69,7 @@ const ShippingPage: React.FC = () => {
               <h2 className="text-2xl font-bold">Efficient & Timely</h2>
             </div>
             <p className="text-gray-700">
-              Ayokah Foods & Services values your time. Our logistics and
+              Afrovending Online Marketplace values your time. Our logistics and
               service delivery system is optimized for efficiency, minimizing
               delays, and ensuring that groceries, food orders, or service
               bookings are delivered on schedule.

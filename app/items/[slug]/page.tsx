@@ -1,9 +1,10 @@
 import { Metadata } from "next";
 import ItemDetail from "../components/ItemDetail";
-import { getItemDetail } from "@/lib/api/items"; 
+import { getItemDetail } from "@/lib/api/items";
 
-
-export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageParams): Promise<Metadata> {
   // const { slug } = params;
   const awaitedParams = await params;
   const slug = awaitedParams.slug;
@@ -13,7 +14,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     const product = response.data.product;
 
     return {
-      title: `${product.title} | Ayokah Foods & Services`,
+      title: `${product.title} | Afrovending Online Marketplace`,
       description:
         product.meta_description || product.description?.slice(0, 155),
 
@@ -50,8 +51,6 @@ type PageParams = {
   };
 };
 
-
-
 export default async function ItemDetailPage({ params }: PageParams) {
   const awaitedParams = await params;
   const slug = awaitedParams.slug;
@@ -59,7 +58,7 @@ export default async function ItemDetailPage({ params }: PageParams) {
   try {
     const response = await getItemDetail(slug);
 
-    const product = response.data.product; 
+    const product = response.data.product;
 
     const productSchema = {
       "@context": "https://schema.org",
@@ -70,7 +69,7 @@ export default async function ItemDetailPage({ params }: PageParams) {
       sku: product.sku || product.id,
       brand: {
         "@type": "Brand",
-        name: "Ayokah Foods & Services",
+        name: "Afrovending Online Marketplace",
       },
       offers: {
         "@type": "Offer",
@@ -106,7 +105,7 @@ export default async function ItemDetailPage({ params }: PageParams) {
         <ItemDetail product={product} />
       </>
     );
-  } catch  {
+  } catch {
     return (
       <div className="p-10 text-center text-red-500 font-medium">
         Failed to load product.

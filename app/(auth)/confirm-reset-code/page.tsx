@@ -1,84 +1,188 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { confirmResetCode } from "../../../lib/api_/login";
 import toast from "react-hot-toast";
-import { SubmitButton } from "../../components/commons/SubmitButton";
+import { confirmResetCode } from "@/lib/api/auth/auth";
+import Link from "next/link";
+import Image from "next/image";
 
 type ErrorResponse = {
-    message?: string;
-    status?: string;
-    error_detail?: string;
+  message?: string;
+  status?: string;
+  error_detail?: string;
 };
 
 export default function ConfirmResetCode() {
-    const router = useRouter();
-    const [code, setCode] = useState("");
-    const [email, setEmail] = useState("");
-    const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const [code, setCode] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const savedEmail = sessionStorage.getItem("resetEmail");
-        if (savedEmail) {
-            setEmail(savedEmail);
-        } else {
-            router.replace("/auth/forget-password");
-        }
-    }, [router]);
+  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
+  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+  useEffect(() => {
+    const savedEmail = sessionStorage.getItem("resetEmail");
+    if (savedEmail) {
+      setEmail(savedEmail);
+    } else {
+      router.replace("/forget-password");
+    }
+  }, [router]);
 
-        const formData = new FormData();
-        formData.append("otp", code);
-        formData.append("email", email);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+  const value = e.target.value;
 
-        try {
-            setLoading(true);
-            const result = await confirmResetCode(formData);
+  if (!/^[0-9]?$/.test(value)) return; 
 
-            toast.success(result.message || "Code confirmed successfully.");
-            router.replace("/auth/reset-password");
-        } catch (err) {
-            const error = err as { response?: { data?: ErrorResponse } };
-            const errorDetail =
-                error.response?.data?.error_detail ||
-                error.response?.data?.message ||
-                "Invalid reset code";
-            toast.error(errorDetail);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const newOtp = [...otp];
+  newOtp[idx] = value;
+  setOtp(newOtp);
 
-    return (
-        <>
- 
+  // Move to next input automatically
+  if (value && idx < 5) {
+    inputsRef.current[idx + 1]?.focus();
+  }
 
-                <h1 className="text-2xl font-bold mb-6 text-gray-800">Confirm Reset Code</h1>
+  // Update main code state
+  setCode(newOtp.join(""));
+};
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="w-full max-w-sm space-y-8 text-gray-800"
-                >
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Enter the 6-digit code sent to your email address
-                        </label>
-                        <input
-                            type="tel"
-                            maxLength={6}
-                            value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            placeholder="Enter the code from your email"
-                            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none"
-                            required
-                        />
-                    </div>
+const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
+  if (e.key === "Backspace" && !otp[idx] && idx > 0) {
+    const prev = idx - 1;
+    inputsRef.current[prev]?.focus();
 
-                    <SubmitButton label="Verify Code" loading={loading} />
-                </form>
-            </>
-    );
+    const newOtp = [...otp];
+    newOtp[prev] = "";
+    setOtp(newOtp);
+    setCode(newOtp.join(""));
+  }
+};
+
+const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+  const paste = e.clipboardData.getData("text").slice(0, 6).replace(/\D/g, "");
+
+  if (paste.length !== 6) return;
+
+  const newOtp = paste.split("");
+  setOtp(newOtp);
+  setCode(newOtp.join(""));
+
+  inputsRef.current[5]?.focus();
+};
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+
+      const payload = { email, otp: code };
+      const result = await confirmResetCode(payload);
+      
+      toast.success(result.message || "Code confirmed successfully.");
+      router.replace("/reset-password");
+    } catch (err) {
+      const error = err as { response?: { data?: ErrorResponse } };
+      const errorDetail =
+        error.response?.data?.error_detail ||
+        error.response?.data?.message ||
+        "Invalid reset code";
+      toast.error(errorDetail);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const setInputRef = (index: number) => (el: HTMLInputElement | null) => {
+    inputsRef.current[index] = el;
+  };
+
+
+  return (
+    <div className="flex min-h-screen">
+      {/* Left Column: Image */}
+      <div className="relative hidden lg:block h-full w-1/2">
+        <Image
+          width={1200}
+          height={1600}
+          src="account-header.jpg"
+          alt="A woman in traditional African attire"
+          className="w-full h-full object-cover"
+          unoptimized
+        />
+        <div className="absolute inset-0 bg-gray-50 opacity-10"></div>
+      </div>
+
+      <div className="flex items-center justify-center bg-red-50 p-8 sm:p-12 w-full lg:w-1/2">
+        <div className="w-full max-w-md">
+          {/* Logo */}
+          <div hidden className="mb-8 flex justify-center">
+            <Link href="/">
+              <Image
+                src="/images/logo.svg"
+                alt="African Market Hub"
+                width={180}
+                height={40}
+                style={{ height: "40px" }}
+                priority
+                unoptimized
+              />
+            </Link>
+          </div>
+
+          <h1 className="text-2xl font-bold mb-6 text-gray-800">
+            Confirm Reset Code
+          </h1>
+
+          <form
+            onSubmit={handleSubmit}
+            className="w-full max-w-sm space-y-8 text-gray-800"
+          >
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Enter the 6-digit code sent to your email address
+              </label>
+
+              <div className="flex gap-3 justify-between">
+                {Array(6)
+                  .fill(0)
+                  .map((_, idx) => (
+                    <input
+                      key={idx}
+                      type="text"
+                      maxLength={1}
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      ref={(el) => {
+                        inputsRef.current[idx] = el;
+                      }}
+                      value={otp[idx] || ""}
+                      onChange={(e) => handleChange(e, idx)}
+                      onKeyDown={(e) => handleKeyDown(e, idx)}
+                      onPaste={handlePaste}
+                      className="w-12 h-12 border border-gray-300 rounded-md text-center text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-red-400"
+                    />
+                  ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+              <button
+                type="submit"
+                className={`btn btn-primary w-full ${
+                  loading ? "opacity-70 cursor-not-allowed" : ""
+                }`}
+                disabled={loading}
+              >
+                {loading ? "Confirming..." : "Verify code"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
 }
