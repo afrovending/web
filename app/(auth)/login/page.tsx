@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image"; 
-import GoogleSignInButton from "../components/common/GoogleSignInButton"; 
+import GoogleSignInButton from "@/app/components/common/GoogleSignInButton";
 
  
 declare global {
