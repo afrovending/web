@@ -29,7 +29,7 @@ export async function numverifyValidatePhone({
   try {
     const apiKey = process.env.NEXT_PUBLIC_NUMVERIFY_API;
 
-    const url = `http://apilayer.net/api/validate?access_key=${apiKey}&number=${number}&country_code=${countryCode}&format=1`;
+    const url = `https://apilayer.net/api/validate?access_key=${apiKey}&number=${number}&country_code=${countryCode}&format=1`;
 
     const res = await fetch(url);
 
