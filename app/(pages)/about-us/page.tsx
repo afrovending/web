@@ -254,7 +254,7 @@ const AboutPageContent: React.FC = () => {
               <ul className="space-y-4 text-gray-700">
                 {COMPANY_DATA.strategicEdge.map((edge, index) => (
                   <li key={index} className="flex items-start">
-                    <FaShieldAlt className="w-5 h-5 text-[#1B412C] mr-3 mt-1 flex-shrink-0" />
+                    <FaShieldAlt className="w-5 h-5 text-[#1B412C] mr-3 mt-1 shrink-0" />
                     <span className="text-sm sm:text-base">{edge}</span>
                   </li>
                 ))}

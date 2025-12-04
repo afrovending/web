@@ -44,9 +44,9 @@ export default function CategorySelector({
       {/* Category Selector */}
       <div>
         {categoriesLoading ? (
-          <Skeleton height={44} />
+          <Skeleton height={50} className="mt-6" />
         ) : categoriesError ? (
-          <div className="text-sm text-red-500">{categoriesError}</div>
+          <div className="text-sm text-red-500!">{categoriesError}</div>
         ) : (
           <SelectField
             label="Category"

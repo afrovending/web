@@ -6,6 +6,7 @@ import usePlacesAutocomplete, {
 } from "use-places-autocomplete";
 import GoogleAddress from "@/interfaces/googleAddress";
 import { ALLOWED_COUNTRIES } from "@/setting";
+import { getDialCode } from "@/lib/api/ip/countries";
 
 type Address = {
   street_address: string;
@@ -15,6 +16,7 @@ type Address = {
   country: string;
   lat?: number;
   lng?: number;
+  dialCode?:string;
 };
 
 type Props = {
@@ -73,6 +75,10 @@ export default function GoogleAddressAutocomplete({
 
       console.log(results);
 
+       const dialCode = components.country
+         ? await getDialCode(components.country)
+         : "";
+
       onSelect({
         street_address: components.street ?? desc,
         city: components.city ?? "",
@@ -81,6 +87,7 @@ export default function GoogleAddressAutocomplete({
         country: components.country ?? "",
         lat,
         lng,
+        dialCode,
       });
     } catch (err) {
       console.error("Geocode error:", err);

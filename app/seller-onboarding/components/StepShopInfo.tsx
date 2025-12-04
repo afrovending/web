@@ -46,12 +46,13 @@ export default function StepShopInfo({ onNext }: StepProps) {
   const [lng, setLng] = useState<number | undefined>(undefined);
 
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [dialCode, setDialCode] = useState("");
   const [description, setDescription] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [bannerUrl, setBannerUrl] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   // types + categories
@@ -73,48 +74,47 @@ export default function StepShopInfo({ onNext }: StepProps) {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
 
-
   const LIMIT = 5000;
 
   // load shop
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      setInitialLoading(true);
-      try {
-        const res = await getMyShop();
-        if (cancelled) return;
-        if (res?.status === "success") {
-          const shop = res.data;
-          setName(shop.name);
-          setShopId(shop.id ?? null);
-          setAddressLine(shop.address || "");
-          setDescription(shop.description || "");
-          setPhoneNumber(shop.phone || "");
-          setLogoUrl(shop.logo ?? null);
-          setBannerUrl(shop.banner ?? null);
-          if (shop.category)
-            setSelectedCategory({
-              id: shop.category.id,
-              name: shop.category.name,
-            });
+  // useEffect(() => {
+  //   let cancelled = false;
+  //   const load = async () => {
+  //     setInitialLoading(true);
+  //     try {
+  //       const res = await getMyShop();
+  //       if (cancelled) return;
+  //       if (res?.status === "success") {
+  //         const shop = res.data;
+  //         setName(shop.name);
+  //         setShopId(shop.id ?? null);
+  //         setAddressLine(shop.address || "");
+  //         setDescription(shop.description || "");
+  //         setPhoneNumber(shop.phone || "");
+  //         setLogoUrl(shop.logo ?? null);
+  //         setBannerUrl(shop.banner ?? null);
+  //         if (shop.category)
+  //           setSelectedCategory({
+  //             id: shop.category.id,
+  //             name: shop.category.name,
+  //           });
 
-          if (shop.city) setCity(shop.city);
-          if (shop.zip) setZip(shop.zip);
-          if (shop.country) setCountryCode(shop.country);
-          if (shop.state) setStateCode(shop.state);
-        }
-      } catch (err) {
-        console.error("load shop failed", err);
-      } finally {
-        setInitialLoading(false);
-      }
-    };
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  //         if (shop.city) setCity(shop.city);
+  //         if (shop.zip) setZip(shop.zip);
+  //         if (shop.country) setCountryCode(shop.country);
+  //         if (shop.state) setStateCode(shop.state);
+  //       }
+  //     } catch (err) {
+  //       console.error("load shop failed", err);
+  //     } finally {
+  //       setInitialLoading(false);
+  //     }
+  //   };
+  //   load();
+  //   return () => {
+  //     cancelled = true;
+  //   };
+  // }, []);
 
   // load categories on type change
   useEffect(() => {
@@ -179,6 +179,15 @@ export default function StepShopInfo({ onNext }: StepProps) {
     return () => clearTimeout(timer);
   }, [phoneNumber, validatePhoneNumber]);
 
+  function countryCodeToFlag(code: string) {
+    if (!code) return "";
+    return code
+      .toUpperCase()
+      .replace(/./g, (char) =>
+        String.fromCodePoint(127397 + char.charCodeAt(0))
+      );
+  }
+
   // Google address selection handler
   const handleAddressSelect = (addr: {
     street_address: string;
@@ -188,6 +197,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
     country: string;
     lat?: number;
     lng?: number;
+    dialCode?: string;
   }) => {
     setAddressLine(addr.street_address);
     setCity(addr.city);
@@ -196,34 +206,8 @@ export default function StepShopInfo({ onNext }: StepProps) {
     setCountryCode(addr.country);
     setLat(addr.lat);
     setLng(addr.lng);
+    setDialCode(addr.dialCode ?? "");
   };
-
-  // const handleBannerFile = async (file?: File) => {
-  //   if (!file) return;
-  //   if (file.size > 5 * 1024 * 1024) {
-  //     toast.error("File too large. Max 5 MB.");
-  //     return;
-  //   }
-
-  //   const previewUrl = URL.createObjectURL(file);
-  //   setBannerUrl(previewUrl); // instant preview
-
-  //   try {
-  //     const resp = await (shopId
-  //       ? updateShopBanner(shopId, file)
-  //       : Promise.reject("Shop ID is missing"));
-  //     // Show toast based on API response message
-  //     if (resp?.status === "success") {
-  //       toast.success(resp?.message ?? "Banner uploaded successfully");
-  //     } else {
-  //       toast.error(resp?.message ?? "Banner upload failed");
-  //     }
-  //   } catch (err) {
-  //     console.error("Banner upload failed", err);
-  //     toast.error("Banner upload failed. Try again.");
-  //     setBannerUrl(null);
-  //   }
-  // };
 
   const handleBannerFile = async (file?: File) => {
     if (!file) return;
@@ -255,34 +239,6 @@ export default function StepShopInfo({ onNext }: StepProps) {
       setBannerUrl(null);
     }
   };
-
-  // const handleLogoFile = async (file?: File) => {
-
-  //   if (!file) return;
-  //   if (file.size > 5 * 1024 * 1024) {
-  //     toast.error("File too large. Max 5 MB.");
-  //     return;
-  //   }
-
-  //   const previewUrl = URL.createObjectURL(file);
-  //   setLogoUrl(previewUrl);
-
-  //   try {
-  //     const resp = await (shopId
-  //       ? updateShopLogo(shopId, file)
-  //       : Promise.reject("Shop ID is missing"));
-  //     // Show toast based on API response message
-  //     if (resp?.status === "success") {
-  //       toast.success(resp?.message ?? "Logo uploaded successfully");
-  //     } else {
-  //       toast.error(resp?.message ?? "Logo upload failed");
-  //     }
-  //   } catch (err) {
-  //     console.error("Logo upload failed", err);
-  //     toast.error("Logo upload failed. Try again.");
-  //     setLogoUrl(null);
-  //   }
-  // };
 
   const handleLogoFile = async (file?: File) => {
     if (!file) return;
@@ -428,10 +384,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
           <div className="h-40 bg-gray-100 rounded animate-pulse" />
         </div>
       ) : (
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6 "
-        >
+        <form onSubmit={handleSubmit} className="space-y-6 ">
           {errorMsg && (
             <div className="p-3 text-red-700 bg-red-100 rounded text-sm">
               {errorMsg}
@@ -480,8 +433,8 @@ export default function StepShopInfo({ onNext }: StepProps) {
             </div>
 
             <PhoneInput
-              countryFlag={countryCode ?? ""}
-              dialCode={""}
+              countryFlag={countryCodeToFlag(countryCode)}
+              dialCode={dialCode ?? ""}
               value={phoneNumber}
               onChange={setPhoneNumber}
               validating={isValidatingPhone}
