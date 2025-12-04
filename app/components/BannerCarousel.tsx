@@ -58,7 +58,7 @@ export default function BannerCarousel() {
         {banners.map((banner) => (
           <div
             key={banner.id}
-            className="w-full flex-shrink-0 relative h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px]"
+            className="w-full shrink-0 relative h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px]"
           >
             <Image
               src={banner.banner}

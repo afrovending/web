@@ -166,7 +166,7 @@ export default function StepBankInfo({ onNext }: StepProps) {
           </div>
         </div>
 
-        <button type="submit" className="btn-primary w-full" disabled={loading}>
+        <button type="submit" className="btn btn-primary w-full" disabled={loading}>
           {loading ? "Saving..." : "Continue"}
         </button>
       </form>

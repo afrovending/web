@@ -289,9 +289,9 @@ export default function StepShopInfo({ onNext }: StepProps) {
       form.append("zip", zip || "");
       form.append("category_id", String(selectedCategory.id));
 
-      // If your backend expects logo/banner URLs, send them
-      if (logoUrl) form.append("logo_url", logoUrl);
-      if (bannerUrl) form.append("banner_url", bannerUrl);
+      // --- FIX: Attach actual files during creation ---
+      if (logoFile) form.append("logo", logoFile);
+      if (bannerFile) form.append("banner", bannerFile);
 
       const response = await saveShop(form);
 
@@ -462,7 +462,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
             <button
               type="submit"
               disabled={isFormDisabled}
-              className={`w-full h-11 rounded bg-red-600 text-white font-semibold ${
+              className={`btn btn-primary w-full ${
                 isFormDisabled
                   ? "opacity-60 cursor-not-allowed"
                   : "hover:bg-red-700"
