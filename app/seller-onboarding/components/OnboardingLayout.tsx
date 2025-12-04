@@ -24,7 +24,7 @@ export default function OnboardingLayout({
       <div className="w-full mb-2">
         <Image
           src="/store-bg.jpg"
-          alt="Ayokah Banner"
+          alt="Afrovending Banner"
           width={1920}
           height={160}
           className="w-full h-40 object-cover"

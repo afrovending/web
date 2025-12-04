@@ -61,6 +61,7 @@ export default function LoginPage() {
       // Store in Zustand auth store
       useAuthStore.getState().setAuth(result.token, result.user);
 
+      const hasShop = !!result.hasShop;
       // Store in cookies
       document.cookie = `token=${result.token}; path=/;`;
       document.cookie = `role=${result.user.role}; path=/;`;
@@ -68,15 +69,22 @@ export default function LoginPage() {
       // Redirect based on role
       const role = result.user.role;
 
+      // Redirect logic
       if (role === "customer") {
         router.replace("/account");
+        toast.success("Welcome Back");
       } else if (role === "vendor") {
-        router.replace("/dashboard");
+        if (hasShop) {
+          toast.success("Welcome Back");
+          router.replace("/dashboard");
+        } else {
+          toast.success("Setup your shop to continue");
+          router.replace("/seller-onboarding");
+        }
       } else {
-        // router.replace("/");
+        // Fallback (should not happen)
+        router.replace("/");
       }
-
-      toast.success("Welcome Back");
     } catch (error) {
       let message = "Login failed. Please try again.";
 

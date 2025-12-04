@@ -64,7 +64,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex">
       {/* Left Column */}
       <div className="relative hidden lg:block h-full w-1/2">
         <Image
@@ -169,7 +169,7 @@ export default function RegisterPage() {
                 {ROLE_OPTIONS.map((opt) => (
                   <label
                     key={opt.value}
-                    className="flex items-center gap-3 p-3 border rounded-md cursor-pointer bg-white hover:bg-gray-50"
+                    className="flex items-center gap-3 p-3 border border-red-100 rounded-md cursor-pointer bg-white hover:bg-gray-50"
                   >
                     <input
                       type="checkbox"

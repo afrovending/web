@@ -28,7 +28,7 @@ const TermsContent: React.FC = () => {
               your credentials secure.
             </li>
             <li>
-              Changes to Terms: Ayokah may update these Terms at any time.
+              Changes to Terms: Afrovending may update these Terms at any time.
               Continued use constitutes acceptance.
             </li>
           </ul>
@@ -38,16 +38,16 @@ const TermsContent: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">2. Services</h2>
           <ul className="list-disc list-inside text-gray-700 space-y-1">
             <li>
-              Products & Services: Ayokah offers groceries, meals, household
-              items, event catering, and service bookings. Availability and
-              pricing may change without notice.
+              Products & Services: Afrovending offers groceries, meals,
+              household items, event catering, and service bookings.
+              Availability and pricing may change without notice.
             </li>
             <li>
               Service Bookings: Bookings are subject to availability and
               confirmation via email or account dashboard.
             </li>
             <li>
-              Shipping: Ayokah uses EasyPost to manage shipping, generate
+              Shipping: Afrovending uses EasyPost to manage shipping, generate
               labels, and track deliveries. Customers are responsible for
               accurate addresses.
             </li>
@@ -119,7 +119,7 @@ const TermsContent: React.FC = () => {
             7. Disclaimers & Limitations
           </h2>
           <p className="text-gray-700">
-            Services are provided “as is.” Ayokah is not liable for delays,
+            Services are provided “as is.” Afrovending is not liable for delays,
             damages, or losses from shipping or third-party errors. Liability is
             limited to the amount paid for the Services.
           </p>
