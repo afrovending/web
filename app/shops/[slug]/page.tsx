@@ -128,7 +128,7 @@ const Items: FC = () => {
    *  UI
    * ------------------------- */
   return (
-    <div className="p-4 bg-orange-50 min-h-screen">
+    <div className="p-4 bg-red-50 min-h-screen">
       {/* Search Input */}
       <div className="mb-4">
         <input
@@ -161,10 +161,10 @@ const Items: FC = () => {
 
                   {/* Hover Buttons */}
                   <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition">
-                    <button className="bg-white rounded-full p-2 shadow hover:bg-orange-100">
+                    <button className="bg-white rounded-full p-2 shadow hover:bg-red-100">
                       <ShoppingBagIcon className="w-5 h-5 text-black" />
                     </button>
-                    <button className="bg-white rounded-full p-2 shadow hover:bg-orange-100">
+                    <button className="bg-white rounded-full p-2 shadow hover:bg-red-100">
                       <HeartIcon className="w-5 h-5 text-black" />
                     </button>
                   </div>

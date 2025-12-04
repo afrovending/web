@@ -39,13 +39,13 @@ export default function NotificationPage() {
     <>
       <div className="card mb-6">
         <h2 className="text-lg font-semibold flex items-center">
-          <FiBell className="text-orange-800 text-xl mr-2" size={24} />
+          <FiBell className="text-red-800 text-xl mr-2" size={24} />
           Notifications
         </h2>
         <p className="text-sm mt-1 text-gray-600">
           From your account dashboard, you can easily get latest updates from
           your orders, products, coupons and other related
-          <span className="text-orange-800"> notifications </span>.
+          <span className="text-red-800"> notifications </span>.
         </p>
       </div>
 
@@ -54,7 +54,7 @@ export default function NotificationPage() {
         {notifications.map((noti: any, index) => (
           <div
             key={index}
-            className="flex items-center gap-3 p-4 card bg-orange-50/50!"
+            className="flex items-center gap-3 p-4 card bg-red-50/50!"
           >
             {noti.image ? (
               <Image
@@ -65,7 +65,7 @@ export default function NotificationPage() {
                 className="rounded-lg object-cover"
               />
             ) : (
-              <div className="w-12 h-12 bg-orange-100 rounded-lg" />
+              <div className="w-12 h-12 bg-red-100 rounded-lg" />
             )}
 
             <div className="flex-1">

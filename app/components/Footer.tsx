@@ -9,7 +9,7 @@ import { COMPANY_CONTACT_INFO } from "@/setting";
 
 export default function Footer() {
   return (
-    <footer className="bg-orange-50 text-orange-900 py-5">
+    <footer className="bg-red-50 text-red-900 py-5">
       <div className="max-w-1xl mx-auto px-4 md:px-8">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           {/* Logo */}
@@ -27,7 +27,9 @@ export default function Footer() {
                 />
               </Link>
             </div>
-            <span className="text-sm truncate">{COMPANY_CONTACT_INFO.companyDescription}</span>
+            <span className="text-sm truncate">
+              {COMPANY_CONTACT_INFO.companyDescription}
+            </span>
           </div>
 
           {/* About */}

@@ -32,7 +32,7 @@ export default function ItemTabs({
           onClick={() => setActiveTab("description")}
           className={`px-4 py-2 text-sm font-medium cursor-pointer ${
             activeTab === "description"
-              ? "border-b-2 border-orange-800 text-orange-800"
+              ? "border-b-2 border-red-800 text-red-800"
               : "text-gray-400 hover:text-gray-200"
           }`}
         >
@@ -42,7 +42,7 @@ export default function ItemTabs({
           onClick={() => setActiveTab("reviews")}
           className={`px-4 py-2 text-sm font-medium cursor-pointer ${
             activeTab === "reviews"
-              ? "border-b-2 border-orange-800 text-orange-800"
+              ? "border-b-2 border-red-800 text-red-800"
               : "text-gray-400 hover:text-gray-200"
           }`}
         >

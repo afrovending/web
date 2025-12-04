@@ -138,12 +138,12 @@ export default function Orders() {
     <div>
       <div className="card mb-6">
         <h2 className="text-lg font-semibold flex items-center">
-          <FiPackage className="text-orange-800 text-xl mr-2" size={24} />
+          <FiPackage className="text-red-800 text-xl mr-2" size={24} />
           Orders
         </h2>
         <p className="text-sm mt-1 text-gray-600">
           From your account, you can easily manage your recent
-          <span className="text-orange-800"> orders </span>
+          <span className="text-red-800"> orders </span>
         </p>
       </div>
 
@@ -154,7 +154,7 @@ export default function Orders() {
           placeholder="Search orders by product name"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border border-orange-200 rounded-lg px-3 py-2 w-full focus:outline-none"
+          className="border border-red-200 rounded-lg px-3 py-2 w-full focus:outline-none"
         />
       </div>
 
@@ -226,7 +226,7 @@ export default function Orders() {
               </div>
 
               {/* Items */}
-              <div className="mt-4 border-t border-orange-200 pt-4 space-y-4">
+              <div className="mt-4 border-t border-red-200 pt-4 space-y-4">
                 {order.order_items.map((item) => (
                   <Link
                     key={item.id}

@@ -47,7 +47,6 @@ export default function GoogleSignInButton() {
   }) => {
     const id_token = response.credential;
     if (!id_token) {
-      console.error("Google response missing credential (ID Token).");
       toast.error("Google login failed: Missing token.");
       return;
     }
@@ -74,7 +73,7 @@ export default function GoogleSignInButton() {
       if (role === "customer") {
         router.push("/account"); 
       } else if (role === "vendor") {
-        router.push("/dashboard"); // seller dashboard
+        router.push("/dashboard");
       } else {
         // router.push("/"); 
       }
@@ -145,7 +144,6 @@ export default function GoogleSignInButton() {
         Sign in to your account
       </h2>
 
-      {/* Target div where Google will render the button */}
       <div id="g_id_signin" className="mb-4"></div>
     </div>
   );

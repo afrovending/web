@@ -193,7 +193,6 @@ export default function StepShopInfo({ onNext }: StepProps) {
     setLat(addr.lat);
     setLng(addr.lng);
   };
- 
 
   const handleBannerFile = async (file?: File) => {
     if (!file) return;
@@ -206,11 +205,9 @@ export default function StepShopInfo({ onNext }: StepProps) {
     setBannerUrl(previewUrl); // instant preview
 
     try {
-      const resp = await(
-        shopId
-          ? updateShopBanner(shopId, file)
-          : Promise.reject("Shop ID is missing")
-      );
+      const resp = await (shopId
+        ? updateShopBanner(shopId, file)
+        : Promise.reject("Shop ID is missing"));
       // Show toast based on API response message
       if (resp?.status === "success") {
         toast.success(resp?.message ?? "Banner uploaded successfully");
@@ -235,11 +232,9 @@ export default function StepShopInfo({ onNext }: StepProps) {
     setLogoUrl(previewUrl); // instant preview
 
     try {
-      const resp = await(
-        shopId
-          ? updateShopLogo(shopId, file)
-          : Promise.reject("Shop ID is missing")
-      );
+      const resp = await (shopId
+        ? updateShopLogo(shopId, file)
+        : Promise.reject("Shop ID is missing"));
       // Show toast based on API response message
       if (resp?.status === "success") {
         toast.success(resp?.message ?? "Logo uploaded successfully");
@@ -316,7 +311,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
 
           {/* Pencil Icon for Banner */}
           <label className="absolute top-2 right-2 p-2 bg-white rounded-full cursor-pointer shadow hover:bg-gray-100">
-            <FaPencil className="text-orange-700" />
+            <FaPencil className="text-red-700" />
             <input
               type="file"
               accept="image/*"
@@ -329,7 +324,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
         </div>
 
         {/* Logo - overlaps banner */}
-        <div className="absolute left-4 -translate-y-1/2 top-full w-24 h-24 sm:w-32 sm:h-32 border-2 border-orange-900 rounded-full overflow-hidden bg-gray-50 shadow-xl">
+        <div className="absolute left-4 -translate-y-1/2 top-full w-24 h-24 sm:w-32 sm:h-32 border-2 border-red-900 rounded-full overflow-hidden bg-gray-50 shadow-xl">
           {logoUrl ? (
             <img
               src={logoUrl}
@@ -344,7 +339,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
 
           {/* Pencil Icon for Logo */}
           <label className="absolute bottom-1 right-1 p-2 bg-white rounded-full cursor-pointer shadow hover:bg-gray-100">
-            <FaPencil className="text-orange-700 text-sm sm:text-base" />
+            <FaPencil className="text-red-700 text-sm sm:text-base" />
             <input
               type="file"
               accept="image/*"
@@ -440,17 +435,17 @@ export default function StepShopInfo({ onNext }: StepProps) {
               onChange={setDescription}
               rows={5}
               limit={LIMIT}
-            /> 
+            />
           </div>
 
           <div className="pt-2">
             <button
               type="submit"
               disabled={isFormDisabled}
-              className={`w-full h-11 rounded bg-orange-600 text-white font-semibold ${
+              className={`w-full h-11 rounded bg-red-600 text-white font-semibold ${
                 isFormDisabled
                   ? "opacity-60 cursor-not-allowed"
-                  : "hover:bg-orange-700"
+                  : "hover:bg-red-700"
               }`}
             >
               {loading ? (

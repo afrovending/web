@@ -136,7 +136,7 @@ const Items: FC<ItemsProps> = ({}) => {
                 alt={categoryInfo.name}
                 width={150}
                 height={150}
-                className="w-36 h-36 rounded-full object-cover border-4 border-orange-100 shrink-0"
+                className="w-36 h-36 rounded-full object-cover border-4 border-red-100 shrink-0"
               />
             )}
             <div className="text-center md:text-left">
@@ -172,10 +172,10 @@ const Items: FC<ItemsProps> = ({}) => {
                     className="w-full h-56 object-cover"
                   />
                   <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition">
-                    <button className="bg-white rounded-full p-2 shadow hover:bg-orange-100">
+                    <button className="bg-white rounded-full p-2 shadow hover:bg-red-100">
                       <ShoppingBagIcon className="w-5 h-5 text-black cursor-pointer" />
                     </button>
-                    <button className="bg-white rounded-full p-2 shadow hover:bg-orange-100">
+                    <button className="bg-white rounded-full p-2 shadow hover:bg-red-100">
                       <HeartIcon className="w-5 h-5 text-black cursor-pointer" />
                     </button>
                   </div>

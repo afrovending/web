@@ -207,7 +207,7 @@ export default function OrderSummary({
                 className={`flex gap-4 items-center p-4 rounded-lg border cursor-pointer transition
                   ${
                     active
-                      ? "border-orange-800 bg-blue-50 scale-[1.02]"
+                      ? "border-red-800 bg-blue-50 scale-[1.02]"
                       : "border-gray-200 hover:border-gray-400 hover:scale-[1.01]"
                   }
                 `}
@@ -241,7 +241,7 @@ export default function OrderSummary({
       )}
 
       {/* Total */}
-      <div className="flex justify-between mt-6 pt-4 border-t border-orange-800 text-lg font-semibold text-gray-800">
+      <div className="flex justify-between mt-6 pt-4 border-t border-red-800 text-lg font-semibold text-gray-800">
         <span>Total</span>
         <span>
           {shippingFee > 0

@@ -257,14 +257,14 @@ export default function CheckoutPage() {
                   value={serviceNote}
                   onChange={(e) => setServiceNote(e.target.value)}
                   rows={4}
-                  className="border border-gray-200 p-3 rounded md:col-span-2 focus:ring-orange-800 focus:border-orange-800 focus:outline-none transition duration-150"
+                  className="border border-gray-200 p-3 rounded md:col-span-2 focus:ring-red-800 focus:border-red-800 focus:outline-none transition duration-150"
                   required
                 />
                 <input
                   type="datetime-local"
                   value={preferredDate}
                   onChange={(e) => setPreferredDate(e.target.value)}
-                  className="border border-gray-200 p-3 rounded md:col-span-2 focus:ring-orange-800 focus:border-orange-800 focus:outline-none transition duration-150"
+                  className="border border-gray-200 p-3 rounded md:col-span-2 focus:ring-red-800 focus:border-red-800 focus:outline-none transition duration-150"
                   required
                 />
               </>

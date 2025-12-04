@@ -73,7 +73,7 @@ export default function WalletCard({
                 {formatAmount(wallet?.available_to_withdraw)}
               </span>
               &nbsp;•&nbsp; Pending:
-              <span className="font-semibold text-orange-800">
+              <span className="font-semibold text-red-800">
                 {" "}
                 {formatAmount(wallet?.pending)}
               </span>

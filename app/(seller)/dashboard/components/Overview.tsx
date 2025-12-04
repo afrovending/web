@@ -28,14 +28,14 @@ const StatCard: React.FC<StatCardProps> = ({
   icon: Icon,
 }) => (
   // Removed explicit width classes here. The parent grid handles the layout now.
-  <div className="card border-b-4 border-orange-300 p-4 cursor-pointer hover:bg-orange-50 transition duration-300 ease-in-out hover:shadow-lg transform hover:-translate-y-1 rounded-lg">
+  <div className="card border-b-4 border-red-300 p-4 cursor-pointer hover:bg-red-50 transition duration-300 ease-in-out hover:shadow-lg transform hover:-translate-y-1 rounded-lg">
     <div className="flex items-center justify-between mb-0">
       <div className="text-sm font-medium text-gray-500">{title}</div>
-      <Icon className="text-xl text-orange-500" />
+      <Icon className="text-xl text-red-500" />
     </div>
     {/* Value section */}
     <div className="flex items-baseline gap-2">
-      <div className="text-4xl font-bold text-orange-900">
+      <div className="text-4xl font-bold text-red-900">
         {loading ? (
           <Skeleton
             width={80}

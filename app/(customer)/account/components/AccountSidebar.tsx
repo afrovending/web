@@ -6,8 +6,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { CUSTOMER_MENU } from "@/setting";
 import { FiLogOut } from "react-icons/fi";
 
-
-
 export default function AccountSidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -16,7 +14,7 @@ export default function AccountSidebar() {
 
   const handleLogout = () => {
     clearAuth();
-    router.push("/login"); 
+    router.push("/login");
   };
   return (
     <aside className="md:sticky md:top-28 bg-white rounded-xl shadow-sm p-4 overflow-x-auto md:overflow-visible">
@@ -33,14 +31,14 @@ export default function AccountSidebar() {
               className={`flex items-center gap-3 px-3 py-2 rounded-lg whitespace-nowrap transition-all duration-200
                 ${
                   isActive
-                    ? "bg-orange-100 text-orange-800 font-medium"
+                    ? "bg-red-100 text-red-800 font-medium"
                     : "hover:bg-gray-100 text-gray-700"
                 }
               `}
             >
               <Icon
                 size={18}
-                className={isActive ? "text-orange-800" : "text-gray-500"}
+                className={isActive ? "text-red-800" : "text-gray-500"}
               />
               <span>{item.name}</span>
             </Link>

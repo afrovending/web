@@ -36,38 +36,37 @@ export default function WithdrawalHistory() {
   const [limit] = useState<number>(3);
   const [total, setTotal] = useState<number>(0);
 
-async function fetchWithdrawals(loadMore = false) {
-  try {
-    if (loadMore) {
-      setLoadingMore(true);
-    } else {
-      setLoading(true);
-      setOffset(0);
-    }
-
-    const currentOffset = loadMore ? offset : 0;
-    const response: ApiResponse = await getWithdrawalHistory(
-      currentOffset,
-      limit
-    );
-
-    if (response.status === "success") {
-      setTotal(response.total);
+  async function fetchWithdrawals(loadMore = false) {
+    try {
       if (loadMore) {
-        setWithdrawals((prev) => [...prev, ...response.data]);
+        setLoadingMore(true);
       } else {
-        setWithdrawals(response.data);
+        setLoading(true);
+        setOffset(0);
       }
-      setOffset(currentOffset + limit);
-    }
-  } catch (err) {
-    console.error("Failed to fetch withdrawal history:", err);
-  } finally {
-    setLoading(false);
-    setLoadingMore(false);
-  }
-}
 
+      const currentOffset = loadMore ? offset : 0;
+      const response: ApiResponse = await getWithdrawalHistory(
+        currentOffset,
+        limit
+      );
+
+      if (response.status === "success") {
+        setTotal(response.total);
+        if (loadMore) {
+          setWithdrawals((prev) => [...prev, ...response.data]);
+        } else {
+          setWithdrawals(response.data);
+        }
+        setOffset(currentOffset + limit);
+      }
+    } catch (err) {
+      console.error("Failed to fetch withdrawal history:", err);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }
 
   useEffect(() => {
     fetchWithdrawals();
@@ -89,7 +88,7 @@ async function fetchWithdrawals(loadMore = false) {
           ))}
         </>
       ) : withdrawals.length === 0 ? (
-        <p className="text-orange-800! card text-center text-sm">
+        <p className="text-red-800! card text-center text-sm">
           No withdrawals yet.
         </p>
       ) : (
@@ -110,7 +109,7 @@ async function fetchWithdrawals(loadMore = false) {
                       ? "text-green-600"
                       : w.status === "declined"
                       ? "text-red-600"
-                      : "text-orange-600"
+                      : "text-red-600"
                   }`}
                 >
                   {w.status}
@@ -122,8 +121,8 @@ async function fetchWithdrawals(loadMore = false) {
                 {w.settlement_account.name})
               </p>
             </div>
-            <div className="text-xs text-orange-800 flex items-center">
-            <FiClock />  {formatHumanReadableDate(w.created_at)}
+            <div className="text-xs text-red-800 flex items-center">
+              <FiClock /> {formatHumanReadableDate(w.created_at)}
             </div>
           </div>
         ))

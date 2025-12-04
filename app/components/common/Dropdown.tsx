@@ -38,7 +38,7 @@ export default function Dropdown({
         leaveTo="opacity-0 translate-y-1"
       >
         <MenuItems
-          className={`absolute ${positionClass} mt-3 ${width} bg-white border border-orange-100 rounded-lg shadow-lg p-3 z-50 focus:outline-none`}
+          className={`absolute ${positionClass} mt-3 ${width} bg-white border border-red-100 rounded-lg shadow-lg p-3 z-50 focus:outline-none`}
         >
           {children}
         </MenuItems>

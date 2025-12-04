@@ -31,7 +31,7 @@ const reviews = [
     date: "30 Apr, 2024",
   },
 ];
- 
+
 export default function ItemDetail({ product }: { product: Item }) {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(
@@ -104,9 +104,7 @@ export default function ItemDetail({ product }: { product: Item }) {
                   width={80}
                   height={80}
                   className={`rounded-md cursor-pointer border ${
-                    selectedImage === img
-                      ? "border-orange-800"
-                      : "border-gray-200"
+                    selectedImage === img ? "border-red-800" : "border-gray-200"
                   }`}
                   onClick={() => setSelectedImage(img)}
                 />
@@ -148,7 +146,7 @@ export default function ItemDetail({ product }: { product: Item }) {
                   <span className="line-through text-gray-400">
                     {formatAmount(regularPrice)}
                   </span>
-                  <span className="text-orange-800 font-semibold">
+                  <span className="text-red-800 font-semibold">
                     -{discount}%
                   </span>
                 </>
@@ -188,10 +186,10 @@ export default function ItemDetail({ product }: { product: Item }) {
                   }}
                   className={`btn btn-primary rounded-full! text-xs! ${
                     added
-                      ? "bg-orange-800 text-white scale-105"
+                      ? "bg-red-800 text-white scale-105"
                       : isInCart
-                      ? "bg-orange-800 text-white hover:bg-orange-700"
-                      : "bg-orange-400 text-white hover:bg-orange-800"
+                      ? "bg-red-800 text-white hover:bg-red-700"
+                      : "bg-red-400 text-white hover:bg-red-800"
                   }`}
                 >
                   {added ? (
@@ -210,10 +208,10 @@ export default function ItemDetail({ product }: { product: Item }) {
                   onClick={handleAddToCart}
                   className={`btn btn-primary rounded-full! text-xs! ${
                     added
-                      ? "bg-orange-800 text-white scale-105"
+                      ? "bg-red-800 text-white scale-105"
                       : isInCart
-                      ? "bg-orange-800 text-white hover:bg-orange-700"
-                      : "bg-orange-400 text-white hover:bg-orange-800"
+                      ? "bg-red-800 text-white hover:bg-red-700"
+                      : "bg-red-400 text-white hover:bg-red-800"
                   }`}
                 >
                   {added ? (
@@ -238,7 +236,7 @@ export default function ItemDetail({ product }: { product: Item }) {
                 <Link
                   target="_blank"
                   title="relative items"
-                  className="text-orange-800"
+                  className="text-red-800"
                   href={`/items?category=${product.category?.slug}&type=${product.type}`}
                 >
                   {product.category?.name}
@@ -252,7 +250,7 @@ export default function ItemDetail({ product }: { product: Item }) {
                 <Link
                   target="_blank"
                   title="Seller shop"
-                  className="text-orange-800"
+                  className="text-red-800"
                   href={`/shops/${product?.shop?.slug}`}
                 >
                   {product?.shop?.name}{" "}

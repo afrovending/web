@@ -61,7 +61,7 @@ export default function ShopPageContent() {
                     className="rounded-full border"
                   />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-orange-600 transition">
+                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-red-600 transition">
                       {shop.name}
                     </h3>
                     <p className="text-sm text-gray-500">
@@ -77,13 +77,11 @@ export default function ShopPageContent() {
 
                 {/* Location */}
                 <p className="text-sm text-gray-500 flex items-center">
-                  <FaMapMarker />  {shop.city}, {shop.state}
+                  <FaMapMarker /> {shop.city}, {shop.state}
                 </p>
 
                 {/* Visit Shop button */}
-                <button className="mt-4 btn btn-primary">
-                  Visit Shop
-                </button>
+                <button className="mt-4 btn btn-primary">Visit Shop</button>
               </div>
             </Link>
           ))}

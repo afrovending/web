@@ -62,7 +62,7 @@ export default function ItemForm({ onClose, item }: ItemFormProps) {
   // form state
   const [title, setTitle] = useState(item?.title ?? "");
   const [description, setDescription] = useState(item?.description ?? "");
-  
+
   const [salesPrice, setSalesPrice] = useState<string>(
     item?.sales_price ? String(item.sales_price) : ""
   );
@@ -692,7 +692,7 @@ export default function ItemForm({ onClose, item }: ItemFormProps) {
           {imagePreviews.map((src, idx) => (
             <div
               key={idx}
-              className="relative rounded-lg overflow-hidden h-28  border border-orange-950"
+              className="relative rounded-lg overflow-hidden h-28  border border-red-950"
             >
               <Image
                 src={src}

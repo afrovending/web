@@ -8,7 +8,6 @@ import { FaFlagCheckered } from "react-icons/fa";
 
 type StepImagesProps = { shopId: number; onNext?: (data?: any) => void };
 
-
 export default function StepImages({ shopId, onNext }: StepImagesProps) {
   const [logo, setLogo] = useState<File | null>(null);
   const [banner, setBanner] = useState<File | null>(null);
@@ -95,9 +94,9 @@ export default function StepImages({ shopId, onNext }: StepImagesProps) {
 
   return (
     <>
-      <div className="border border-orange-100 p-4 rounded-md mb-6">
+      <div className="border border-red-100 p-4 rounded-md mb-6">
         <h2 className="text-lg font-semibold flex items-center">
-          <FaFlagCheckered className="text-orange-800 text-xl mr-2" size={24} />
+          <FaFlagCheckered className="text-red-800 text-xl mr-2" size={24} />
           Shop or Business Images
         </h2>
         <p className="text-sm mt-1 text-gray-600">

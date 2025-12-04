@@ -16,11 +16,11 @@ export default function DesktopSearch() {
   return (
     <div className="hidden md:flex flex-1 mx-6 relative">
       <div
-        className="flex items-center w-full max-w-xl border border-orange-50 rounded-full px-4 py-2 bg-orange-200 shadow-sm"
+        className="flex items-center w-full max-w-xl border border-red-50 rounded-full px-4 py-2 bg-red-200 shadow-sm"
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)} // This is simple; a more robust solution might use focus-within
       >
-        <MagnifyingGlassIcon className="w-5 h-5 text-orange-400" />
+        <MagnifyingGlassIcon className="w-5 h-5 text-red-400" />
         <input
           type="text"
           placeholder="Search for products..."

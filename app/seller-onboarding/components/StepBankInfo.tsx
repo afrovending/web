@@ -56,9 +56,9 @@ export default function StepBankInfo({ onNext }: StepProps) {
 
   return (
     <>
-      <div className="border border-orange-100 p-4 rounded-md mb-6">
+      <div className="border border-red-100 p-4 rounded-md mb-6">
         <h2 className="text-lg font-semibold flex items-center">
-          <FaCashRegister className="text-orange-800 text-xl mr-2" size={24} />
+          <FaCashRegister className="text-red-800 text-xl mr-2" size={24} />
           Bank Information
         </h2>
         <p className="text-sm mt-1 text-gray-600">

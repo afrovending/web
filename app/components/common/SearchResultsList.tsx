@@ -33,7 +33,7 @@ export default function SearchResultsList({
             <Link
               href={`/items/${item.slug}`}
               onClick={onItemClick}
-              className="block p-3 hover:bg-orange-50 text-gray-700 transition"
+              className="block p-3 hover:bg-red-50 text-gray-700 transition"
             >
               {item.title}
             </Link>

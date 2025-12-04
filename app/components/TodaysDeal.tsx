@@ -58,7 +58,7 @@ const TodaysDeal: FC = () => {
             Today`s Deal for You
           </h2>
           <ArrowRightCircleIcon
-            className="w-6 h-6 text-orange-800 cursor-pointer"
+            className="w-6 h-6 text-red-800 cursor-pointer"
             onClick={() => router.push("/items")}
           />
         </div>
@@ -84,10 +84,10 @@ const TodaysDeal: FC = () => {
 
                     {/* Floating Buttons */}
                     <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition">
-                      <button className="bg-white rounded-full p-2 shadow hover:bg-orange-100">
+                      <button className="bg-white rounded-full p-2 shadow hover:bg-red-100">
                         <ShoppingBagIcon className="w-5 h-5 text-black" />
                       </button>
-                      <button className="bg-white rounded-full p-2 shadow hover:bg-orange-100">
+                      <button className="bg-white rounded-full p-2 shadow hover:bg-red-100">
                         <HeartIcon className="w-5 h-5 text-black" />
                       </button>
                     </div>

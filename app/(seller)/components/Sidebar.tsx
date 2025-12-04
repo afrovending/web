@@ -52,7 +52,7 @@ export function Sidebar({
             prefetch={true}
             className={`block p-3 rounded-lg text-sm font-medium ${
               currentPath.startsWith(item.href)
-                ? "bg-orange-100 text-orange-700"
+                ? "bg-red-100 text-red-700"
                 : "text-gray-700 hover:bg-gray-100"
             }`}
             onClick={toggleSidebar}

@@ -126,7 +126,7 @@ const COMPANY_DATA: CompanyData = {
 // Type the component props explicitly
 const BusinessCard: React.FC<{ business: Business }> = ({ business }) => (
   <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border border-gray-100">
-    <business.icon className="w-10 h-10 text-orange-600 mb-4 bg-orange-50 p-2 rounded-lg" />
+    <business.icon className="w-10 h-10 text-red-600 mb-4 bg-red-50 p-2 rounded-lg" />
     <h3 className="text-xl font-bold text-gray-900 mb-3">{business.name}</h3>
     <p className="text-gray-600 mb-4 text-sm">{business.description}</p>
 
@@ -157,8 +157,8 @@ const BusinessCard: React.FC<{ business: Business }> = ({ business }) => (
 
 // Type the component props explicitly
 const ValueCard: React.FC<{ value: CoreValue }> = ({ value }) => (
-  <div className="flex flex-col items-center text-center p-6 bg-orange-50 rounded-lg shadow-inner">
-    <value.icon className="w-8 h-8 text-orange-700 mb-3" />
+  <div className="flex flex-col items-center text-center p-6 bg-red-50 rounded-lg shadow-inner">
+    <value.icon className="w-8 h-8 text-red-700 mb-3" />
     <h4 className="font-semibold text-lg text-gray-900 mb-1">{value.title}</h4>
     <p className="text-sm text-gray-600">{value.description}</p>
   </div>
@@ -170,12 +170,12 @@ const AboutPageContent: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <header className="text-center py-16 bg-white rounded-xl shadow-lg mb-12">
           <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
-            About <span className="text-orange-600">{COMPANY_DATA.name}</span>
+            About <span className="text-red-600">{COMPANY_DATA.name}</span>
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto mb-6">
             {COMPANY_DATA.tagline}
           </p>
-          <div className="max-w-4xl mx-auto p-4 bg-orange-50 rounded-lg border-l-4 border-orange-600">
+          <div className="max-w-4xl mx-auto p-4 bg-red-50 rounded-lg border-l-4 border-red-600">
             <p className="text-md text-gray-800 italic">
               &quot;Ayokah Foods & Services is a modern, people-focused food and
               service marketplace created to make everyday living simpler,
@@ -186,7 +186,7 @@ const AboutPageContent: React.FC = () => {
 
         {/* Core Narrative */}
         <section className="py-12 px-6 bg-white rounded-xl shadow-lg mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-orange-100 pb-2">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-red-100 pb-2">
             Our Story
           </h2>
           <p className="text-lg text-gray-700 leading-relaxed">
@@ -198,7 +198,7 @@ const AboutPageContent: React.FC = () => {
         <section className="grid md:grid-cols-2 gap-8 mb-12">
           {/* Vision Card */}
           <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-[#1B412C]">
-            <div className="flex items-center text-orange-600 mb-4">
+            <div className="flex items-center text-red-600 mb-4">
               <FaBullseye className="w-6 h-6 mr-3" />
               <h3 className="text-2xl font-bold">OUR VISION</h3>
             </div>
@@ -207,7 +207,7 @@ const AboutPageContent: React.FC = () => {
 
           {/* Mission Card */}
           <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-[#1B412C]">
-            <div className="flex items-center text-orange-600 mb-4">
+            <div className="flex items-center text-red-600 mb-4">
               <FaPaperPlane className="w-6 h-6 mr-3" />
               <h3 className="text-2xl font-bold">OUR MISSION</h3>
             </div>

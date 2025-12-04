@@ -15,7 +15,6 @@ interface FormData {
   message: string;
 }
 
-
 const ContactForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -279,7 +278,7 @@ const ContactUsPage: React.FC = () => {
         <header className="text-center py-16 bg-white rounded-xl shadow-lg mb-12">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
             Contact{" "}
-            <span className="text-orange-600">
+            <span className="text-red-600">
               {COMPANY_CONTACT_INFO.companyName}
             </span>
           </h1>
@@ -292,7 +291,7 @@ const ContactUsPage: React.FC = () => {
         <div className="grid lg:grid-cols-3 gap-10">
           {/* Contact Info Sidebar (2/3) */}
           <div className="lg:col-span-1 space-y-8 p-6 lg:p-0">
-            <div className="bg-orange-50 p-6 rounded-xl shadow-md border-l-4 border-orange-600">
+            <div className="bg-red-50 p-6 rounded-xl shadow-md border-l-4 border-red-600">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 Get in Touch
               </h2>
@@ -303,7 +302,7 @@ const ContactUsPage: React.FC = () => {
 
               {/* Address */}
               <div className="flex items-start mb-4">
-                <FaBuilding className="w-6 h-6 text-orange-600 mt-1 shrink-0" />
+                <FaBuilding className="w-6 h-6 text-red-600 mt-1 shrink-0" />
                 <div className="ml-3">
                   <p className="text-sm font-semibold text-gray-900">
                     Physical Address
@@ -316,7 +315,7 @@ const ContactUsPage: React.FC = () => {
 
               {/* Phone */}
               <div className="flex items-start mb-4">
-                <FaPhoneAlt className="w-6 h-6 text-orange-600 mt-1 shrink-0" />
+                <FaPhoneAlt className="w-6 h-6 text-red-600 mt-1 shrink-0" />
                 <div className="ml-3">
                   <p className="text-sm font-semibold text-gray-900">
                     Contact Number
@@ -327,7 +326,7 @@ const ContactUsPage: React.FC = () => {
 
               {/* Email (Derived) */}
               <div className="flex items-start">
-                <FaPaperPlane className="w-6 h-6 text-orange-600 mt-1 shrink-0" />
+                <FaPaperPlane className="w-6 h-6 text-red-600 mt-1 shrink-0" />
                 <div className="ml-3">
                   <p className="text-sm font-semibold text-gray-900">
                     Email Address

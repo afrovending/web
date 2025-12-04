@@ -29,7 +29,7 @@ export default function MobileSearch() {
       <motion.button
         whileTap={{ scale: 0.9 }}
         onClick={openModal}
-        className="md:hidden px-2 py-2 flex items-center justify-center bg-orange-200 rounded-full text-orange-900"
+        className="md:hidden px-2 py-2 flex items-center justify-center bg-red-200 rounded-full text-red-900"
         aria-label="Open search"
       >
         <MagnifyingGlassIcon className="w-5 h-5" />

@@ -134,7 +134,7 @@ function OrderItemsTable({ order }: { order: Order }) {
             <span>Shipping Fee ({order.shipping_method}):</span>
             <span>{formatAmount(parseFloat(order.shipping_fee))}</span>
           </div>
-          <div className="flex justify-between text-lg font-bold border-t pt-2 border-gray-300 text-orange-700">
+          <div className="flex justify-between text-lg font-bold border-t pt-2 border-gray-300 text-red-700">
             <span>Order Total:</span>
             <span>{formatAmount(parseFloat(order.total))}</span>
           </div>

@@ -55,13 +55,13 @@ const TrackOrderPage: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@mail.com"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-800 transition text-gray-700"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800 transition text-gray-700"
               required
             />
             <button
               type="submit"
               disabled={loading}
-              className="cursor-pointer px-6 py-2 bg-[#1B412C] text-white font-semibold rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-800 disabled:bg-orange-300 disabled:cursor-not-allowed transition"
+              className="cursor-pointer px-6 py-2 bg-[#1B412C] text-white font-semibold rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-800 disabled:bg-red-300 disabled:cursor-not-allowed transition"
             >
               {loading ? "Searching..." : "Track"}
             </button>

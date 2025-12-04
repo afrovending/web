@@ -23,7 +23,7 @@ const DashboardPage: React.FC = () => {
     <>
       <div className="card mb-6 hover:shadow-lg transition-all duration-300 rounded-xl bg-white cursor-default">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold flex items-center gap-2 text-orange-800!">
+          <h2 className="text-lg font-semibold flex items-center gap-2 text-red-800!">
             <LuLayoutDashboard />
             Seller Dashboard
           </h2>
@@ -35,7 +35,7 @@ const DashboardPage: React.FC = () => {
         </div>
         <p className="text-sm mt-1 text-gray-600">
           From your dashboard, you can easily access and control your
-          <span className="text-orange-800"> selling platform</span>
+          <span className="text-red-800"> selling platform</span>
         </p>
       </div>
       <div className="space-y-4 text-gray-700 p-4 md:p-0">

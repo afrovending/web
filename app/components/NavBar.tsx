@@ -35,7 +35,7 @@ const iconMap: Record<string, JSX.Element> = {
 
 export default function NavBar() {
   return (
-    <nav className="bg-orange-900 text-white">
+    <nav className="bg-red-900 text-white">
       <div className="container mx-auto flex items-center justify-between px-2">
         <Menu as="div" className="relative">
           <MenuButton className="flex items-center gap-2 bg-yellow-700 text-white px-3 py-3 text-sm font-medium rounded-full hover:bg-yellow-600 active:scale-95 transition-all duration-200 shadow-md focus:outline-none cursor-pointer">

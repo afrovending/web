@@ -28,22 +28,23 @@ type CredentialResponse = {
   select_by?: string;
   clientId?: string;
 };
+
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex">
+    <div className="flex">
       <div className="relative hidden lg:block h-full">
         <Image
           width={1200}
           height={1600}
-          src="https://placehold.co/1200x1600/FDE8C7/333333?text=Ayokah+Foods+And+Services"
+          src="account-header.jpg"
           alt="A woman in traditional African attire"
           className="w-full h-full object-cover"
           unoptimized
         />
-        <div className="absolute inset-0 bg-black opacity-10"></div>
+        <div className="absolute inset-0 bg-gray-50 opacity-10"></div>
       </div>
       {/* Right Column: Form (Full width on small screens) */}
-      <div className="flex items-center justify-center p-8 sm:p-12 w-full">
+      <div className="flex items-center justify-center bg-red-50 p-8 sm:p-12 w-full">
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="mb-8 flex justify-center">

@@ -58,7 +58,7 @@ const CategorySection: FC = () => {
             <div
               key={cat.id}
               onClick={() => handleClick(cat.slug, "products")}
-              className="relative rounded-xl overflow-hidden group cursor-pointer border border-orange-100"
+              className="relative rounded-xl overflow-hidden group cursor-pointer border border-red-100"
             >
               <Image
                 src={cat.image || "/placeholder.png"}
@@ -69,7 +69,7 @@ const CategorySection: FC = () => {
                 className="w-full h-56 object-cover group-hover:scale-105 transition"
               />
               <div className="absolute bottom-3 left-3 right-3">
-                <div className="bg-orange-800 text-white text-center py-2 rounded-lg font-semibold text-sm md:text-base">
+                <div className="bg-red-800 text-white text-center py-2 rounded-lg font-semibold text-sm md:text-base">
                   {cat.name}
                 </div>
               </div>
@@ -96,12 +96,12 @@ const CategorySection: FC = () => {
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center">
-            <p className="text-3xl font-bold text-orange-800 text-center">
+            <p className="text-3xl font-bold text-red-800 text-center">
               {banner.type === "home_service_banner"
                 ? "Nearby Service Providers"
                 : "Essential Daily Needs"}
             </p>
-            <button className="mt-4 bg-orange-100 text-orange-800 px-6 py-2 rounded-full text-sm font-semibold flex items-center gap-2 hover:bg-orange-200 transition cursor-pointer">
+            <button className="mt-4 bg-red-100 text-red-800 px-6 py-2 rounded-full text-sm font-semibold flex items-center gap-2 hover:bg-red-200 transition cursor-pointer">
               <ShoppingBagIcon className="w-5 h-5" /> Shop Now
             </button>
           </div>

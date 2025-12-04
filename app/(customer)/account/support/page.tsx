@@ -9,16 +9,16 @@ export default function CustomerSupportPage() {
     <>
       <div className="card mb-6">
         <h2 className="text-lg font-semibold flex items-center">
-          <FiLifeBuoy className="text-orange-800 text-xl mr-2" size={24} />
+          <FiLifeBuoy className="text-red-800 text-xl mr-2" size={24} />
           Customer Support
         </h2>
         <p className="text-sm mt-1 text-gray-600">
           From your account dashboard, you can easily contact support regarding
           your
-          <span className="text-orange-800"> Orders or other inquiries </span>
+          <span className="text-red-800"> Orders or other inquiries </span>
         </p>
       </div>
-      <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm"> 
+      <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
         <section className="mb-10">
           <h2 className="text-lg font-semibold">Contact Support</h2>
           <p className="text-sm text-gray-500 mb-4">

@@ -24,8 +24,8 @@ const ShippingPage: React.FC = () => {
 
         {/* Shipping Features */}
         <section className="grid md:grid-cols-2 gap-8 mb-12">
-          <div className="flex flex-col justify-center p-6 bg-white rounded-xl shadow-lg border-l-4 border-orange-600">
-            <div className="flex items-center mb-4 text-orange-600">
+          <div className="flex flex-col justify-center p-6 bg-white rounded-xl shadow-lg border-l-4 border-red-600">
+            <div className="flex items-center mb-4 text-red-600">
               <FaTruck className="w-6 h-6 mr-3" />
               <h2 className="text-2xl font-bold">Reliable Shipping</h2>
             </div>
@@ -36,8 +36,8 @@ const ShippingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-col justify-center p-6 bg-white rounded-xl shadow-lg border-l-4 border-orange-600">
-            <div className="flex items-center mb-4 text-orange-600">
+          <div className="flex flex-col justify-center p-6 bg-white rounded-xl shadow-lg border-l-4 border-red-600">
+            <div className="flex items-center mb-4 text-red-600">
               <FaMapMarkerAlt className="w-6 h-6 mr-3" />
               <h2 className="text-2xl font-bold">Real-Time Tracking</h2>
             </div>
@@ -49,8 +49,8 @@ const ShippingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-col justify-center p-6 bg-white rounded-xl shadow-lg border-l-4 border-orange-600">
-            <div className="flex items-center mb-4 text-orange-600">
+          <div className="flex flex-col justify-center p-6 bg-white rounded-xl shadow-lg border-l-4 border-red-600">
+            <div className="flex items-center mb-4 text-red-600">
               <FaShieldAlt className="w-6 h-6 mr-3" />
               <h2 className="text-2xl font-bold">Safe & Secure Delivery</h2>
             </div>
@@ -62,8 +62,8 @@ const ShippingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-col justify-center p-6 bg-white rounded-xl shadow-lg border-l-4 border-orange-600">
-            <div className="flex items-center mb-4 text-orange-600">
+          <div className="flex flex-col justify-center p-6 bg-white rounded-xl shadow-lg border-l-4 border-red-600">
+            <div className="flex items-center mb-4 text-red-600">
               <FaClock className="w-6 h-6 mr-3" />
               <h2 className="text-2xl font-bold">Efficient & Timely</h2>
             </div>
@@ -78,7 +78,7 @@ const ShippingPage: React.FC = () => {
 
         {/* How It Works */}
         <section className="py-12 px-6 bg-white rounded-xl shadow-lg mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-orange-100 pb-2">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-red-100 pb-2">
             How Our Shipping Works
           </h2>
           <ol className="list-decimal list-inside space-y-4 text-gray-700">
@@ -107,7 +107,7 @@ const ShippingPage: React.FC = () => {
         </section>
 
         {/* Contact Section */}
-        <section className="py-12 px-6 bg-orange-50 rounded-xl shadow-lg">
+        <section className="py-12 px-6 bg-red-50 rounded-xl shadow-lg">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Need Assistance?
           </h2>

@@ -19,7 +19,7 @@ export default function CategoriesPageContent() {
   });
 
   return (
-    <div className="px-4 py-10 bg-orange-50 h-screen">
+    <div className="px-4 py-10 bg-red-50 h-screen">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 capitalize">
         Our Categories
       </h2>

@@ -181,15 +181,15 @@ export default function StepShopInfo({ onNext }: StepProps) {
     setIsValidatingPhone(true);
 
     try {
-    const fullNumber = `${selectedCountry.dial_code?.replace(
-      "+",
-      ""
-    )}${phoneNumber}`;
+      const fullNumber = `${selectedCountry.dial_code?.replace(
+        "+",
+        ""
+      )}${phoneNumber}`;
 
-    const data = await numverifyValidatePhone({
-      number: fullNumber,
-      countryCode: selectedCountry.code ?? '',
-    });
+      const data = await numverifyValidatePhone({
+        number: fullNumber,
+        countryCode: selectedCountry.code ?? "",
+      });
 
       setIsPhoneValid(data.valid === true);
     } catch (err) {
@@ -207,7 +207,6 @@ export default function StepShopInfo({ onNext }: StepProps) {
 
     return () => clearTimeout(timer);
   }, [phoneNumber, validatePhoneNumber]);
-
 
   const handleDescriptionChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -292,13 +291,13 @@ export default function StepShopInfo({ onNext }: StepProps) {
     !selectedCountry ||
     !selectedState ||
     isPhoneValid !== true;
-    !selectedCity;
+  !selectedCity;
 
   return (
     <div className="h-full">
-      <div className="border border-orange-100 p-4 rounded-md mb-6">
+      <div className="border border-red-100 p-4 rounded-md mb-6">
         <h2 className="text-lg font-semibold flex items-center">
-          <FaShoppingBag className="text-orange-800 text-xl mr-2" size={24} />
+          <FaShoppingBag className="text-red-800 text-xl mr-2" size={24} />
           Shop or Business Information
         </h2>
         <p className="text-sm mt-1 text-gray-600">
@@ -334,7 +333,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
             </div>
 
             <input
-              className="flex-1 h-[45px] border border-gray-300 rounded-r-lg px-3 focus:ring-2 focus:ring-orange-500 outline-none"
+              className="flex-1 h-[45px] border border-gray-300 rounded-r-lg px-3 focus:ring-2 focus:ring-red-500 outline-none"
               type="tel"
               placeholder="712 345 678"
               maxLength={15}
@@ -365,7 +364,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
 
             {/* Input */}
             <input
-              className="flex-1 h-[45px] border border-gray-300 rounded-r-lg px-3 focus:ring-2 focus:ring-orange-500 outline-none"
+              className="flex-1 h-[45px] border border-gray-300 rounded-r-lg px-3 focus:ring-2 focus:ring-red-500 outline-none"
               type="tel"
               placeholder="712 345 678"
               value={phoneNumber}

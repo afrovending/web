@@ -8,8 +8,8 @@ export default function ShopHeaderCard({ subtitle }: { subtitle?: string }) {
   return (
     <div className="card p-4 border rounded-md bg-white shadow-sm mb-6">
       <div className="flex items-start gap-3">
-        <div className="rounded-md bg-orange-50 p-2">
-          <LuShoppingBag className="text-orange-700" size={22} />
+        <div className="rounded-md bg-red-50 p-2">
+          <LuShoppingBag className="text-red-700" size={22} />
         </div>
         <div>
           <h2 className="text-lg font-semibold text-gray-800">

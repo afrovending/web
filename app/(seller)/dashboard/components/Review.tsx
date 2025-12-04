@@ -93,7 +93,7 @@ export function RecentReviews() {
           href="/customer-feedback"
           className="btn btn-gray flex items-center text-xs!"
         >
-          See all  
+          See all
         </Link>
       </div>
       <div className="mb-6 card">
@@ -106,10 +106,7 @@ export function RecentReviews() {
             </div>
           ) : (
             reviews.map((review) => (
-              <div
-                key={review.id}
-                className="border-b border-orange-50"
-              >
+              <div key={review.id} className="border-b border-red-50">
                 <ReviewCard review={review} />
               </div>
             ))

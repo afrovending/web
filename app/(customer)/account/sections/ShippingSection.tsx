@@ -289,7 +289,7 @@ export default function ShippingSection({ user }: ShippingSectionProps) {
           </p>
 
           <button
-            className="mt-3 text-orange-800 hover:underline cursor-pointer"
+            className="mt-3 text-red-800 hover:underline cursor-pointer"
             onClick={() => setIsEditing(true)}
           >
             Edit Shipping Address

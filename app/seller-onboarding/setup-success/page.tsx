@@ -77,7 +77,7 @@ function SuccessContent() {
   if (status === "loading") {
     return (
       <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-orange-500 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-500 mx-auto mb-4"></div>
         <h2 className="text-xl font-semibold text-gray-700">
           Finalizing your shop setup...
         </h2>
@@ -101,7 +101,7 @@ function SuccessContent() {
         </p>
         <Link
           href="/seller-onboarding"
-          className="text-orange-600 font-medium hover:text-orange-700 underline"
+          className="text-red-600 font-medium hover:text-red-700 underline"
         >
           Return to Onboarding
         </Link>
@@ -121,8 +121,8 @@ function SuccessContent() {
         Your subscription is active and your shop has been created successfully.
       </p>
 
-      <div className="bg-orange-50 border border-orange-100 rounded-lg p-4 mb-8">
-        <p className="text-sm text-orange-800 font-medium">
+      <div className="bg-red-50 border border-red-100 rounded-lg p-4 mb-8">
+        <p className="text-sm text-red-800 font-medium">
           Redirecting to your dashboard in {countdown}s...
         </p>
       </div>
