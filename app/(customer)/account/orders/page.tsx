@@ -166,9 +166,20 @@ export default function Orders() {
           ))}
         </div>
       ) : error ? (
-        <p className="text-red-500">{error}</p>
+        <div className="flex flex-col items-center justify-center py-10 text-red-500">
+          <FiPackage className="text-red-500 text-xl mr-2" size={24} />
+
+          <p className="text-lg font-medium">{error}</p>
+        </div>
       ) : orders.length === 0 ? (
-        <p className="text-gray-500">No orders found.</p>
+        <div className="flex flex-col items-center justify-center py-10 text-gray-500 animate-fadeIn card">
+          <FiPackage className="text-red-800 text-xl mr-2" size={24} />
+
+          <h3 className="text-xl font-semibold mb-1">No Orders Found</h3>
+          <p className="text-sm text-gray-400 text-center max-w-xs">
+            You currently have no orders
+          </p>
+        </div>
       ) : (
         <div className="space-y-4">
           {orders.map((order) => (
@@ -270,7 +281,6 @@ export default function Orders() {
       )}
 
       {/* review model */}
-      {/* review modal */}
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => {

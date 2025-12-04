@@ -19,7 +19,6 @@ import FadeSlide from "./components/FadeSlide";
 import GoogleAddressAutocomplete from "./components/GoogleAddressAutocomplete";
 import PhoneInput from "./components/PhoneInput";
 import TextareaField from "./components/TextareaField";
-import ImageUploader from "./components/ImageUploader";
 import { Option } from "./components/CategorySelector";
 import { FaPencil } from "react-icons/fa6";
 

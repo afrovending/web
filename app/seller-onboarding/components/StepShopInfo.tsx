@@ -1,18 +1,28 @@
 "use client";
 
-import SelectField from "@/app/components/common/SelectField";
-import { useState, useEffect, useCallback, useMemo } from "react";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
-import { BeatLoader } from "react-spinners";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { listCategories } from "@/lib/api/category";
-import { saveShop } from "@/lib/api/seller/shop";
-import { FaShoppingBag } from "react-icons/fa";
-import toast from "react-hot-toast";
-import { StepProps } from "@/interfaces/StepProps";
-import { locationData } from "@/data/locations";
+import {
+  getMyShop,
+  saveShop,
+  updateShopLogo,
+  updateShopBanner,
+} from "@/lib/api/seller/shop";
 import { numverifyValidatePhone } from "@/lib/api/ip/route";
+import toast from "react-hot-toast";
+import { BeatLoader } from "react-spinners";
+import { StepProps } from "@/interfaces/StepProps";
+import { FaPencil } from "react-icons/fa6";
+import ShopHeaderCard from "@/app/(seller)/shop-management/components/ShopHeaderCard";
+import CategorySelector from "@/app/(seller)/shop-management/components/CategorySelector";
+import FadeSlide from "@/app/(seller)/shop-management/components/FadeSlide";
+import GoogleAddressAutocomplete from "@/app/(seller)/shop-management/components/GoogleAddressAutocomplete";
+import PhoneInput from "@/app/(seller)/shop-management/components/PhoneInput";
+import TextareaField from "@/app/(seller)/shop-management/components/TextareaField";
+import TextInput from "@/app/(seller)/shop-management/components/TextInput";
+import { DefaultOption } from "@/app/components/common/SelectField";
+
+export interface Option extends DefaultOption {}
 
 interface SelectOption {
   id: number;
@@ -22,42 +32,34 @@ interface SelectOption {
   dial_code?: string;
 }
 
-interface FadeSlideProps {
-  children: React.ReactNode;
-  keyId: string | number;
-}
-
-const FadeSlide = ({ children, keyId }: FadeSlideProps) => (
-  <AnimatePresence mode="wait">
-    <motion.div
-      key={keyId}
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.25 }}
-    >
-      {children}
-    </motion.div>
-  </AnimatePresence>
-);
-
 export default function StepShopInfo({ onNext }: StepProps) {
-  // --- Form State ---
-  const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
+  // form state
+  const [name, setName] = useState<string>("");
+  const [shopId, setShopId] = useState<number | null>(null);
+
+  const [addressLine, setAddressLine] = useState("");
+  const [city, setCity] = useState("");
+  const [stateCode, setStateCode] = useState("");
+  const [zip, setZip] = useState("");
+  const [countryCode, setCountryCode] = useState("");
+  const [lat, setLat] = useState<number | undefined>(undefined);
+  const [lng, setLng] = useState<number | undefined>(undefined);
+
   const [phoneNumber, setPhoneNumber] = useState("");
   const [description, setDescription] = useState("");
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [bannerUrl, setBannerUrl] = useState<string | null>(null);
 
-  const [isValidatingPhone, setIsValidatingPhone] = useState(false);
-  const [isPhoneValid, setIsPhoneValid] = useState<null | boolean>(null);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // --- Type & Category State ---
+  // types + categories
   const types: SelectOption[] = [
     { id: 2, name: "Products" },
     { id: 1, name: "Services" },
   ];
   const [selectedType, setSelectedType] = useState<SelectOption>(types[0]);
-
   const [categories, setCategories] = useState<SelectOption[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState("");
@@ -65,493 +67,465 @@ export default function StepShopInfo({ onNext }: StepProps) {
     null
   );
 
-  // --- Location State ---
-  // Convert locationData to SelectOptions
-  const countryOptions: SelectOption[] = useMemo(
-    () =>
-      locationData.map((c) => ({
-        id: c.id,
-        name: c.name,
-        code: c.code,
-        flag: c.flag,
-        dial_code: c.dial_code,
-      })),
-    []
-  );
+  // phone validation
+  const [isValidatingPhone, setIsValidatingPhone] = useState(false);
+  const [isPhoneValid, setIsPhoneValid] = useState<boolean | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
 
-  const [selectedCountry, setSelectedCountry] = useState<SelectOption>(
-    countryOptions[0]
-  ); // Default to UK (Index 0) or Kenya
 
-  const [stateOptions, setStateOptions] = useState<SelectOption[]>([]);
-  const [selectedState, setSelectedState] = useState<SelectOption | null>(null);
-
-  const [cityOptions, setCityOptions] = useState<SelectOption[]>([]);
-  const [selectedCity, setSelectedCity] = useState<SelectOption | null>(null);
-  const [isCityLoading, setIsCityLoading] = useState(false);
-
-  // --- Submission State ---
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
   const LIMIT = 5000;
 
-  // 1. Handle Country Change -> Load States
+  // load shop
   useEffect(() => {
-    const countryData = locationData.find((c) => c.id === selectedCountry.id);
-    if (countryData) {
-      const states = countryData.states.map((s) => ({
-        id: s.id,
-        name: s.name,
-      }));
-      setStateOptions(states);
-      // Reset child selections
-      setSelectedState(states.length > 0 ? states[0] : null);
-      setCityOptions([]);
-      setSelectedCity(null);
-    }
-  }, [selectedCountry]);
+    let cancelled = false;
+    const load = async () => {
+      setInitialLoading(true);
+      try {
+        const res = await getMyShop();
+        if (cancelled) return;
+        if (res?.status === "success") {
+          const shop = res.data;
+          setName(shop.name);
+          setShopId(shop.id ?? null);
+          setAddressLine(shop.address || "");
+          setDescription(shop.description || "");
+          setPhoneNumber(shop.phone || "");
+          setLogoUrl(shop.logo ?? null);
+          setBannerUrl(shop.banner ?? null);
+          if (shop.category)
+            setSelectedCategory({
+              id: shop.category.id,
+              name: shop.category.name,
+            });
 
-  // 2. Handle State Change -> Load Cities
+          if (shop.city) setCity(shop.city);
+          if (shop.zip) setZip(shop.zip);
+          if (shop.country) setCountryCode(shop.country);
+          if (shop.state) setStateCode(shop.state);
+        }
+      } catch (err) {
+        console.error("load shop failed", err);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // load categories on type change
   useEffect(() => {
-    if (!selectedState) return;
-
-    setIsCityLoading(true);
-    // Simulate small network/processing delay for UX
-    const timer = setTimeout(() => {
-      const countryData = locationData.find((c) => c.id === selectedCountry.id);
-      const stateData = countryData?.states.find(
-        (s) => s.id === selectedState.id
-      );
-
-      if (stateData) {
-        const cities = stateData.cities.map((c) => ({
+    let cancelled = false;
+    const loadCats = async () => {
+      setCategoriesLoading(true);
+      setCategoriesError("");
+      try {
+        const r = await listCategories(
+          50,
+          0,
+          undefined,
+          selectedType.name.toLowerCase()
+        );
+        if (cancelled) return;
+        const formatted = (r?.categories ?? []).map((c: any) => ({
           id: c.id,
           name: c.name,
         }));
-        setCityOptions(cities);
-        setSelectedCity(cities.length > 0 ? cities[0] : null);
-      } else {
-        setCityOptions([]);
-        setSelectedCity(null);
-      }
-      setIsCityLoading(false);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [selectedState, selectedCountry]);
-
-  // 3. Handle Category Loading
-  useEffect(() => {
-    const fetchCategories = async () => {
-      setCategoriesLoading(true);
-      setCategoriesError("");
-      setCategories([]);
-      setSelectedCategory(null);
-
-      const typeString = selectedType.name.toLowerCase();
-
-      try {
-        const response = await listCategories(50, 0, undefined, typeString);
-
-        const formatted: SelectOption[] =
-          response?.categories?.map((cat: any) => ({
-            id: cat.id,
-            name: cat.name,
-          })) ?? [];
-
         setCategories(formatted);
-        setSelectedCategory(formatted[0] ?? null);
-      } catch (err: any) {
-        console.error("Failed to load categories:", err);
-        setCategoriesError("Failed to load categories. Please try again.");
+        setSelectedCategory((prev) => {
+          if (!prev) return formatted[0] ?? null;
+          const keep = formatted.find((f: Option) => f.id === prev.id);
+          return keep ?? formatted[0] ?? null;
+        });
+      } catch (err) {
+        console.error(err);
+        setCategoriesError("Failed to load categories.");
       } finally {
         setCategoriesLoading(false);
       }
     };
-
-    fetchCategories();
+    loadCats();
+    return () => {
+      cancelled = true;
+    };
   }, [selectedType]);
 
+  // phone validation
   const validatePhoneNumber = useCallback(async () => {
     if (!phoneNumber || phoneNumber.length < 7) {
       setIsPhoneValid(null);
       return;
     }
-
     setIsValidatingPhone(true);
-
     try {
-      const fullNumber = `${selectedCountry.dial_code?.replace(
-        "+",
-        ""
-      )}${phoneNumber}`;
-
+      const fullNumber = `${phoneNumber}`;
       const data = await numverifyValidatePhone({
         number: fullNumber,
-        countryCode: selectedCountry.code ?? "",
+        countryCode: countryCode ?? "",
       });
-
       setIsPhoneValid(data.valid === true);
     } catch (err) {
-      console.error("Phone validation failed:", err);
       setIsPhoneValid(false);
+    } finally {
+      setIsValidatingPhone(false);
     }
-
-    setIsValidatingPhone(false);
-  }, [phoneNumber, selectedCountry]);
+  }, [phoneNumber, countryCode]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      validatePhoneNumber();
-    }, 600); // wait 0.6 sec after typing stops
-
+    const timer = setTimeout(() => validatePhoneNumber(), 600);
     return () => clearTimeout(timer);
   }, [phoneNumber, validatePhoneNumber]);
 
-  const handleDescriptionChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const currentLength = e.target.value.length;
-      setDescription(e.target.value);
+  // Google address selection handler
+  const handleAddressSelect = (addr: {
+    street_address: string;
+    city: string;
+    state: string;
+    zip_code: string;
+    country: string;
+    lat?: number;
+    lng?: number;
+  }) => {
+    setAddressLine(addr.street_address);
+    setCity(addr.city);
+    setStateCode(addr.state);
+    setZip(addr.zip_code);
+    setCountryCode(addr.country);
+    setLat(addr.lat);
+    setLng(addr.lng);
+  };
 
-      const counter = e.target.nextElementSibling as HTMLElement | null;
-      if (!counter) return;
+  // const handleBannerFile = async (file?: File) => {
+  //   if (!file) return;
+  //   if (file.size > 5 * 1024 * 1024) {
+  //     toast.error("File too large. Max 5 MB.");
+  //     return;
+  //   }
 
-      counter.textContent = `${currentLength} / ${LIMIT}`;
-      if (currentLength > LIMIT * 0.9) {
-        counter.classList.replace("text-gray-400", "text-red-500");
-      } else {
-        counter.classList.replace("text-red-500", "text-gray-400");
-      }
-    },
-    [LIMIT]
-  );
+  //   const previewUrl = URL.createObjectURL(file);
+  //   setBannerUrl(previewUrl); // instant preview
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  //   try {
+  //     const resp = await (shopId
+  //       ? updateShopBanner(shopId, file)
+  //       : Promise.reject("Shop ID is missing"));
+  //     // Show toast based on API response message
+  //     if (resp?.status === "success") {
+  //       toast.success(resp?.message ?? "Banner uploaded successfully");
+  //     } else {
+  //       toast.error(resp?.message ?? "Banner upload failed");
+  //     }
+  //   } catch (err) {
+  //     console.error("Banner upload failed", err);
+  //     toast.error("Banner upload failed. Try again.");
+  //     setBannerUrl(null);
+  //   }
+  // };
 
-    if (!selectedCategory || categories.length === 0) {
-      setErrorMsg("Please select a valid category.");
+  const handleBannerFile = async (file?: File) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File too large. Max 5 MB.");
       return;
     }
 
+    const previewUrl = URL.createObjectURL(file);
+    setBannerUrl(previewUrl);
+    setBannerFile(file);
+
+    // CREATE MODE → STOP HERE
+    if (!shopId) {
+      return; // Do NOT call API
+    }
+
+    // UPDATE MODE → upload
+    try {
+      const resp = await updateShopBanner(shopId, file);
+      if (resp?.status === "success") {
+        toast.success(resp?.message ?? "Banner uploaded successfully");
+      } else {
+        toast.error(resp?.message ?? "Banner upload failed");
+      }
+    } catch (err) {
+      console.error("Banner upload failed", err);
+      toast.error("Banner upload failed. Try again.");
+      setBannerUrl(null);
+    }
+  };
+
+  // const handleLogoFile = async (file?: File) => {
+
+  //   if (!file) return;
+  //   if (file.size > 5 * 1024 * 1024) {
+  //     toast.error("File too large. Max 5 MB.");
+  //     return;
+  //   }
+
+  //   const previewUrl = URL.createObjectURL(file);
+  //   setLogoUrl(previewUrl);
+
+  //   try {
+  //     const resp = await (shopId
+  //       ? updateShopLogo(shopId, file)
+  //       : Promise.reject("Shop ID is missing"));
+  //     // Show toast based on API response message
+  //     if (resp?.status === "success") {
+  //       toast.success(resp?.message ?? "Logo uploaded successfully");
+  //     } else {
+  //       toast.error(resp?.message ?? "Logo upload failed");
+  //     }
+  //   } catch (err) {
+  //     console.error("Logo upload failed", err);
+  //     toast.error("Logo upload failed. Try again.");
+  //     setLogoUrl(null);
+  //   }
+  // };
+
+  const handleLogoFile = async (file?: File) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File too large. Max 5 MB.");
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setLogoUrl(previewUrl);
+    setLogoFile(file);
+
+    // CREATE MODE → only preview
+    if (!shopId) {
+      return;
+    }
+
+    // UPDATE MODE → upload
+    try {
+      const resp = await updateShopLogo(shopId, file);
+      if (resp?.status === "success") {
+        toast.success(resp?.message ?? "Logo uploaded successfully");
+      } else {
+        toast.error(resp?.message ?? "Logo upload failed");
+      }
+    } catch (err) {
+      console.error("Logo upload failed", err);
+      toast.error("Logo upload failed. Try again.");
+      setLogoUrl(null);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCategory) return setErrorMsg("Please pick a category.");
     setLoading(true);
     setErrorMsg("");
-
     try {
-      const formData = new FormData();
+      const form = new FormData();
+      form.append("name", name || "");
+      form.append("address", addressLine || "");
+      form.append("description", description || "");
+      form.append("phone", phoneNumber || "");
+      form.append("type", selectedType.name.toLowerCase());
+      form.append("country", countryCode || "");
+      form.append("state", stateCode || "");
+      form.append("city", city || "");
+      form.append("zip", zip || "");
+      form.append("category_id", String(selectedCategory.id));
 
-      // Form Data
-      formData.append("name", name);
-      formData.append("address", address);
-      formData.append("description", description);
+      // If your backend expects logo/banner URLs, send them
+      if (logoUrl) form.append("logo_url", logoUrl);
+      if (bannerUrl) form.append("banner_url", bannerUrl);
 
-      formData.append("phone", phoneNumber);
-
-      formData.append("type", selectedType.name.toLowerCase());
-
-      // Location details
-      formData.append("country", selectedCountry.name); // Now dynamic
-      formData.append("state", selectedState?.name || "");
-      formData.append("city", selectedCity?.name || "");
-
-      formData.append("category_id", String(selectedCategory.id));
-
-      formData.append("logo", "");
-      formData.append("banner", "");
-
-      const response = await saveShop(formData);
+      const response = await saveShop(form);
 
       if (response.status === "success") {
-        toast.success("Shop Info saved successfully!");
-        onNext({ shopId: response.data.id });
+        toast.success("Shop updated successfully");
+        onNext?.({ shopId: response.data.id });
       } else {
-        setErrorMsg(
-          response.message || "Shop could not be created. Try again."
-        );
-        toast.error(
-          response.message || "Shop could not be created. Try again."
-        );
+        setErrorMsg(response.message || "Could not save shop.");
+        toast.error(response.message || "Could not save shop.");
       }
-    } catch (error: any) {
-      setErrorMsg(
-        error?.response?.data?.message ?? "An unknown error occurred."
-      );
-      toast.error(
-        error?.response?.data?.message ?? "An unknown error occurred."
-      );
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err?.response?.data?.message || "Unknown error");
+      toast.error(err?.response?.data?.message || "Unknown error");
     } finally {
       setLoading(false);
     }
   };
 
   const isFormDisabled =
-    loading ||
-    categoriesLoading ||
-    !selectedCategory ||
-    !selectedCountry ||
-    !selectedState ||
-    isPhoneValid !== true;
-  !selectedCity;
+    loading || categoriesLoading || !selectedCategory || isPhoneValid === false;
 
   return (
-    <div className="h-full">
-      <div className="border border-red-100 p-4 rounded-md mb-6">
-        <h2 className="text-lg font-semibold flex items-center">
-          <FaShoppingBag className="text-red-800 text-xl mr-2" size={24} />
-          Shop or Business Information
-        </h2>
-        <p className="text-sm mt-1 text-gray-600">
-          Please provide your shop or business details to get started.
-        </p>
+    <div className="mx-auto">
+      <ShopHeaderCard subtitle="Update your shop details — use autocomplete for fast address entry." />
+      <div className="relative w-full">
+        {/* Banner */}
+        <div className="w-full h-40 sm:h-56 bg-gray-100 rounded-md overflow-hidden relative">
+          {bannerUrl ? (
+            <img
+              src={bannerUrl}
+              alt="Banner"
+              className="w-full h-full object-cover rounded-t-xl"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center sm:text-xs text-gray-400">
+              Click on the pencil to add a new one
+            </div>
+          )}
+
+          {/* Pencil Icon for Banner */}
+          <label className="absolute top-2 right-2 p-2 bg-white rounded-full cursor-pointer shadow hover:bg-gray-100">
+            <FaPencil className="text-red-700" />
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) =>
+                e.target.files && handleBannerFile(e.target.files[0])
+              }
+            />
+          </label>
+        </div>
+
+        {/* Logo - overlaps banner */}
+        <div className="absolute left-4 -translate-y-1/2 top-full w-24 h-24 sm:w-32 sm:h-32 border-2 border-red-900 rounded-full overflow-hidden bg-gray-50 shadow-xl">
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="Logo"
+              className="w-full h-full object-cover rounded-full"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-400">
+              No logo
+            </div>
+          )}
+
+          {/* Pencil Icon for Logo */}
+          <label className="absolute bottom-1 right-1 p-2 bg-white rounded-full cursor-pointer shadow hover:bg-gray-100">
+            <FaPencil className="text-red-700 text-sm sm:text-base" />
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) =>
+                e.target.files && handleLogoFile(e.target.files[0])
+              }
+            />
+          </label>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5 text-gray-900">
-        {/* ERROR MESSAGE */}
-        {errorMsg && (
-          <div className="p-3 text-red-700 bg-red-100 rounded-md text-sm">
-            {errorMsg}
-          </div>
-        )}
+      {/* Spacer so content below doesn't overlap logo */}
+      <div className="h-16 sm:h-20" />
 
-        <FadeSlide keyId="country-select">
-          <SelectField
-            label="Country"
-            value={selectedCountry}
-            onChange={setSelectedCountry}
-            options={countryOptions}
-          />
-        </FadeSlide>
-
-        {/* <div>
-          <label className="text-sm font-medium mb-1 block">
-            Shop/Business phone number
-          </label>
-          <div className="flex items-center">
-            <div className="flex items-center justify-center h-[45px] px-3 border border-gray-300 border-r-0 rounded-l-lg bg-gray-50 text-gray-600 text-sm min-w-[90px]">
-              <span className="mr-2 text-lg">{selectedCountry.flag}</span>
-              <span>{selectedCountry.dial_code}</span>
-            </div>
-
-            <input
-              className="flex-1 h-[45px] border border-gray-300 rounded-r-lg px-3 focus:ring-2 focus:ring-red-500 outline-none"
-              type="tel"
-              placeholder="712 345 678"
-              maxLength={15}
-              minLength={9}
-              value={phoneNumber}
-              onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, "");
-                setPhoneNumber(val);
-              }}
-              required
-            />
-          </div>
-          <p className="text-xs text-gray-400 mt-1">
-            Enter number without the country code.
-          </p>
-        </div> */}
-        <div>
-          <label className="text-sm font-medium mb-1 block">
-            Shop/Business phone number
-          </label>
-
-          <div className="flex items-center">
-            {/* Country */}
-            <div className="flex items-center justify-center h-[45px] px-3 border border-gray-300 border-r-0 rounded-l-lg bg-gray-50 text-gray-600 text-sm min-w-[90px]">
-              <span className="mr-2 text-lg">{selectedCountry.flag}</span>
-              <span>{selectedCountry.dial_code}</span>
-            </div>
-
-            {/* Input */}
-            <input
-              className="flex-1 h-[45px] border border-gray-300 rounded-r-lg px-3 focus:ring-2 focus:ring-red-500 outline-none"
-              type="tel"
-              placeholder="712 345 678"
-              value={phoneNumber}
-              onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, "");
-                setPhoneNumber(val);
-              }}
-              required
-            />
-
-            {/* Validation Icon */}
-            <div className="ml-2 w-6">
-              {isValidatingPhone && <BeatLoader size={6} />}
-
-              {!isValidatingPhone && isPhoneValid === true && (
-                <span className="text-green-600 text-xl">👍</span>
-              )}
-
-              {!isValidatingPhone && isPhoneValid === false && (
-                <span className="text-red-600 text-xl">👎</span>
-              )}
-            </div>
-          </div>
-
-          {isPhoneValid === false && (
-            <h2 className="text-xs text-red-500! mt-1">
-              Invalid phone number. Please enter a valid number.
-            </h2>
-          )}
+      {initialLoading ? (
+        <div className="space-y-4">
+          <div className="h-12 bg-gray-100 rounded w-1/3 animate-pulse" />
+          <div className="h-40 bg-gray-100 rounded animate-pulse" />
         </div>
-
-        {/* Shop Name */}
-        <div>
-          <label className="text-sm font-medium mb-1 block">
-            Shop/Business name
-          </label>
-          <input
-            className="input"
-            placeholder="Shop Name"
-            maxLength={50}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-
-        {/* Type */}
-        <FadeSlide keyId={selectedType.id}>
-          <SelectField
-            label="Shop/Business type"
-            value={selectedType}
-            onChange={setSelectedType}
-            options={types}
-          />
-        </FadeSlide>
-
-        {/* Category */}
-        <div>
-          <label className="text-sm font-medium mb-1 block">
-            Shop/Business category
-          </label>
-
-          {categoriesLoading ? (
-            <Skeleton height={45} borderRadius={10} />
-          ) : categoriesError ? (
-            <div className="text-red-500 text-sm">{categoriesError}</div>
-          ) : (
-            <FadeSlide
-              keyId={selectedType.id + "-" + (selectedCategory?.id ?? "none")}
-            >
-              {categories.length > 0 && selectedCategory ? (
-                <SelectField
-                  label=""
-                  value={selectedCategory}
-                  onChange={setSelectedCategory}
-                  options={categories}
-                />
-              ) : (
-                <div className="h-[45px] flex items-center justify-center rounded-lg border bg-gray-50 text-gray-500 text-sm">
-                  No categories available for {selectedType.name}
-                </div>
-              )}
-            </FadeSlide>
-          )}
-        </div>
-
-        {/* Address */}
-        <div>
-          <label className="text-sm font-medium mb-1 block">
-            Shop/Business address
-          </label>
-          <input
-            className="input"
-            placeholder="Shop Address (Street, Building, etc)"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            required
-          />
-        </div>
-
-        {/* State / Province / County */}
-        <div>
-          <label className="text-sm font-medium mb-1 block">
-            State / Province / County
-          </label>
-          <FadeSlide keyId={"state-" + selectedCountry.id}>
-            {stateOptions.length > 0 && selectedState ? (
-              <SelectField
-                label=""
-                value={selectedState}
-                onChange={setSelectedState}
-                options={stateOptions}
-              />
-            ) : (
-              <div className="h-[45px] flex items-center justify-center rounded-lg border bg-gray-50 text-gray-500 text-sm">
-                No states available
-              </div>
-            )}
-          </FadeSlide>
-        </div>
-
-        {/* City */}
-        <div>
-          <label className="text-sm font-medium mb-1 flex items-center gap-2">
-            City
-            {isCityLoading && <BeatLoader size={6} />}
-          </label>
-
-          <FadeSlide
-            keyId={isCityLoading ? "loading" : selectedCity?.id || "empty"}
-          >
-            {isCityLoading ? (
-              <Skeleton height={45} borderRadius={10} />
-            ) : cityOptions.length === 0 ? (
-              <div className="h-[45px] flex items-center justify-center rounded-lg border bg-gray-50 text-gray-500 text-sm">
-                No cities available for this region
-              </div>
-            ) : (
-              <SelectField
-                label=""
-                value={selectedCity!}
-                onChange={setSelectedCity}
-                options={cityOptions}
-              />
-            )}
-          </FadeSlide>
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="text-sm font-medium mb-1 block">
-            Shop/Business description
-          </label>
-
-          <div className="relative">
-            <textarea
-              className="input pr-16"
-              placeholder="Tell us about your shop/business..."
-              rows={5}
-              maxLength={LIMIT}
-              minLength={500}
-              value={description}
-              onChange={handleDescriptionChange}
-              required
-            />
-
-            <span className="absolute bottom-2 right-3 text-xs text-gray-400">
-              {description.length} / {LIMIT}
-            </span>
-          </div>
-        </div>
-
-        {/* Submit */}
-        <button
-          type="submit"
-          className="btn-primary w-full"
-          disabled={isFormDisabled}
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6 "
         >
-          {loading ? (
-            <>
-              <BeatLoader size={8} color="white" /> Creating Shop...
-            </>
-          ) : (
-            "Continue"
+          {errorMsg && (
+            <div className="p-3 text-red-700 bg-red-100 rounded text-sm">
+              {errorMsg}
+            </div>
           )}
-        </button>
-      </form>
+
+          <div className="grid grid-cols-1 gap-4">
+            <TextInput
+              label="Shop name"
+              value={name}
+              onChange={setName}
+              placeholder="Shop name"
+              required
+              maxLength={50}
+            />
+
+            <CategorySelector
+              types={types}
+              selectedType={selectedType}
+              onTypeChange={setSelectedType}
+              categories={categories}
+              categoriesLoading={categoriesLoading}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              categoriesError={categoriesError}
+            />
+
+            <FadeSlide keyId="address">
+              <GoogleAddressAutocomplete onSelect={handleAddressSelect} />
+            </FadeSlide>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div>
+                <TextInput label="City" value={city} onChange={setCity} />
+              </div>
+              <div>
+                <TextInput label="ZIP" value={zip} onChange={setZip} />
+              </div>
+              <div>
+                <TextInput
+                  label="State"
+                  value={stateCode}
+                  onChange={setStateCode}
+                />
+              </div>
+            </div>
+
+            <PhoneInput
+              countryFlag={countryCode ?? ""}
+              dialCode={""}
+              value={phoneNumber}
+              onChange={setPhoneNumber}
+              validating={isValidatingPhone}
+              valid={isPhoneValid}
+            />
+
+            <TextInput
+              label="Address (street / building)"
+              value={addressLine}
+              onChange={setAddressLine}
+              placeholder="Street address"
+              required
+            />
+
+            <TextareaField
+              label="Description"
+              value={description}
+              onChange={setDescription}
+              rows={5}
+              limit={LIMIT}
+            />
+          </div>
+
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isFormDisabled}
+              className={`w-full h-11 rounded bg-red-600 text-white font-semibold ${
+                isFormDisabled
+                  ? "opacity-60 cursor-not-allowed"
+                  : "hover:bg-red-700"
+              }`}
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <BeatLoader size={6} color="white" /> Saving...
+                </span>
+              ) : (
+                "Update Shop"
+              )}
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }
