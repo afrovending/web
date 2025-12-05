@@ -27,7 +27,7 @@ export default function Footer() {
                 />
               </Link>
             </div>
-            <span className="text-sm truncate">
+            <span className="text-sm line-clamp-2">
               {COMPANY_CONTACT_INFO.companyDescription}
             </span>
           </div>
