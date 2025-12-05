@@ -82,19 +82,15 @@ function OnboardingContent() {
 }
 
 export default function OnboardingPage() {
-  return <OnboardingContent />;
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <OnboardingContent />
+    </Suspense>
+  );
 }
-
-// export default function OnboardingPage() {
-//   return (
-//     <Suspense
-//       fallback={
-//         <div className="flex h-screen items-center justify-center">
-//           Loading...
-//         </div>
-//       }
-//     >
-//       <OnboardingContent />
-//     </Suspense>
-//   );
-// }
