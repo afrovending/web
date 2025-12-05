@@ -19,7 +19,6 @@ import FadeSlide from "./components/FadeSlide";
 import GoogleAddressAutocomplete from "./components/GoogleAddressAutocomplete";
 import PhoneInput from "./components/PhoneInput";
 import TextareaField from "./components/TextareaField";
-import ImageUploader from "./components/ImageUploader";
 import { Option } from "./components/CategorySelector";
 import { FaPencil } from "react-icons/fa6";
 
@@ -35,6 +34,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
   // form state
   const [name, setName] = useState<string>("");
   const [shopId, setShopId] = useState<number | null>(null);
+  const [dialCode, setDialCode] = useState("");
 
   const [addressLine, setAddressLine] = useState("");
   const [city, setCity] = useState("");
@@ -175,6 +175,16 @@ export default function StepShopInfo({ onNext }: StepProps) {
     return () => clearTimeout(timer);
   }, [phoneNumber, validatePhoneNumber]);
 
+    function countryCodeToFlag(code: string) {
+      if (!code) return "";
+      return code
+        .toUpperCase()
+        .replace(/./g, (char) =>
+          String.fromCodePoint(127397 + char.charCodeAt(0))
+        );
+    }
+
+
   // Google address selection handler
   const handleAddressSelect = (addr: {
     street_address: string;
@@ -184,6 +194,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
     country: string;
     lat?: number;
     lng?: number;
+    dialCode?: string;
   }) => {
     setAddressLine(addr.street_address);
     setCity(addr.city);
@@ -192,6 +203,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
     setCountryCode(addr.country);
     setLat(addr.lat);
     setLng(addr.lng);
+    setDialCode(addr.dialCode ?? "");
   };
  
 
@@ -418,8 +430,8 @@ export default function StepShopInfo({ onNext }: StepProps) {
             </div>
 
             <PhoneInput
-              countryFlag={countryCode ?? ""}
-              dialCode={""}
+              countryFlag={countryCodeToFlag(countryCode)}
+              dialCode={dialCode ?? ""}
               value={phoneNumber}
               onChange={setPhoneNumber}
               validating={isValidatingPhone}
@@ -440,7 +452,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
               onChange={setDescription}
               rows={5}
               limit={LIMIT}
-            /> 
+            />
           </div>
 
           <div className="pt-2">

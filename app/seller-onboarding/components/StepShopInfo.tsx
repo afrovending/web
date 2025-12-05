@@ -21,6 +21,7 @@ import PhoneInput from "@/app/(seller)/shop-management/components/PhoneInput";
 import TextareaField from "@/app/(seller)/shop-management/components/TextareaField";
 import TextInput from "@/app/(seller)/shop-management/components/TextInput";
 import { DefaultOption } from "@/app/components/common/SelectField";
+import { countryCodeToFlag } from "@/utils/countryFlag";
 
 export interface Option extends DefaultOption {}
 
@@ -178,15 +179,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
     const timer = setTimeout(() => validatePhoneNumber(), 600);
     return () => clearTimeout(timer);
   }, [phoneNumber, validatePhoneNumber]);
-
-  function countryCodeToFlag(code: string) {
-    if (!code) return "";
-    return code
-      .toUpperCase()
-      .replace(/./g, (char) =>
-        String.fromCodePoint(127397 + char.charCodeAt(0))
-      );
-  }
+ 
 
   // Google address selection handler
   const handleAddressSelect = (addr: {
