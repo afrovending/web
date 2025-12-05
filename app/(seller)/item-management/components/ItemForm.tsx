@@ -34,7 +34,7 @@ function FallbackSubmitButton({
     <button
       type="submit"
       disabled={loading}
-      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-white font-medium hover:opacity-95 disabled:opacity-60"
+      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white font-medium hover:opacity-95 disabled:opacity-60"
     >
       {loading ? "Saving..." : label || "Save"}
     </button>
@@ -667,7 +667,7 @@ export default function ItemForm({ onClose, item }: ItemFormProps) {
         </label>
 
         {imagePreviews.length < 7 && (
-          <label className="relative w-full aspect-square border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-amber-500 hover:bg-amber-50 transition-colors overflow-hidden flex items-center justify-center p-4">
+          <label className="relative w-full aspect-square border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-red-500 hover:bg-red-50 transition-colors overflow-hidden flex items-center justify-center p-4">
             <div className="flex flex-col items-center justify-center text-center text-gray-500">
               <HiOutlineUpload className="text-3xl" />
               <span className="mt-2 text-sm">

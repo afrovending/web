@@ -39,11 +39,13 @@ export default function WishlistButton({ product }: Props) {
     }
 
     addToWishlist({
-        id: product.id,
-        title: product.title,
-        price: product.sales_price || 0,
-        image: Array.isArray(product.images) ? product.images[0] : product.images ?? "/placeholder.png",
-      });
+      id: product.id,
+      title: product.title,
+      price: product.sales_price || 0,
+      image: Array.isArray(product.images)
+        ? product.images[0]
+        : product.images ?? "/placeholder.png",
+    });
   };
 
   return (
@@ -52,14 +54,14 @@ export default function WishlistButton({ product }: Props) {
       className={clsx(
         "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition cursor-pointer",
         wishlisted
-          ? "bg-amber-50 text-amber-700 border border-amber-200"
+          ? "bg-red-50 text-red-700 border border-red-200"
           : "bg-gray-100 text-gray-700"
       )}
       aria-pressed={wishlisted}
     >
       {wishlisted ? (
         <>
-          <HeartSolid className="w-4 h-4 text-amber-600" />
+          <HeartSolid className="w-4 h-4 text-red-600" />
           Saved
         </>
       ) : (

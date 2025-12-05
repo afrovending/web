@@ -190,7 +190,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ limit, status }) => {
           placeholder="Search by customer or product name..."
           value={search}
           onChange={handleSearchChange}
-          className="w-full px-3 py-2 border rounded-md border-amber-600 text-gray-900 focus:outline-hub-primary-400"
+          className="w-full px-3 py-2 border rounded-md border-red-600 text-gray-900 focus:outline-hub-primary-400"
         />
       </div>
       <TanStackTable

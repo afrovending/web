@@ -134,7 +134,7 @@ const Items: FC = () => {
         <input
           type="text"
           placeholder="Search shop items..."
-          className="w-full px-3 py-2 border rounded-md border-amber-600 text-gray-900 focus:outline-none"
+          className="w-full px-3 py-2 border rounded-md border-red-600 text-gray-900 focus:outline-none"
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
@@ -189,7 +189,7 @@ const Items: FC = () => {
       </div>
 
       {/* Pagination */}
-      <div className="mt-6 flex items-center justify-center gap-4">
+      <div className="mt-6 flex items-center justify-center gap-4 text-red-900">
         <button
           onClick={prevPage}
           disabled={currentPage === 1}

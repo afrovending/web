@@ -257,7 +257,7 @@ const ItemsTable: React.FC<ProductTableProps> = ({ limit, offset, status }) => {
           const views = getValue() as number;
           return (
             <div className="flex items-center gap-1 text-gray-700">
-              <EyeIcon className="w-4 h-4 text-amber-600" />
+              <EyeIcon className="w-4 h-4 text-red-600" />
               <span>{views}</span>
             </div>
           );
@@ -356,7 +356,7 @@ const ItemsTable: React.FC<ProductTableProps> = ({ limit, offset, status }) => {
           placeholder="Search by product name..."
           value={search}
           onChange={handleSearchChange}
-          className="w-full px-3 py-2 border rounded-md border-amber-600 text-gray-900 focus:outline-none"
+          className="w-full px-3 py-2 border rounded-md border-red-600 text-gray-900 focus:outline-none"
         />
       </div>
 
@@ -386,9 +386,12 @@ const ItemsTable: React.FC<ProductTableProps> = ({ limit, offset, status }) => {
           setEditingProduct(null);
         }}
         title={editingProduct ? "Edit Item" : "Add Item"}
-      > 
+      >
         {editingProduct && (
-          <ItemForm item={editingProduct} onClose={() => setDrawerOpen(false)} />
+          <ItemForm
+            item={editingProduct}
+            onClose={() => setDrawerOpen(false)}
+          />
         )}
       </Drawer>
     </div>
