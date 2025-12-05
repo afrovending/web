@@ -111,7 +111,7 @@ export default function ForgetPassword() {
 
               <button
                 type="button"
-                className="btn btn-gray"
+                className="btn btn-gray "
                 onClick={() => router.push("/login")}
               >
                 Back to login

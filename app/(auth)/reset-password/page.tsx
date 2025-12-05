@@ -79,7 +79,7 @@ export default function ResetPassword() {
         <div className="absolute inset-0 bg-gray-50 opacity-10"></div>
       </div>
 
-      <div className="flex items-center justify-center bg-red-50 p-8 sm:p-12 w-full lg:w-1/2">
+      <div className="flex items-center justify-center bg-gray-50 p-8 sm:p-12 w-full lg:w-1/2">
         <div className="w-full max-w-md">
           {/* Logo */}
           <div hidden className="mb-8 flex justify-center">
@@ -142,7 +142,7 @@ export default function ResetPassword() {
 
             <button
               type="submit"
-              className={`btn btn-primary ${
+              className={`btn btn-primary w-full ${
                 loading ? "opacity-70 cursor-not-allowed" : ""
               }`}
               disabled={loading}

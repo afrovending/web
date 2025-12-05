@@ -42,6 +42,7 @@ export default function RegisterPage() {
       };
 
       const response = await registerUser(payload);
+      console.log(response);
       if (response.status === "success") {
         sessionStorage.setItem("registerEmail", email);
         toast.success("Confirm your email to continue");
