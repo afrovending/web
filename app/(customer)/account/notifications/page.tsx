@@ -51,7 +51,7 @@ export default function NotificationPage() {
 
       {/* Empty State */}
       {!loading && notifications.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-10 text-gray-500 animate-fadeIn">
+        <div className="flex flex-col items-center justify-center py-10 text-gray-500 animate-fadeIn card">
           <FiBell className="text-red-800 text-xl mr-2" size={24} />
           <h3 className="text-lg font-semibold mb-1">No Notifications</h3>
           <p className="text-sm text-gray-400 text-center max-w-xs">
