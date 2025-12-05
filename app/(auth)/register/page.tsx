@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
 import { ROLE_OPTIONS } from "@/setting";
+import { RadioGroup } from "@headlessui/react";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -163,24 +164,38 @@ export default function RegisterPage() {
             <div>
               <label className="block text-sm font-medium mb-1">
                 Choose Account Type
-              </label>
-
-              <div className="space-y-2">
-                {ROLE_OPTIONS.map((opt) => (
-                  <label
-                    key={opt.value}
-                    className="flex items-center gap-3 p-3 border border-red-100 rounded-md cursor-pointer bg-white hover:bg-gray-50"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={role === opt.value}
-                      onChange={() => setRole(opt.value)}
-                      className="h-4 w-4 text-red-600 border-gray-300 rounded cursor-pointer"
-                    />
-                    <span className="text-sm text-gray-700">{opt.label}</span>
-                  </label>
-                ))}
-              </div>
+              </label> 
+              <RadioGroup value={role} onChange={setRole}>
+                <div className="space-y-3">
+                  {ROLE_OPTIONS.map((opt) => (
+                    <RadioGroup.Option
+                      key={opt.value}
+                      value={opt.value}
+                      className={({ checked }) =>
+                        `relative flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition 
+                          ${
+                            checked
+                              ? "border-red-500 bg-red-50"
+                              : "border-gray-200 bg-white hover:bg-gray-50"
+                          }`
+                                      }
+                                    >
+                                      {({ checked }) => (
+                                        <>
+                                          <div
+                                            className={`h-4 w-4 rounded-full border 
+                              ${checked ? "border-red-600 bg-red-600" : "border-gray-400"}
+                            `}
+                          />
+                          <span className="text-sm text-gray-800">
+                            {opt.label}
+                          </span>
+                        </>
+                      )}
+                    </RadioGroup.Option>
+                  ))}
+                </div>
+              </RadioGroup>
             </div>
 
             {/* Password */}
