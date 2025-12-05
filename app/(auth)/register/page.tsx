@@ -79,7 +79,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Right Column */}
-      <div className="flex items-center justify-center bg-red-50 p-8 sm:p-12 w-full lg:w-1/2">
+      <div className="flex items-center justify-center bg-gray-50 p-8 sm:p-12 w-full lg:w-1/2">
         <div className="w-full max-w-md">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 text-center">
             Create Your Account

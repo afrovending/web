@@ -104,7 +104,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex">
       {/* Left Column: Image */}
       <div className="relative hidden lg:block h-full w-1/2">
         <Image
@@ -119,7 +119,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Column: Form */}
-      <div className="flex items-center justify-center bg-red-50 p-8 sm:p-12 w-full lg:w-1/2">
+      <div className="flex items-center justify-center bg-gray-50 p-8 sm:p-12 w-full lg:w-1/2">
         <div className="w-full max-w-md">
           {/* Logo */}
           <div hidden className="mb-8 flex justify-center">
