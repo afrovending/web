@@ -42,7 +42,7 @@ export default function ShopPageContent() {
               {/* Banner */}
               <div className="relative w-full h-40 bg-gray-100">
                 <Image
-                  src={shop.banner || "/placeholder.jpg"}
+                  src={shop.banner || "/placeholder.png"}
                   alt={shop.name}
                   fill
                   className="object-cover"
@@ -81,7 +81,7 @@ export default function ShopPageContent() {
                 </p>
 
                 {/* Visit Shop button */}
-                <button className="mt-4 btn btn-primary">Visit Shop</button>
+                <button className="mt-4 btn btn-primary">View Items</button>
               </div>
             </Link>
           ))}

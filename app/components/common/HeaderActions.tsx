@@ -13,7 +13,7 @@ export default function HeaderActions() {
   return (
     <div className="flex items-center gap-3 sm:gap-4">
       <motion.button
-        onClick={() => router.push("/tracking-order")}
+        onClick={() => router.push("/track-order")}
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.05 }}
         transition={{ type: "spring", stiffness: 300, damping: 15 }}

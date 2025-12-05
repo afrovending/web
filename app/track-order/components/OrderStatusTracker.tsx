@@ -54,7 +54,7 @@ export const OrderStatusTracker: React.FC<OrderStatusTrackerProps> = ({
                   className={clsx(
                     "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
                     {
-                      "bg-[#1B412C] text-white": isCompleted,
+                      "bg-red-800 text-white": isCompleted,
                       "bg-gray-200 text-gray-400": !isCompleted,
                     }
                   )}
@@ -77,7 +77,7 @@ export const OrderStatusTracker: React.FC<OrderStatusTrackerProps> = ({
               {!isLastStep && (
                 <div
                   className={clsx("flex-1 h-1 transition-colors", {
-                    "bg-[#1B412C]": isCompleted,
+                    "bg-red-800": isCompleted,
                     "bg-gray-200": !isCompleted,
                   })}
                 />

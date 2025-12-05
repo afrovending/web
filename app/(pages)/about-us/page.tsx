@@ -136,7 +136,7 @@ const BusinessCard: React.FC<{ business: Business }> = ({ business }) => (
         {business.features.map((feature: string, index: number) => (
           <li key={index} className="flex items-start">
             <svg
-              className="w-4 h-4 text-[#1B412C] mr-2 mt-1 shrink-0"
+              className="w-4 h-4 text-red-800 mr-2 mt-1 shrink-0"
               fill="currentColor"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
@@ -197,7 +197,7 @@ const AboutPageContent: React.FC = () => {
         {/* Vision and Mission */}
         <section className="grid md:grid-cols-2 gap-8 mb-12">
           {/* Vision Card */}
-          <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-[#1B412C]">
+          <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-red-800">
             <div className="flex items-center text-red-600 mb-4">
               <FaBullseye className="w-6 h-6 mr-3" />
               <h3 className="text-2xl font-bold">OUR VISION</h3>
@@ -206,7 +206,7 @@ const AboutPageContent: React.FC = () => {
           </div>
 
           {/* Mission Card */}
-          <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-[#1B412C]">
+          <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-red-800">
             <div className="flex items-center text-red-600 mb-4">
               <FaPaperPlane className="w-6 h-6 mr-3" />
               <h3 className="text-2xl font-bold">OUR MISSION</h3>
@@ -254,7 +254,7 @@ const AboutPageContent: React.FC = () => {
               <ul className="space-y-4 text-gray-700">
                 {COMPANY_DATA.strategicEdge.map((edge, index) => (
                   <li key={index} className="flex items-start">
-                    <FaShieldAlt className="w-5 h-5 text-[#1B412C] mr-3 mt-1 shrink-0" />
+                    <FaShieldAlt className="w-5 h-5 text-red-800 mr-3 mt-1 shrink-0" />
                     <span className="text-sm sm:text-base">{edge}</span>
                   </li>
                 ))}
