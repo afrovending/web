@@ -92,7 +92,7 @@ function CategoryList() {
 
   const categoriesToShow = showAll
     ? data.categories
-    : data.categories.slice(0, 15);
+    : data.categories.slice(0, 10);
 
   return (
     <div className="py-2">
