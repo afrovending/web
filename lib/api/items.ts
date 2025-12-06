@@ -82,3 +82,11 @@ export async function deleteItem(productId: number) {
   const { data } = await api.delete(`/vendor/item/delete/${productId}`);
   return data.data;
 }
+
+export async function deleteItemPhoto(productId: number, imageId: string) {
+  const { data } = await api.delete(`/vendor/item/image/delete/${productId}`, {
+    data: { imageId },
+  });
+
+  return data.data;
+}
