@@ -67,7 +67,7 @@ export function Sidebar({
       <div className="border-t p-4">
         <button
           onClick={handleLogout}
-          className="flex items-center w-full p-3 text-red-600 hover:bg-red-50 rounded-lg"
+          className="flex items-center w-full p-3 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
         >
           <LuLogOut className="w-5 h-5 mr-3" />
           Logout

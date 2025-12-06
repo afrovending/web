@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { StarIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
+import parse from "html-react-parser"; // new
 
 interface Review {
   id: number;
@@ -25,7 +26,7 @@ export default function ItemTabs({
   );
 
   return (
-    <div className=" bg-white pb-8">
+    <div className="bg-white pb-8">
       {/* Tabs */}
       <div className="flex justify-center border-b border-gray-700">
         <button
@@ -51,17 +52,17 @@ export default function ItemTabs({
       </div>
 
       {/* Content */}
-      <div className="mt-4 p-4">
+      <div className="mt-4 p-4 text-gray-400">
         {activeTab === "description" && (
-          <div className="text-gray-400 whitespace-pre-line">
-            <span dangerouslySetInnerHTML={{ __html: description }} />
+          <div className="prose prose-invert max-w-none">
+            {parse(description)}
           </div>
         )}
 
         {activeTab === "reviews" && (
           <div className="space-y-6">
             {reviews.length === 0 ? (
-              <p className="text-gray-400">No reviews yet.</p>
+              <p>No reviews yet.</p>
             ) : (
               reviews.map((review) => (
                 <div key={review.id} className="border-b border-gray-700 pb-4">

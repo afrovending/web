@@ -12,6 +12,7 @@ import Item from "@/interfaces/items";
 import { useRouter } from "next/navigation";
 import Skeleton from "react-loading-skeleton";
 import { formatAmount } from "@/utils/formatCurrency";
+import Link from "next/link";
 
 const RecommendedProducts: FC = () => {
   const [products, setProducts] = useState<Item[]>([]);
@@ -61,15 +62,15 @@ const RecommendedProducts: FC = () => {
             onClick={() => router.push("/items")}
           />
         </div>
-
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
           {loading
             ? renderSkeletons()
             : products.map((product) => (
-                <div
-                  onClick={() => router.push(`/items/${product.slug}`)}
+                <Link
+                  href={`/items/${product.slug}`}
                   key={product.id}
                   className="bg-white rounded-xl overflow-hidden shadow relative group cursor-pointer"
+                  prefetch={true} // optional: prefetch product page for faster navigation
                 >
                   {/* Product Image */}
                   <div className="relative">
@@ -109,7 +110,7 @@ const RecommendedProducts: FC = () => {
                       {formatAmount(product.sales_price)}
                     </p>
                   </div>
-                </div>
+                </Link>
               ))}
         </div>
       </div>

@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import WishlistButton from "@/app/(customer)/account/wishlists/components/WishlistButton";
+import parse from "html-react-parser";
 
 const reviews = [
   {
@@ -49,14 +50,7 @@ export default function ItemDetail({ product }: { product: Item }) {
   const decreaseQty = () => setQuantity((q) => (q > 1 ? q - 1 : 1));
   const salesPrice = parseFloat(product.sales_price);
   const regularPrice = parseFloat(product.regular_price);
-
-  const limit = 155;
-  const rawDescription = product.description;
-
-  const truncatedHtml = truncate(rawDescription, limit, {
-    ellipsis: "...",
-  });
-
+ 
   const discount =
     regularPrice > salesPrice
       ? Math.round(((regularPrice - salesPrice) / regularPrice) * 100)
@@ -151,11 +145,11 @@ export default function ItemDetail({ product }: { product: Item }) {
                   </span>
                 </>
               )}
+            </div> 
+            
+            <div className="text-gray-500 line-clamp-2">
+              {parse(product.description)}
             </div>
-
-            <p className="text-gray-600">
-              <span dangerouslySetInnerHTML={{ __html: truncatedHtml }} />
-            </p>
 
             <div className="flex items-center gap-2 mt-5">
               <div className="flex items-center rounded-md">
