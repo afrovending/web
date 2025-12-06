@@ -27,7 +27,7 @@ export interface VendorRate {
   currency: string;
   delivery_days: number;
   estimated_delivery: string;
-  rate_id: number; // ✅ ADD THIS
+  rate_id: number; 
 }
 
 export interface RateOption {

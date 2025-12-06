@@ -98,7 +98,7 @@ const [formData, setFormData] = useState<ShippingFormData>({
         country: user.country || "",
         zip_code: user.zip_code || "",
         phone: user.phone || "",
-        address_label: user.address_label || "",
+        address_label: user.address_label || "Home",
       });
     setIsEditing(false);
   };
@@ -188,7 +188,7 @@ const [formData, setFormData] = useState<ShippingFormData>({
 
           <TextInput
             label="Address Label"
-            value={formData.address_label}
+            value={formData.address_label || "Home" }
             onChange={(v) =>
               setFormData((prev) => ({ ...prev, address_label: v }))
             }
