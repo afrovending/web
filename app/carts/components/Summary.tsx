@@ -10,6 +10,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useCart } from "@/context/CartContext";
 import { CheckoutPayload, checkoutStripe } from "@/lib/api/customer/checkout";
 import axios from "axios";
+import { ShippingRateResponse, RateOption } from "@/interfaces/shippingRate";
 
 interface CartItem {
   id: number;
@@ -19,25 +20,7 @@ interface CartItem {
   qty: number;
 }
 
-interface VendorRate {
-  service_code: string;
-  carrier: string;
-  total: number;
-  currency: string;
-  delivery_days: number;
-  estimated_delivery: string;
-}
-
-interface RateOption {
-  total: number;
-  vendors: Record<string, VendorRate>;
-}
-
-interface ShippingRateResponse {
-  cheapest?: RateOption;
-  fastest?: RateOption;
-}
-
+ 
 interface OrderSummaryProps {
   cart: CartItem[];
   subtotal: number;
@@ -100,19 +83,24 @@ export default function OrderSummary({
 
     const sessionEmail = sessionStorage.getItem("checkout_email");
 
-    const vendorServiceCodes: Record<string, string> = Object.fromEntries(
-      Object.entries(selectedShipping.vendors).map(([vendorId, v]) => [
-        vendorId,
-        v.service_code,
-      ])
-    );
-
-    const vendorShippingDetails: Record<string, VendorRate> =
-      selectedShipping.vendors;
+  
 
     const vendorCarriers = Array.from(
       new Set(Object.values(selectedShipping.vendors).map((v) => v.carrier))
     ).join(", ");
+
+    const shippingServiceCodes = Object.values(selectedShipping.vendors).map(
+      (v) => ({
+        total: v.total,
+        service_code: v.service_code,
+        carrier: v.carrier,
+        currency: v.currency,
+        delivery_days: v.delivery_days,
+        estimated_delivery: v.estimated_delivery,
+        rate_id: v.rate_id,
+      })
+    );
+
 
     // Earliest delivery across all vendors
     const estimatedDelivery =
@@ -127,9 +115,7 @@ export default function OrderSummary({
       shipping_fee: shippingFee,
       shipping_carrier: vendorCarriers,
       estimated_delivery: estimatedDelivery!,
-
-      shipping_service_code: vendorServiceCodes,
-      // shipping_service_code: vendorShippingDetails, // FULL OBJECT
+      shipping_service_code: shippingServiceCodes,
     };
 
     try {

@@ -1,4 +1,3 @@
-import Item from "@/interfaces/items";
 import api from "../axios";
 
 export interface CheckoutPayload {
@@ -7,7 +6,8 @@ export interface CheckoutPayload {
   shipping_fee: number;
   shipping_carrier: string;
   estimated_delivery: string | null;
-  shipping_service_code: Record<number, string>; // vendor_id -> service_code
+  shipping_service_code: any; 
+
 }
 
 interface CheckoutProduct {
