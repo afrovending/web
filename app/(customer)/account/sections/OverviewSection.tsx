@@ -27,8 +27,35 @@ export default function OverviewSection() {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const validateProfileForm = () => {
+    if (!formData.name.trim()) {
+      toast.error("First name is required");
+      return false;
+    }
+
+    if (!formData.last_name.trim()) {
+      toast.error("Last name is required");
+      return false;
+    }
+
+    if (!formData.phone.trim()) {
+      toast.error("Phone number is required");
+      return false;
+    }
+
+    // Soft phone validation (don’t be too strict)
+    if (formData.phone.length < 7) {
+      toast.error("Please enter a valid phone number");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSave = async () => {
     if (!user?.id) return;
+    if (!validateProfileForm()) return;
+
     setLoading(true);
     try {
       const updatedUser = await updateUserProfile(user.id, formData);

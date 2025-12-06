@@ -73,8 +73,36 @@ const [formData, setFormData] = useState<ShippingFormData>({
     loadAddress();
   }, [user]);
 
+  const validateForm = () => {
+    if (!formData.street_address.trim()) {
+      toast.error("Street address is required");
+      return false;
+    }
+
+    if (!formData.city.trim()) {
+      toast.error("City is required");
+      return false;
+    }
+
+    if (!formData.country.trim()) {
+      toast.error("Country is required");
+      return false;
+    }
+
+    if (!formData.phone.trim()) {
+      toast.error("Phone number is required");
+      return false;
+    }
+ 
+ 
+    return true;
+  };
+
+
   const handleSave = async () => {
-    setLoading(true);
+      if (!validateForm()) return;
+
+      setLoading(true);
     try {
       const updated = await updateAddress(formData);
       setAddress(updated);
