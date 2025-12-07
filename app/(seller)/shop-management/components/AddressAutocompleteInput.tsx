@@ -23,7 +23,7 @@ export default function AddressAutocompleteInput({
         value={value}
         disabled={!ready}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Enter your address"
+        placeholder="Start typing your address to autofill"
         className="input w-full border p-2 rounded"
       />
 

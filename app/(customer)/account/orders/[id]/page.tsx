@@ -241,10 +241,22 @@ export default function OrderDetail() {
 
             <div className="flex justify-between items-start">
               <p className="font-medium text-gray-600 w-1/2">
-                Tracking Number:
+                Tracking Detail:
               </p>
               <p className="text-gray-800 w-1/2 text-right">
-                {orderMeta.tracking_number ?? "Not yet"}
+                {orderMeta.tracking_url ? (
+                  <a
+                    href={orderMeta.tracking_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-red-600 underline truncate block max-w-full"
+                    title={orderMeta.tracking_url} 
+                  >
+                    {orderMeta.tracking_url}
+                  </a>
+                ) : (
+                  orderMeta.tracking_number
+                )}
               </p>
             </div>
 

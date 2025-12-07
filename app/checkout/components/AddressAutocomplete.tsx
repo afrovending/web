@@ -78,7 +78,7 @@ export default function AddressAutocomplete({ onSelectAddress }: Props) {
         value={value}
         disabled={!ready}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Enter your address"
+        placeholder="Start typing your address to autofill"
         className="input"
       />
 

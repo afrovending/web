@@ -66,7 +66,7 @@ export default function RootLayout({
       <body className={`antialiased bg-gray-50 h-full flex flex-col`}>
         <Script
           src="https://accounts.google.com/gsi/client"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
         />
         <Providers>
           <CartProvider>

@@ -83,7 +83,9 @@ export default function OrderSummary({
 
     const sessionEmail = sessionStorage.getItem("checkout_email");
 
-  
+  const vendorIds = Object.keys(selectedShipping.vendors); 
+const vendor_id = vendorIds[0];
+
 
     const vendorCarriers = Array.from(
       new Set(Object.values(selectedShipping.vendors).map((v) => v.carrier))
@@ -91,12 +93,14 @@ export default function OrderSummary({
 
     const shippingServiceCodes = Object.values(selectedShipping.vendors).map(
       (v) => ({
+        vendor_id: Number(vendor_id),
         total: v.total,
         service_code: v.service_code,
         carrier: v.carrier,
         currency: v.currency,
         delivery_days: v.delivery_days,
         estimated_delivery: v.estimated_delivery,
+        shipment_id: v.shipment_id,
         rate_id: v.rate_id,
       })
     );
@@ -212,10 +216,7 @@ export default function OrderSummary({
                     {estimatedDelivery
                       ? formatHumanReadableDate(estimatedDelivery)
                       : "N/A"}
-                  </p>
-                  <p hidden className="text-sm text-gray-500">
-                    Total Vendors: {Object.keys(option.vendors).length}
-                  </p>
+                  </p> 
                 </div>
                 <div className="text-right font-semibold text-gray-700">
                   {formatAmount(option.total)}
