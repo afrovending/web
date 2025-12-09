@@ -1,6 +1,7 @@
 import { FaDhl } from "react-icons/fa6";
 import { SiFedex, SiUps, SiUsps, SiAmazon, SiDeliveroo } from "react-icons/si";
 import { MdLocalShipping } from "react-icons/md";
+import { AiOutlineWechatWork } from "react-icons/ai";
 
 import {
   FiUser,
@@ -95,7 +96,12 @@ export const NAVIGATION: NavItem[] = [
       // Assuming sub-settings links
     ],
   },
-  // { id: 8, label: "Vendor Support", href: "/vendor-support", icon: LuUsers },
+  {
+    id: 8,
+    label: "Seller Copilot",
+    href: "/seller-copilot",
+    icon: AiOutlineWechatWork,
+  },
 ];
 
 export const CUSTOMER_MENU = [
