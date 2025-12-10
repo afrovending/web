@@ -20,7 +20,21 @@ export const useAuthStore = create<AuthStore>()(
       _hasHydrated: false,
 
       setAuth: (token, user) => set({ token, user }),
-      clearAuth: () => set({ token: null, user: null }),
+      clearAuth: () => {
+        // Clear Zustand
+        set({ token: null, user: null });
+
+        // Clear cookies
+        document.cookie.split(";").forEach((cookie) => {
+          const name = cookie.split("=")[0].trim();
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+        });
+
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("auth-storage");
+        }
+      },
+
       setHasHydrated: (state) => set({ _hasHydrated: state }),
 
       updateUser: (userUpdate: Partial<User>) =>
@@ -35,6 +49,7 @@ export const useAuthStore = create<AuthStore>()(
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
+
       storage: createJSONStorage(() => {
         if (typeof window !== "undefined") return localStorage;
         return {

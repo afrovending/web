@@ -8,6 +8,7 @@ import Script from "next/script";
 import PublicLayoutElements from "./PublicLayoutElements";
 import FooterWrapper from "./FooterWrapper";
 import { WishlistProvider } from "@/context/WishlistContext";
+import { useAuthBootstrap } from "@/hooks/useAuthBootstrap";
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
@@ -31,7 +32,8 @@ export const metadata: Metadata = {
     "Afrovending",
   ],
   openGraph: {
-    title: "Afrovending Online Marketplace | African Groceries, Clothes & Foods",
+    title:
+      "Afrovending Online Marketplace | African Groceries, Clothes & Foods",
     description:
       "Buy authentic African groceries, clothes, and foods online. Afrovending Online Marketplace delivers Africa’s best — fresh ingredients, fashion & essentials — right to your door.",
     url: "https://afrovending.com",
@@ -49,7 +51,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Afrovending Online Marketplace | African Groceries, Clothes & Foods",
+    title:
+      "Afrovending Online Marketplace | African Groceries, Clothes & Foods",
     description:
       "Shop authentic African groceries, clothes & foods online. Afrovending Online Marketplace delivers Africa’s best directly to your home.",
     images: ["https://afrovending.com/Twitter.png"],
@@ -61,6 +64,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  useAuthBootstrap();
   return (
     <html lang="en" className={`${instrumentSans.variable}`}>
       <body className={`antialiased bg-gray-50 h-full flex flex-col`}>
