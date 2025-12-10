@@ -3,18 +3,19 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import clsx from "clsx";
-import {
-  AiOutlineWechatWork,
-  AiOutlineSend,
-  AiFillRobot,
-} from "react-icons/ai";
+import { AiOutlineWechatWork, AiOutlineSend } from "react-icons/ai";
 import {
   askSellerCopilot,
   AskSellerCopilotResponse,
+  getConversationHistory,
 } from "@/lib/api/seller/gemini/sellerCopilot";
 import Markdown from "react-markdown";
 
-export default function SellerCopilot() {
+interface Props {
+  conversationId: number | null; // now we take the active conversation id
+}
+
+export default function SellerCopilot({ conversationId }: Props) {
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -27,14 +28,31 @@ export default function SellerCopilot() {
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  const [conversationId, setConversationId] = useState<number | null>(null);
+  // Fetch conversation whenever conversationId changes
+  useEffect(() => {
+    if (conversationId === null) return;
+
+    setLoading(true);
+
+    getConversationHistory(conversationId)
+      .then((history) => {
+        setMessages(
+          history.map((m) => ({
+            id: m.id,
+            role: m.role,
+            content: m.content,
+          }))
+        );
+      })
+      .finally(() => setLoading(false));
+  }, [conversationId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const sendMessage = async () => {
-    if (!input.trim() || loading) return;
+    if (!input.trim() || loading || conversationId === null) return;
 
     const userMessage = { id: Date.now(), role: "user", content: input };
     setMessages((prev) => [...prev, userMessage]);
@@ -44,16 +62,10 @@ export default function SellerCopilot() {
     try {
       const response: AskSellerCopilotResponse = await askSellerCopilot({
         message: input,
-        ...(conversationId ? { conversation_id: conversationId } : {}),
+        conversation_id: conversationId,
       });
 
-      const { reply, conversation_id } = response;
-
-      // persist session
-      if (!conversationId && conversation_id) {
-        setConversationId(conversation_id);
-        localStorage.setItem("seller_copilot_session", String(conversation_id));
-      }
+      const { reply } = response;
 
       await new Promise((r) => setTimeout(r, 400));
 
@@ -82,8 +94,8 @@ export default function SellerCopilot() {
       <div className="flex items-center gap-2 rounded-t-2xl bg-linear-to-r from-red-950 to-red-600 px-4 py-3 text-white">
         <AiOutlineWechatWork className="text-xl" />
         <div>
-          <h2 className="text-sm font-semibold text-white">Seller Copilot</h2>
-          <p className="text-xs text-red-100">
+          <h2 className="text-sm font-semibold text-white!">Seller Copilot</h2>
+          <p className="text-xs text-red-100!">
             AI-powered insights to optimise your shop, improve listings, and
             increase sales to your buyers.
           </p>
@@ -98,15 +110,15 @@ export default function SellerCopilot() {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             className={clsx(
-              "max-w-[75%] rounded-2xl px-4 py-2 text-sm shadow-sm",
+              "max-w-[75%] rounded-t-2xl px-4 py-2 text-sm shadow-sm",
               msg.role === "user"
-                ? "ml-auto bg-red-950 text-white"
-                : "bg-white text-gray-800 border border-red-100"
+                ? "ml-auto bg-linear-to-r from-red-600 to-red-950 text-gray-100! rounded-l-2xl"
+                : "bg-white text-gray-800 border border-red-100 rounded-r-2xl"
             )}
           >
             {msg.role === "assistant" && (
               <div className="mb-1 flex items-center gap-1 text-xs text-red-500">
-                <AiFillRobot />
+                <AiOutlineWechatWork />
                 AI Support
               </div>
             )}
@@ -119,12 +131,11 @@ export default function SellerCopilot() {
           </motion.div>
         ))}
 
-        {/* ✅ Typing indicator goes AFTER messages */}
         {loading && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-[75%] rounded-2xl border border-red-100 bg-white px-4 py-2 text-sm text-gray-800 shadow-sm"
+            className="max-w-[75%] rounded-t-2xl rounded-r-2xl border border-red-100 bg-white px-4 py-2 text-sm text-gray-800 shadow-sm"
           >
             <TypingIndicator />
           </motion.div>
@@ -146,7 +157,7 @@ export default function SellerCopilot() {
           />
           <button
             onClick={sendMessage}
-            disabled={loading}
+            disabled={loading || conversationId === null}
             className="flex items-center justify-center rounded-xl bg-red-950 p-2 text-white transition hover:bg-red-700 active:scale-95 disabled:opacity-50"
           >
             <AiOutlineSend className="text-lg" />
@@ -160,7 +171,7 @@ export default function SellerCopilot() {
 function TypingIndicator() {
   return (
     <div className="flex items-center gap-2 text-xs text-red-500">
-      <AiFillRobot />
+      <AiOutlineWechatWork />
       <span>Typing</span>
       <div className="flex gap-1">
         {[0, 1, 2].map((i) => (

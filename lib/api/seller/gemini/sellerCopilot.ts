@@ -41,24 +41,31 @@ export interface AiConversationSummary {
   created_at: string;
   updated_at: string;
 }
+export interface AiConversationHistoryResponse {
+  total: number;
+  offset: number;
+  limit: number;
+  data: AiConversationSummary[];
+}
 
-export async function getHistories(): Promise<AiMessage[]> {
-  const response = await api.get<AiMessage[]>(
-    "/vendor/seller-copilot/histories"
+export async function listConversations(
+  offset = 0,
+  limit = 10
+): Promise<AiConversationHistoryResponse> {
+  const response = await api.get<AiConversationHistoryResponse>(
+    "/vendor/seller-copilot/conversations",
+    { params: { offset, limit } }
   );
   return response.data;
 }
+
 
 export async function getConversationHistory(
   conversationId: number
 ): Promise<AiMessage[]> {
   const response = await api.get<AiMessage[]>(
-    "/vendor/seller-copilot/history",
-    {
-      params: {
-        conversation_id: conversationId,
-      },
-    }
+    `/vendor/seller-copilot/conversations/${conversationId}`
   );
   return response.data;
 }
+
