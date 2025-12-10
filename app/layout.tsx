@@ -8,7 +8,6 @@ import Script from "next/script";
 import PublicLayoutElements from "./PublicLayoutElements";
 import FooterWrapper from "./FooterWrapper";
 import { WishlistProvider } from "@/context/WishlistContext";
-import { useAuthBootstrap } from "@/hooks/useAuthBootstrap";
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
@@ -64,7 +63,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  useAuthBootstrap();
   return (
     <html lang="en" className={`${instrumentSans.variable}`}>
       <body className={`antialiased bg-gray-50 h-full flex flex-col`}>
