@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 import {
@@ -8,14 +8,15 @@ import {
   AiConversationSummary,
   AiConversationHistoryResponse,
 } from "@/lib/api/seller/gemini/sellerCopilot";
-import { FiX, FiMessageSquare } from "react-icons/fi";
+import { FiX, FiMessageSquare, FiPlus } from "react-icons/fi";
 import Skeleton from "react-loading-skeleton";
 
 interface Props {
   open: boolean;
   activeConversationId: number | null;
-  onSelectConversation: (id: number) => void;
+  onSelectConversation: (id: number | null) => void;
   onClose: () => void;
+  className?: string
 }
 
 export default function SellerCopilotSidebar({
@@ -30,6 +31,9 @@ export default function SellerCopilotSidebar({
   const [limit] = useState(10);
   const [total, setTotal] = useState(0);
 
+  // ✅ prevents refetch on every toggle
+  const hasFetchedRef = useRef(false);
+
   const fetchHistories = async (reset = false) => {
     setLoading(true);
     try {
@@ -42,9 +46,7 @@ export default function SellerCopilotSidebar({
         reset ? response.data : [...prev, ...response.data]
       );
       setTotal(response.total);
-      setOffset((prev) =>
-        reset ? response.limit : prev + response.data.length
-      );
+      setOffset(reset ? response.limit : offset + response.data.length);
     } finally {
       setLoading(false);
     }
@@ -52,7 +54,12 @@ export default function SellerCopilotSidebar({
 
   useEffect(() => {
     if (!open) return;
-    fetchHistories(true); // reset when opening
+
+    // ✅ fetch only ONCE
+    if (hasFetchedRef.current) return;
+
+    hasFetchedRef.current = true;
+    fetchHistories(true);
   }, [open]);
 
   const hasMore = histories.length < total;
@@ -71,18 +78,35 @@ export default function SellerCopilotSidebar({
           <span className="text-sm font-semibold text-red-950">
             Conversations
           </span>
+          <button onClick={onClose} className="rounded-lg p-1 hover:bg-red-100">
+            <FiX />
+          </button>
+        </div>
+
+        {/* New Chat */}
+        <div className="p-2">
+          <button
+            onClick={() => onSelectConversation(null)}
+            className="flex w-full items-center gap-2 rounded-xl bg-red-100 px-3 py-2 text-sm font-medium text-red-950 hover:bg-red-200 cursor-pointer"
+          >
+            <FiPlus />
+            New Chat
+          </button>
         </div>
 
         {/* List */}
-        <div className="flex-1 overflow-y-auto p-2 space-y-1">
-          {loading && <Skeleton width={240} height={30} />}
+        <div className="flex-1 overflow-y-auto space-y-1 p-2">
+          
+          {loading && histories.length === 0 && (
+            <Skeleton width={240} height={30} count={3} />
+          )}
 
           {histories.map((item) => (
             <button
               key={item.id}
               onClick={() => onSelectConversation(item.id)}
               className={clsx(
-                "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm",
+                "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm cursor-pointer",
                 activeConversationId === item.id
                   ? "bg-red-600 text-white"
                   : "hover:bg-red-100 text-red-900"
@@ -95,7 +119,6 @@ export default function SellerCopilotSidebar({
             </button>
           ))}
 
-          {/* Load more button */}
           {hasMore && !loading && (
             <button
               onClick={() => fetchHistories()}

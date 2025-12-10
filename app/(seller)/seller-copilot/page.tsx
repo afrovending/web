@@ -12,15 +12,19 @@ import {
 import Markdown from "react-markdown";
 
 interface Props {
-  conversationId: number | null; // now we take the active conversation id
+  conversationId: number | null;
+  onConversationCreated: (id: number) => void;
 }
 
-export default function SellerCopilot({ conversationId }: Props) {
+export default function SellerCopilot({
+  conversationId,
+  onConversationCreated,
+}: Props) {
   const [messages, setMessages] = useState([
     {
       id: 1,
       role: "assistant",
-      content: "Hi 👋 I’m your AI Support Assistant. How can I help today?",
+      content: "Hi 👋 I'm your Afrovending Copilot. How can I help?",
     },
   ]);
 
@@ -28,12 +32,21 @@ export default function SellerCopilot({ conversationId }: Props) {
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  // Fetch conversation whenever conversationId changes
+  // Load or reset conversation
   useEffect(() => {
-    if (conversationId === null) return;
+    if (conversationId === null) {
+      // ✅ New chat
+      setMessages([
+        {
+          id: 1,
+          role: "assistant",
+          content: "Hi 👋 I'm your Afrovending Copilot. How can I help?",
+        },
+      ]);
+      return;
+    }
 
     setLoading(true);
-
     getConversationHistory(conversationId)
       .then((history) => {
         setMessages(
@@ -52,7 +65,7 @@ export default function SellerCopilot({ conversationId }: Props) {
   }, [messages]);
 
   const sendMessage = async () => {
-    if (!input.trim() || loading || conversationId === null) return;
+    if (!input.trim() || loading) return;
 
     const userMessage = { id: Date.now(), role: "user", content: input };
     setMessages((prev) => [...prev, userMessage]);
@@ -65,13 +78,20 @@ export default function SellerCopilot({ conversationId }: Props) {
         conversation_id: conversationId,
       });
 
-      const { reply } = response;
+      const { reply, conversation_id } = response;
 
-      await new Promise((r) => setTimeout(r, 400));
+      // ✅ First message of a new chat
+      if (conversationId === null && conversation_id) {
+        onConversationCreated(conversation_id);
+      }
 
       setMessages((prev) => [
         ...prev,
-        { id: Date.now() + 1, role: "assistant", content: reply },
+        {
+          id: Date.now() + 1,
+          role: "assistant",
+          content: reply,
+        },
       ]);
     } catch (error) {
       setMessages((prev) => [
@@ -89,15 +109,14 @@ export default function SellerCopilot({ conversationId }: Props) {
   };
 
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-red-100 bg-white shadow-sm">
+    <div className="flex h-full flex-col rounded-2xl border border-red-100 bg-white shadow-sm ">
       {/* Header */}
       <div className="flex items-center gap-2 rounded-t-2xl bg-linear-to-r from-red-950 to-red-600 px-4 py-3 text-white">
-        <AiOutlineWechatWork className="text-xl" />
+        <AiOutlineWechatWork className="ml-4 text-xl" />
         <div>
           <h2 className="text-sm font-semibold text-white!">Seller Copilot</h2>
           <p className="text-xs text-red-100!">
-            AI-powered insights to optimise your shop, improve listings, and
-            increase sales to your buyers.
+            AI-powered insights to optimise your shop.
           </p>
         </div>
       </div>
@@ -112,8 +131,8 @@ export default function SellerCopilot({ conversationId }: Props) {
             className={clsx(
               "max-w-[75%] rounded-t-2xl px-4 py-2 text-sm shadow-sm",
               msg.role === "user"
-                ? "ml-auto bg-linear-to-r from-red-600 to-red-950 text-gray-100! rounded-l-2xl"
-                : "bg-white text-gray-800 border border-red-100 rounded-r-2xl"
+                ? "ml-auto rounded-l-2xl border bg-linear-to-r from-red-50 to-red-100"
+                : "rounded-r-2xl border border-red-100 bg-white text-gray-800"
             )}
           >
             {msg.role === "assistant" && (
@@ -123,11 +142,7 @@ export default function SellerCopilot({ conversationId }: Props) {
               </div>
             )}
 
-            <Markdown>
-              {typeof msg.content === "string"
-                ? msg.content
-                : "```json\n" + JSON.stringify(msg.content, null, 2) + "\n```"}
-            </Markdown>
+            <Markdown>{msg.content}</Markdown>
           </motion.div>
         ))}
 
@@ -135,7 +150,7 @@ export default function SellerCopilot({ conversationId }: Props) {
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-[75%] rounded-t-2xl rounded-r-2xl border border-red-100 bg-white px-4 py-2 text-sm text-gray-800 shadow-sm"
+            className="max-w-[75%] rounded-r-2xl rounded-t-2xl border border-red-100 bg-white px-4 py-2 text-sm shadow-sm"
           >
             <TypingIndicator />
           </motion.div>
@@ -145,20 +160,19 @@ export default function SellerCopilot({ conversationId }: Props) {
       </div>
 
       {/* Input */}
-      <div className="border-t border-red-100 bg-white p-3">
+      <div className="bg-white p-3">
         <div className="flex items-center gap-2">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             placeholder="Type your message…"
-            autoFocus
-            className="flex-1 rounded-xl border border-red-200 px-4 py-2 text-sm text-red-950 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="flex-1 input"
           />
           <button
             onClick={sendMessage}
-            disabled={loading || conversationId === null}
-            className="flex items-center justify-center rounded-xl bg-red-950 p-2 text-white transition hover:bg-red-700 active:scale-95 disabled:opacity-50"
+            disabled={loading}
+            className="btn btn-primary flex items-center justify-center"
           >
             <AiOutlineSend className="text-lg" />
           </button>
@@ -179,11 +193,7 @@ function TypingIndicator() {
             key={i}
             className="h-1.5 w-1.5 rounded-full bg-red-500"
             animate={{ opacity: [0.3, 1, 0.3] }}
-            transition={{
-              duration: 1,
-              repeat: Infinity,
-              delay: i * 0.2,
-            }}
+            transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
           />
         ))}
       </div>

@@ -1,24 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import clsx from "clsx";
 import { HiOutlineMenuAlt2, HiOutlineArrowLeft } from "react-icons/hi";
 import SellerCopilotSidebar from "./components/SellerCopilotSidebar";
 import SellerCopilot from "./page";
 
 export default function SellerCopilotLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeConversationId, setActiveConversationId] = useState<
     number | null
   >(null);
 
   return (
-    <div className="flex h-full w-full overflow-hidden rounded-2xl border border-red-100 bg-white shadow-sm">
-      {/* Sidebar */}
+    <div className="flex h-full w-full overflow-hidden rounded-2xl border border-red-100 bg-white shadow-sm ">
       <SellerCopilotSidebar
         open={sidebarOpen}
         activeConversationId={activeConversationId}
-        onSelectConversation={(id) => setActiveConversationId(id)}
+        onSelectConversation={setActiveConversationId}
         onClose={() => setSidebarOpen(false)}
+        className={clsx(
+          "border-r border-red-100 bg-red-50 transition-transform duration-300 ease-in-out",
+          "md:relative md:flex md:flex-col md:translate-x-0",
+          sidebarOpen
+            ? "fixed inset-0 z-50 w-64 shadow-lg translate-x-0"
+            : "-translate-x-full md:translate-x-0 hidden md:flex"
+        )}
       />
 
       {/* Main content */}
@@ -43,13 +50,15 @@ export default function SellerCopilotLayout() {
         {/* Desktop floating toggle */}
         <button
           onClick={() => setSidebarOpen((prev) => !prev)}
-          className="absolute left-0 top-4 z-10 hidden h-10 w-10 items-center justify-center rounded-full bg-red-50 text-red-950 shadow-md md:flex hover:bg-red-100"
+          className="absolute left-0 top-4 z-10 hidden h-8 w-8 items-center justify-center rounded-full bg-red-50 text-red-950 shadow-md md:flex hover:bg-red-100 cursor-pointer"
         >
           {sidebarOpen ? <HiOutlineArrowLeft /> : <HiOutlineMenuAlt2 />}
         </button>
-
-        {/* Chat main content */}
-        <SellerCopilot conversationId={activeConversationId} />
+ 
+        <SellerCopilot
+          conversationId={activeConversationId}
+          onConversationCreated={(id) => setActiveConversationId(id)}
+        />
       </div>
     </div>
   );

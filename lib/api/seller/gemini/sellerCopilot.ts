@@ -2,7 +2,7 @@ import api from "../../axios";
 
 export interface AskSellerCopilotPayload {
   message: string;
-  conversation_id?: number; // now optional
+  conversation_id?: any; // now optional
 }
 
 export interface AskSellerCopilotResponse {
