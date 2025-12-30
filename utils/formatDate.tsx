@@ -6,6 +6,7 @@ import isYesterdayPlugin from "dayjs/plugin/isYesterday";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import utc from "dayjs/plugin/utc";
+import { TIMEZONE } from "@/setting";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -35,9 +36,7 @@ export const formatTimeAgo = (timestamp: string): string => {
  * - 3rd, January (older)
  */
 
-export function formatHumanReadableDate(timestamp: string): string {
-  // Use .utc(timestamp, true) if your API date is a simple string like "2025-12-17"
-  // to prevent it from shifting timezones incorrectly.
+export function formatHumanReadableDate(timestamp: string): string { 
   const date = dayjs.utc(timestamp).tz(TIMEZONE, true);
 
   if (!date.isValid()) return "N/A";
