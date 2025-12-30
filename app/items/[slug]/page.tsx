@@ -33,7 +33,7 @@ export async function generateMetadata({
       description: description,
       keywords: seoKeywords,
       alternates: {
-        canonical: `https://ayokah.com/items/${slug}`,
+        canonical: `https://afrovending.com/items/${slug}`,
       },
       openGraph: {
         title: product.title,
@@ -141,33 +141,42 @@ export default async function ItemDetailPage({ params }: PageParams) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
         />
-        <nav className="text-sm text-gray-500 my-4" aria-label="Breadcrumb">
-          <ol className="list-none ml-4 inline-flex">
-            <li className="flex items-center">
+        <nav
+          className="text-sm text-gray-500 my-4 px-4 overflow-hidden"
+          aria-label="Breadcrumb"
+        >
+          <ol className="list-none flex items-center w-full">
+            {/* Home - Fixed width */}
+            <li className="shrink-0 flex items-center">
               <Link
                 href="/"
                 className="text-hub-primary hover:text-hub-secondary"
               >
                 Home
               </Link>
-              <span className="mx-2">
+              <span className="mx-2 text-gray-400">
                 <IoChevronForward />
               </span>
             </li>
-            <li className="flex items-center min-w-0">
+
+            {/* Category - Truncated */}
+            <li className="flex items-center min-w-0 max-w-[100px] sm:max-w-none">
               <Link
                 href={`/items?category=${product.category.slug}`}
-                className="text-hub-primary hover:text-hub-secondary truncate"
+                className="text-hub-primary hover:text-hub-secondary truncate block"
               >
                 {product.category.name}
               </Link>
-              <span className="mx-2">
+              <span className="mx-2 shrink-0 text-gray-400">
                 <IoChevronForward />
               </span>
             </li>
+
+            {/* Product Title - Truncated */}
             <li
-              className="text-hub-primary font-semibold truncate"
+              className="text-hub-primary font-semibold truncate min-w-0 flex-1"
               aria-current="page"
+              title={product.title} // Shows full name on hover
             >
               {product.title}
             </li>
