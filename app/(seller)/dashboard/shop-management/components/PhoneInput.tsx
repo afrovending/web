@@ -1,7 +1,5 @@
-// components/PhoneInput.tsx
 "use client";
 
-import React from "react";
 import { BeatLoader } from "react-spinners";
 
 interface Props {
