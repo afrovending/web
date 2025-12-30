@@ -91,7 +91,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="text-gray-500 mt-2">
+            <p hidden className="text-gray-500 mt-2">
               Please enter your details to sign in
             </p>
           </div>

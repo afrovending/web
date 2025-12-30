@@ -26,8 +26,8 @@ export default function CustomerSupportPage() {
           </p>
 
           <div className="space-y-1">
-            <SupportItem label="Live Chat" href="#" />
-            <SupportItem label="Email Support" href="#" />
+            <SupportItem label="Live Whatsapp Chat" href="return-policy" />
+            <SupportItem label="Email Support" href="mailto:support@afrovending.com" />
             <SupportItem label="Help Center" href="#" />
           </div>
         </section>
@@ -40,8 +40,8 @@ export default function CustomerSupportPage() {
           </p>
 
           <div className="space-y-1">
-            <SupportItem label="Order Tracking" href="#" />
-            <SupportItem label="Return Instructions" href="#" />
+            <SupportItem label="Order Tracking" href="/account/tracking" />
+            <SupportItem label="Return Instructions" href="/return-policy" />
           </div>
         </section>
       </div>

@@ -17,6 +17,7 @@ import { AxiosError } from "axios";
 import { registerUser } from "@/lib/api/auth/auth";
 import SelectDropdown from "@/app/(seller)/dashboard/components/commons/Fields/SelectDropdown";
 import { listAllowedCountries } from "@/lib/api/ip/countries";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
@@ -317,6 +318,16 @@ export default function RegisterPage() {
                     )}
                   </button>
                 </div>
+                <p className="text-xs text-center">
+                  By continuing, you agree to our{" "}
+                  <Link target="_blank" href="/terms-condition">
+                    <span className="text-hub-primary">Terms of Service</span>
+                  </Link>{" "}
+                  and{" "}
+                  <Link target="_blank" href="/privacy-policy">
+                    <span className="text-hub-primary">Privacy Policy</span>
+                  </Link>
+                </p>
 
                 <button
                   type="submit"

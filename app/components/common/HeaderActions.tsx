@@ -36,7 +36,7 @@ export default function HeaderActions() {
       </motion.button>{" "}
       <motion.button
         aria-label="Track Order"
-        onClick={() => router.push("/tracking")}
+        onClick={() => router.push("/track-order")}
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.05 }}
         transition={{ type: "spring", stiffness: 300, damping: 15 }}
