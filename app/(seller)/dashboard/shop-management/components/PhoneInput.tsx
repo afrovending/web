@@ -30,7 +30,8 @@ export default function PhoneInput({
           <span>{dialCode}</span>
         </div>
         <input
-          type="numeric"
+          type="tel"
+          inputMode="numeric"
           className="rounded-r-xl px-3 h-12.25 border border-gray-300 focus:border-hub-primary focus:ring-1 focus:ring-hub-primary outline-none w-full text-gray-900 text-sm"
           value={value}
           onChange={(e) => onChange(e.target.value.replace(/\D/g, ""))}
