@@ -26,7 +26,7 @@ export default function CustomerSupportPage() {
           </p>
 
           <div className="space-y-1">
-            <SupportItem label="Live Chat" href="https://wa.me/447389199608" />
+            <SupportItem label="Live Chat" href="https://wa.me/1857560354" />
 
             <SupportItem
               label="Email Support"

@@ -164,10 +164,10 @@ export default function StepSubscription({ onNext }: StepProps) {
 
                     <p className="mt-4">
                       <span className="text-5xl font-extrabold text-gray-900">
-                        £{plan.monthly_price}
+                        ${plan.monthly_price}
                       </span>
                       <span className="text-lg font-medium text-gray-500">
-                        /mo
+                        /month
                       </span>
                     </p>
                   </div>
