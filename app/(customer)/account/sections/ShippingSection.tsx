@@ -17,6 +17,7 @@ import {
 import Script from "next/script";
 import Address from "@/interfaces/address";
 import { IconType } from "react-icons";
+import axios from "axios";
 
 interface AddressRowProps {
   Icon: IconType;
@@ -79,8 +80,20 @@ export default function ShippingSection({ user }: { user: User | null }) {
       });
       toast.success("Shipping address synchronized");
       setIsEditing(false);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Update failed");
+    } catch (err: unknown) {
+      let errorMessage = "Update failed";
+      if (axios.isAxiosError(err)) {
+        const data = err.response?.data;
+        if (data?.errors) {
+          const firstErrorKey = Object.keys(data.errors)[0];
+          errorMessage = data.errors[firstErrorKey][0];
+        }
+        else if (data?.message) {
+          errorMessage = data.message;
+        }
+      }
+
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -101,7 +114,7 @@ export default function ShippingSection({ user }: { user: User | null }) {
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="text-xs font-bold text-red-800 flex items-center gap-1 hover:underline"
+            className="text-xs font-bold text-red-800 flex items-center gap-1 hover:underline cursor-pointer"
           >
             <PencilSquareIcon className="w-4 h-4" /> Edit
           </button>
@@ -128,13 +141,13 @@ export default function ShippingSection({ user }: { user: User | null }) {
                 label="City"
                 value={formData.city}
                 onChange={(v) => setFormData((p) => ({ ...p, city: v }))}
-                disabled={!!formData.city}
+                // disabled={!!formData.city}
               />
               <TextInput
                 label="Province"
                 value={formData.state}
                 onChange={(v) => setFormData((p) => ({ ...p, state: v }))}
-                disabled={!!formData.state}
+                // disabled={!!formData.state}
               />
             </div>
 
@@ -143,7 +156,7 @@ export default function ShippingSection({ user }: { user: User | null }) {
                 label="Postal Code"
                 value={formData.zip_code}
                 onChange={(v) => setFormData((p) => ({ ...p, zip_code: v }))}
-                disabled={!!formData.zip_code}
+                // disabled={!!formData.zip_code}
               />
               <TextInput
                 label="Country (2-letter)"
