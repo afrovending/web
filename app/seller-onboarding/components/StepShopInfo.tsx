@@ -210,12 +210,11 @@ export default function StepShopInfo({ onNext }: StepProps) {
     setLogoUrl(previewUrl);
     setLogoFile(file);
 
-    // CREATE MODE → only preview
     if (!shopId) {
       return;
     }
 
-    // UPDATE MODE → upload
+    
     try {
       const resp = await updateShopLogo(shopId, file);
       if (resp?.status === "success") {
@@ -248,7 +247,6 @@ export default function StepShopInfo({ onNext }: StepProps) {
       form.append("zip", zip || "");
       form.append("category_id", String(selectedCategory.id));
 
-      // If your backend expects logo/banner URLs, send them
       if (logoUrl) form.append("logo_url", logoUrl);
       if (bannerUrl) form.append("banner_url", bannerUrl);
 

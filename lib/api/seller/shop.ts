@@ -36,30 +36,39 @@ export async function retryOnboardingStatus(){
   return response.data;
 };
 
-export async function updateShopLogo(file: File) {
+export async function updateShopLogo(shopId: number, file: File) {
   const formData = new FormData();
-  // Laravel "Method Spoofing" for file uploads via PUT
-  formData.append("_method", "PUT");
+  formData.append("shop_id", String(shopId));
   formData.append("logo", file);
 
-  const response = await api.post("/vendor/shop/logo/update", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  const response = await api.post(
+    `/vendor/shop/logo/update/${shopId}`,
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
 
   return response.data;
 }
 
-export async function updateShopBanner(file: File) {
+export async function updateShopBanner(shopId: number, file: File) {
   const formData = new FormData();
-  formData.append("_method", "PUT");
+  formData.append("shop_id", String(shopId));
   formData.append("banner", file);
 
-  const response = await api.post("/vendor/shop/banner/update", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  const response = await api.post(
+    `/vendor/shop/banner/update/${shopId}`,
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
 
   return response.data;
 }
+
+ 
 
 export async function getMyShop() {
   const response = await api.get("/vendor/shop");
