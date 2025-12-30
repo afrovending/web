@@ -9,13 +9,13 @@ export default function CustomerSupportPage() {
     <>
       <div className="card mb-6">
         <h2 className="text-lg font-semibold flex items-center">
-          <FiLifeBuoy className="text-red-800 text-xl mr-2" size={24} />
+          <FiLifeBuoy className="text-orange-800 text-xl mr-2" size={24} />
           Customer Support
         </h2>
         <p className="text-sm mt-1 text-gray-600">
           From your account dashboard, you can easily contact support regarding
           your
-          <span className="text-red-800"> Orders or other inquiries </span>
+          <span className="text-orange-800"> Orders or other inquiries </span>
         </p>
       </div>
       <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
@@ -26,9 +26,17 @@ export default function CustomerSupportPage() {
           </p>
 
           <div className="space-y-1">
-            <SupportItem label="Live Whatsapp Chat" href="return-policy" />
-            <SupportItem label="Email Support" href="mailto:support@afrovending.com" />
-            <SupportItem label="Help Center" href="#" />
+            <SupportItem label="Live Chat" href="https://wa.me/447389199608" />
+
+            <SupportItem
+              label="Email Support"
+              href="mailto:afrovending.online@gmail.com"
+            />
+
+            <SupportItem
+              label="Help Center"
+              href="https://afrovending.com/faqs"
+            />
           </div>
         </section>
 
@@ -41,7 +49,10 @@ export default function CustomerSupportPage() {
 
           <div className="space-y-1">
             <SupportItem label="Order Tracking" href="/account/tracking" />
-            <SupportItem label="Return Instructions" href="/return-policy" />
+            <SupportItem
+              label="Return Instructions"
+              href="https://afrovending.com/return-policy"
+            />
           </div>
         </section>
       </div>
