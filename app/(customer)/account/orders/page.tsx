@@ -11,7 +11,6 @@ import { formatHumanReadableDate } from "@/utils/formatDate";
 import Link from "next/link";
 import Image from "next/image";
 import StatusBadge from "@/utils/StatusBadge";
-import Modal from "@/app/components/common/Modal";
 import ConfirmationModal from "@/app/(seller)/dashboard/components/commons/ConfirmationModal";
 import SelectDropdown from "@/app/(seller)/dashboard/components/commons/Fields/SelectDropdown";
 
@@ -111,7 +110,7 @@ export default function Orders() {
       formData.append("comment", reviewComment);
       // Append images if any
       reviewImages.forEach((file, index) => {
-        formData.append("images[]", file); // backend expects 'images' as array
+        formData.append("images[]", file);
       });
       await submitReview(formData);
 
@@ -138,12 +137,12 @@ export default function Orders() {
     <div>
       <div className="card mb-6">
         <h2 className="text-lg font-semibold flex items-center">
-          <FiPackage className="text-red-800 text-xl mr-2" size={24} />
+          <FiPackage className="text-green-800 text-xl mr-2" size={24} />
           Orders
         </h2>
         <p className="text-sm mt-1 text-gray-600">
           From your account, you can easily manage your recent
-          <span className="text-red-800"> orders </span>
+          <span className="text-green-800"> orders </span>
         </p>
       </div>
 
@@ -154,7 +153,7 @@ export default function Orders() {
           placeholder="Search orders by product name"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border border-red-200 rounded-lg px-3 py-2 w-full focus:outline-none"
+          className="border border-green-200 rounded-lg px-3 py-2 w-full focus:outline-none"
         />
       </div>
 
@@ -166,14 +165,14 @@ export default function Orders() {
           ))}
         </div>
       ) : error ? (
-        <div className="flex flex-col items-center justify-center py-10 text-red-500">
-          <FiPackage className="text-red-500 text-xl mr-2" size={24} />
+        <div className="flex flex-col items-center justify-center py-10 text-green-800">
+          <FiPackage className="text-green-800 text-xl mr-2" size={24} />
 
           <p className="text-lg font-medium">{error}</p>
         </div>
       ) : orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 text-gray-500 animate-fadeIn card">
-          <FiPackage className="text-red-800 text-xl mr-2" size={24} />
+          <FiPackage className="text-green-800 text-xl mr-2" size={24} />
 
           <h3 className="text-xl font-semibold mb-1">No Orders Found</h3>
           <p className="text-sm text-gray-400 text-center max-w-xs">
@@ -224,8 +223,7 @@ export default function Orders() {
                     {order.tracking_url ? (
                       <a
                         href={order.tracking_url}
-                        target="_blank"
-                        className="text-blue-600 underline"
+                        className="text-green-800 underline"
                       >
                         {order.tracking_number}
                       </a>
@@ -237,7 +235,7 @@ export default function Orders() {
               </div>
 
               {/* Items */}
-              <div className="mt-4 border-t border-red-200 pt-4 space-y-4">
+              <div className="mt-4 border-t border-green-200 pt-4 space-y-4">
                 {order.order_items.map((item) => (
                   <Link
                     key={item.id}
@@ -366,7 +364,7 @@ export default function Orders() {
                         prev.filter((_, i) => i !== index)
                       )
                     }
-                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                    className="absolute top-1 right-1 bg-hub-secondary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
                   >
                     &times;
                   </button>

@@ -7,11 +7,13 @@ import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import confetti from "canvas-confetti";
 import { verifyStripeSession } from "@/lib/api/customer/checkout";
+import { useCart } from "@/context/CartContext";
 
 function SuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
+  const { clearCart } = useCart();
 
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
@@ -26,11 +28,10 @@ function SuccessContent() {
 
     const verifyPayment = async () => {
       try {
-        // Call backend to verify session
         const data = await verifyStripeSession(sessionId);
-
         if (data.status === "paid") {
           setStatus("success");
+          clearCart();
           triggerConfetti();
         } else {
           setStatus("error");
@@ -50,7 +51,7 @@ function SuccessContent() {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
       return () => clearTimeout(timer);
     } else if (status === "success" && countdown === 0) {
-      router.push("/account");
+      router.push("/login?redirect=/account");
     }
   }, [status, countdown, router]);
 
@@ -83,7 +84,7 @@ function SuccessContent() {
   if (status === "loading") {
     return (
       <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-500 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-green-500 mx-auto mb-4"></div>
         <h2 className="text-xl font-semibold text-gray-700">
           Finalizing your order...
         </h2>
@@ -107,7 +108,7 @@ function SuccessContent() {
         </p>
         <Link
           href="/items"
-          className="text-red-600 font-medium hover:text-red-700 underline"
+          className="text-green-600 font-medium hover:text-green-700 underline"
         >
           Return to shop
         </Link>
@@ -127,8 +128,8 @@ function SuccessContent() {
       </h1>
       <p className="text-gray-600 mb-8">Your payment was successful.</p>
 
-      <div className="bg-red-50 border border-red-100 rounded-lg p-4 mb-8">
-        <p className="text-sm text-red-800 font-medium">
+      <div className="bg-green-50 border border-green-100 rounded-lg p-4 mb-8">
+        <p className="text-sm text-green-800 font-medium">
           Redirecting to your account in {countdown}s...
         </p>
       </div>

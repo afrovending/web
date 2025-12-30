@@ -13,7 +13,6 @@ export interface ShippingRatePayload {
   email: string;
   phone: string;
   country: string;
-  ip: string;
   products: ProductItem[];
   note?: string;
   preferred_date?: string;

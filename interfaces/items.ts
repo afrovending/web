@@ -1,3 +1,5 @@
+import { Shop } from "./shop";
+
 export default interface Item {
   id: number;
   title: string;
@@ -22,6 +24,12 @@ export default interface Item {
   reviews: [];
   average_rating: number;
   variations: Variation[];
+  available_days?: [];
+  available_from?: string;
+  available_to?: string;
+  estimated_delivery_time?: string;
+  delivery_method?: string;
+  pricing_model?: string;
 }
 
 export interface Category {
@@ -31,21 +39,24 @@ export interface Category {
   description: string;
   image: string;
 }
-
-export interface Shop {
+ 
+interface Color {
   id: number;
   name: string;
-  slug: string;
-  address: string;
-  logo: string;
-  banner: string;
-  country: string;
-  description: string;
+  hexcode: string;
 }
 
+interface Size {
+  id: number;
+  name: string;
+}
+ 
 export interface Variation {
   id?: number;
   name?: string;
   price?: string;
   [key: string]: unknown;
+  quantity: number;
+  color?: Color;
+  size?: Size;
 }

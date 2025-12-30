@@ -1,10 +1,8 @@
-// app/seller-onboarding/setup-success/page.tsx
 "use client";
 
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
-// Dynamically import the SuccessContent component to avoid SSR/hydration issues
 const SuccessContent = dynamic(
   () => import("../components/SetupSuccessContent"),
   { ssr: false }

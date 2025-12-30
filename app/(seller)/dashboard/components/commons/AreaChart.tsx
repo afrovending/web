@@ -35,24 +35,18 @@ const AreaChart = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [hasData, setHasData] = useState<boolean>(false);
 
-  // 1. Prepare Month Options
   const monthOptions = MONTHS.map((m) => ({ label: m, value: m }));
-
-  // 2. Determine the Current Month Name (Robustly)
-  // Use the locale string method to get the full month name, and clean it for comparison
+ 
   const currentMonthName = new Date().toLocaleString("en-US", {
     month: "long",
   });
-
-  // 3. Find the Default Option based on the current month name
-  // Use .trim() and .toLowerCase() on both sides to ensure matching, regardless of subtle differences.
+ 
   const defaultSelectedOption =
     monthOptions.find(
       (opt) =>
         opt.value.trim().toLowerCase() === currentMonthName.trim().toLowerCase()
-    ) || monthOptions[0]; // Fallback to January if the current month is not found
+    ) || monthOptions[0];
 
-  // 4. Initialize State with the Current Month
   const [selected, setSelected] = useState<{ label: string; value: string }>(
     defaultSelectedOption
   );
@@ -61,10 +55,7 @@ const AreaChart = () => {
     setLoading(true);
     try {
       const response: ApiResponse | null = await getSalesGraph(selectedPeriod);
-
-      // The API response is expected to be an object with a 'data' property that is an array.
       const raw = response?.data || [];
-        console.log(raw)
       if (
         response?.status === "success" &&
         Array.isArray(raw) &&
@@ -97,7 +88,6 @@ const AreaChart = () => {
 
   const options: ApexOptions = useMemo(
     () => ({
-      // ... (rest of ApexOptions remain the same)
       chart: {
         type: "area",
         height: 350,
@@ -173,30 +163,33 @@ const AreaChart = () => {
 
   return (
     <>
-      <div className="card flex items-center justify-between mb-6">
-        <h2 className="text-lg font-medium">Sales Graph</h2>
-        <SelectDropdown
-          options={monthOptions}
-          value={selected}
-          onChange={setSelected}
-        />
-      </div>
-      <div className="p-0 text-gray-950 card">
-        {loading ? (
-          <AreaChartSkeleton />
-        ) : hasData ? (
-          <ReactApexChart
-            options={options}
-            series={(options.series)}
-            type="area"
-            height={300}
+      <div className="card mb-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-normal">Sales Graph</h2>
+          <SelectDropdown
+            options={monthOptions}
+            value={selected}
+            onChange={setSelected}
           />
-        ) : (
-          <div className="text-center text-black py-10">
-            No data available for {selected.label}.
-          </div>
-        )}
+        </div>
+        <div className="p-0 text-gray-950">
+          {loading ? (
+            <AreaChartSkeleton />
+          ) : hasData ? (
+            <ReactApexChart
+              options={options}
+              series={options.series}
+              type="area"
+              height={300}
+            />
+          ) : (
+            <div className="text-center text-black py-10">
+              No data available for {selected.label}.
+            </div>
+          )}
+        </div>
       </div>
+     
     </>
   );
 };

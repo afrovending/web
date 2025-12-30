@@ -2,62 +2,82 @@
 
 import { useEffect, useState, useMemo, FC } from "react";
 import Image from "next/image";
-import { ShoppingBagIcon, HeartIcon } from "@heroicons/react/24/outline";
-import Product from "@/interfaces/items";
 import { useParams, useRouter } from "next/navigation";
 import Skeleton from "react-loading-skeleton";
 import debounce from "lodash.debounce";
-import { formatAmount } from "@/utils/formatCurrency";
 import { listShopItems } from "@/lib/api/shops";
+import Product from "@/interfaces/items";
+import { Shop } from "@/interfaces/shop";
+import ProductGrid from "@/app/items/components/ProductGrid";
 
 interface ApiResponse {
   status: string;
   message: string;
   data: Product[];
+  shop: Shop;
   total: number;
   offset: number;
   limit: number;
 }
 
-const Items: FC = () => {
+interface ReadMoreProps {
+  text: string;
+  lines?: number;
+}
+
+const ReadMore: FC<ReadMoreProps> = ({ text, lines = 2 }) => {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="text-sm text-gray-600 mt-1">
+      <p
+        className={`transition-all duration-300 overflow-hidden ${
+          !expanded ? `line-clamp-${lines}` : ""
+        }`}
+      >
+        {text}
+      </p>
+      {text.split(" ").length > 15 && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="text-green-800 hover:underline mt-1 block cursor-pointer"
+        >
+          {expanded ? "Read Less" : "Read More"}
+        </button>
+      )}
+    </div>
+  );
+};
+
+const ShopItems: FC = () => {
   const params = useParams();
   const slug = Array.isArray(params?.slug)
-    ? params.slug[0] // take the first element if it's an array
+    ? params.slug[0]
     : params?.slug ?? "";
   const router = useRouter();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ total: 0 });
-  const [filters, setFilters] = useState({
-    limit: 12,
-    offset: 0,
-    search: "",
-  });
+  const [shop, setShop] = useState<Shop | null>(null);
+  const [total, setTotal] = useState(0);
 
-  /** -------------------------
-   *  Fetch Items
-   * ------------------------- */
+  const [filters, setFilters] = useState({ limit: 12, offset: 0, search: "" });
+
+  const totalPages = Math.ceil(total / filters.limit);
+  const currentPage = filters.offset / filters.limit + 1;
+
   useEffect(() => {
-    if (!slug) return; // don't fetch if slug is undefined
+    if (!slug) return;
     const controller = new AbortController();
 
     const fetchItems = async () => {
       try {
         setLoading(true);
-
-        const res: ApiResponse = await listShopItems(slug, {
-          limit: filters.limit,
-          offset: filters.offset,
-          search: filters.search,
-        });
-
+        const res: ApiResponse = await listShopItems(slug, filters);
         setProducts(res.data || []);
-        setStats({ total: res.total || 0 });
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error("Fetch error:", error);
-        }
+        setShop(res.shop);
+        setTotal(res.total);
+      } catch (err) {
+        if (!controller.signal.aborted) console.error("Fetch error:", err);
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -67,56 +87,28 @@ const Items: FC = () => {
     return () => controller.abort();
   }, [slug, filters]);
 
-  /** -------------------------
-   *  Debounced Search
-   * ------------------------- */
-  const debouncedSearch = useMemo(
+  const handleSearch = useMemo(
     () =>
-      debounce((text: string) => {
-        setFilters((prev) => ({
-          ...prev,
-          offset: 0,
-          search: text,
-        }));
+      debounce((value: string) => {
+        setFilters((prev) => ({ ...prev, search: value, offset: 0 }));
       }, 500),
     []
   );
 
-  const handleSearch = (value: string) => {
-    debouncedSearch(value);
-  };
-
-  /** -------------------------
-   *  Pagination
-   * ------------------------- */
-  const totalPages = Math.ceil(stats.total / filters.limit);
-  const currentPage = filters.offset / filters.limit + 1;
-
   const nextPage = () => {
-    if (currentPage < totalPages) {
-      setFilters((prev) => ({
-        ...prev,
-        offset: prev.offset + prev.limit,
-      }));
-    }
+    if (currentPage < totalPages)
+      setFilters((prev) => ({ ...prev, offset: prev.offset + prev.limit }));
   };
 
   const prevPage = () => {
-    if (currentPage > 1) {
-      setFilters((prev) => ({
-        ...prev,
-        offset: prev.offset - prev.limit,
-      }));
-    }
+    if (currentPage > 1)
+      setFilters((prev) => ({ ...prev, offset: prev.offset - prev.limit }));
   };
 
-  /** -------------------------
-   *  Skeleton Loader
-   * ------------------------- */
   const renderSkeletons = () =>
     Array.from({ length: filters.limit }).map((_, i) => (
       <div key={i} className="bg-white rounded-xl overflow-hidden shadow">
-        <Skeleton height={224} />
+        <Skeleton height={124} />
         <div className="p-3">
           <Skeleton width={100} />
           <Skeleton width={70} />
@@ -124,94 +116,95 @@ const Items: FC = () => {
       </div>
     ));
 
-  /** -------------------------
-   *  UI
-   * ------------------------- */
   return (
-    <div className="p-4 bg-red-50 min-h-screen">
-      {/* Search Input */}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search shop items..."
-          className="w-full px-3 py-2 border rounded-md border-red-600 text-gray-900 focus:outline-none"
-          onChange={(e) => handleSearch(e.target.value)}
-        />
-      </div>
-
-      {/* Items Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-        {loading
-          ? renderSkeletons()
-          : products.length > 0
-          ? products.map((product) => (
-              <div
-                key={product.id}
-                onClick={() => router.push(`/items/${product.slug}`)}
-                className="bg-white rounded-xl overflow-hidden shadow relative group cursor-pointer"
-              >
-                <div className="relative">
+    <div className="bg-gray-50">
+      {/* Shop Header */}
+      {shop && (
+        <div className="mb-6 rounded-xl bg-white shadow">
+          <div className="relative w-full h-52 sm:h-64 bg-gray-200 overflow-hidden">
+            {shop.banner ? (
+              <Image
+                src={shop.banner}
+                alt={shop.name}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="h-full w-full bg-linear-to-r from-green-200 to-amber-300" />
+            )}
+            {shop.logo && (
+              <div className="absolute left-1/2 sm:left-6 top-full -translate-x-1/2 sm:translate-x-0 -translate-y-2/3">
+                <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white bg-white shadow-xl top-full -translate-y-1/4">
                   <Image
-                    src={product.images?.[0] ?? "/placeholder.png"}
-                    alt={product.title}
-                    width={400}
-                    height={400}
-                    className="w-full h-56 object-cover"
+                    src={shop.logo}
+                    alt={shop.name}
+                    fill
+                    className="object-cover rounded-full"
                   />
-
-                  {/* Hover Buttons */}
-                  <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition">
-                    <button className="bg-white rounded-full p-2 shadow hover:bg-red-100">
-                      <ShoppingBagIcon className="w-5 h-5 text-black" />
-                    </button>
-                    <button className="bg-white rounded-full p-2 shadow hover:bg-red-100">
-                      <HeartIcon className="w-5 h-5 text-black" />
-                    </button>
-                  </div>
                 </div>
-
-                <div className="p-3">
-                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-1">
-                    {product.title}
-                  </h3>
-
-                  <p className="text-sm font-bold text-gray-800">
-                    {formatAmount(product.sales_price)}
-                  </p>
-                </div>
-              </div>
-            ))
-          : !loading && (
-              <div className="col-span-full text-center py-10">
-                <p className="text-gray-500 text-lg">No items available.</p>
               </div>
             )}
-      </div>
+          </div>
+          <div className="pt-16 sm:pt-20 px-4 sm:px-6 pb-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                {shop.name}
+              </h1>
+              {shop.description && <ReadMore text={shop.description} />}
+              <p className="text-xs text-gray-500 mt-2">
+                {[shop.city, shop.state, shop.country]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Search */}
+      {totalPages > 1 && (
+        <div className="mb-4 px-4 sm:px-6">
+          <input
+            type="text"
+            placeholder="Search shop items..."
+            className="w-full px-3 py-2 border rounded-md border-amber-600 text-gray-900 focus:outline-none"
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </div>
+      )}
+
+      {/* Items Grid */}
+      <ProductGrid
+        products={products}
+        loading={loading}
+        columns="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"
+        onClickItem={(product) => router.push(`/items/${product.slug}`)}
+      />
 
       {/* Pagination */}
-      <div className="mt-6 flex items-center justify-center gap-4 text-red-900">
-        <button
-          onClick={prevPage}
-          disabled={currentPage === 1}
-          className="btn btn-gray shadow disabled:opacity-50"
-        >
-          Previous
-        </button>
-
-        <span className="font-medium">
-          Page {currentPage} of {totalPages || 1}
-        </span>
-
-        <button
-          onClick={nextPage}
-          disabled={currentPage === totalPages}
-          className="btn btn-gray shadow disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-center gap-4">
+          <button
+            onClick={prevPage}
+            disabled={currentPage === 1}
+            className="btn btn-gray"
+          >
+            Previous
+          </button>
+          <span className="font-medium text-green-800">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={nextPage}
+            disabled={currentPage === totalPages}
+            className="btn btn-gray"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
-export default Items;
+export default ShopItems;

@@ -49,7 +49,7 @@ export default function SellerLayout({ children }: SellerLayoutProps) {
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header toggleSidebar={toggleSidebar} />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-4">{children}</main>
+        <main className="flex-1 overflow-y-auto p-3 md:p-8">{children}</main>
       </div>
     </div>
   );

@@ -12,30 +12,12 @@ import {
 } from "@/lib/api/notifications";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { FiSettings } from "react-icons/fi";
 
 declare const api: {
   get: (url: string) => Promise<any>;
   post: (url: string, payload: any) => Promise<any>;
 };
-
-const NotificationIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="text-red-800 text-xl mr-2"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-  </svg>
-);
-
 const ToggleSwitch = ({
   label,
   checked,
@@ -65,9 +47,9 @@ const ToggleSwitch = ({
         disabled={disabled}
       />
       <div
-        className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 rounded-full peer dark:bg-gray-400 after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 ${
+        className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-400 after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 ${
           checked
-            ? "peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white peer-checked:bg-red-800"
+            ? "peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white peer-checked:bg-green-800"
             : ""
         } ${disabled ? "opacity-40" : ""}`}
       ></div>
@@ -98,7 +80,6 @@ export default function CommunicationSettingsPage() {
     const loadSettings = async () => {
       try {
         const settings = await getCommunicationSettings();
-        console.log("Fetched settings:", settings);
         setInitialSettings(settings);
 
         setOrderSettings({
@@ -199,14 +180,6 @@ export default function CommunicationSettingsPage() {
 
   const isSaveDisabled = isLoading || isSaving || !settingsHaveChanged();
 
-  if (isLoading) {
-    return (
-      <div className="card p-8 flex justify-center items-center h-40 bg-white rounded-xl shadow-md">
-        <p className="text-gray-500">Loading settings...</p>
-      </div>
-    );
-  }
-
   const handleCancel = () => {
     if (!initialSettings) return;
 
@@ -221,18 +194,21 @@ export default function CommunicationSettingsPage() {
       sms: initialSettings.new_products,
     });
   };
+
+  if (isLoading) return <SettingsSkeleton />;
+
   return (
     <>
       {/* Card Header */}
       <div className="card mb-6 hover:shadow-lg transition-all duration-300 rounded-xl bg-white cursor-default p-4">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <NotificationIcon />
-          Notification setting
+        <h2 className="text-lg font-semibold flex items-center text-green-800! gap-2">
+          <FiSettings />
+          Setting
         </h2>
         <p className="text-sm mt-1 text-gray-600">
           From your account dashboard, you can easily check, modify and view
           your
-          <span className="text-red-800"> Notification settings</span>
+          <span className="text-green-800"> Notification settings</span>
         </p>
       </div>
 
@@ -241,7 +217,7 @@ export default function CommunicationSettingsPage() {
         {/* Order Status */}
         <section className="mb-8 group transition-all">
           <div className="flex items-start mb-2">
-            <h3 className="text-xl font-medium text-gray-800 group-hover:text-red-700 transition-colors">
+            <h3 className="text-xl font-medium text-gray-800 group-hover:text-green-700 transition-colors">
               Order Status
             </h3>
           </div>
@@ -282,7 +258,7 @@ export default function CommunicationSettingsPage() {
         {/* Promotional Offers */}
         <section className="group transition-all">
           <div className="flex items-start mb-2">
-            <h3 className="text-xl font-medium text-gray-800 group-hover:text-red-700 transition-colors">
+            <h3 className="text-xl font-medium text-gray-800 group-hover:text-green-700 transition-colors">
               Promotional Offers
             </h3>
           </div>
@@ -335,8 +311,8 @@ export default function CommunicationSettingsPage() {
           <button
             className={`px-4 py-2 font-semibold rounded-lg transition-all duration-200 ${
               isSaveDisabled
-                ? "bg-red-300 text-white cursor-not-allowed"
-                : "bg-red-800 text-white hover:bg-red-700 hover:shadow-md hover:-translate-y-px cursor-pointer"
+                ? "bg-green-300 text-white cursor-not-allowed"
+                : "bg-green-800 text-white hover:bg-green-700 hover:shadow-md hover:-translate-y-px cursor-pointer"
             }`}
             onClick={handleSave}
             disabled={isSaveDisabled}
@@ -348,3 +324,31 @@ export default function CommunicationSettingsPage() {
     </>
   );
 }
+
+const SettingsSkeleton = () => (
+  <div className="animate-pulse">
+    {/* Header Skeleton */}
+    <div className="bg-gray-200 h-28 w-full rounded-xl mb-6" />
+
+    {/* Main Card Skeleton */}
+    <div className="p-6 bg-white rounded-xl shadow-md space-y-8">
+      {[1, 2].map((section) => (
+        <div key={section} className="space-y-4">
+          <div className="h-6 bg-gray-200 rounded w-1/4" />
+          <div className="h-4 bg-gray-200 rounded w-1/2" />
+          <div className="space-y-3 pl-4">
+            {[1, 2, 3].map((item) => (
+              <div
+                key={item}
+                className="flex justify-between items-center py-2"
+              >
+                <div className="h-4 bg-gray-200 rounded w-1/3" />
+                <div className="h-6 bg-gray-200 rounded-full w-10" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);

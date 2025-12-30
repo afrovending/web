@@ -46,7 +46,7 @@ export default function ForgetPassword() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-screen">
       {/* Left Column: Image */}
       <div className="relative hidden lg:block h-full w-1/2">
         <Image
@@ -66,8 +66,8 @@ export default function ForgetPassword() {
           <div hidden className="mb-8 flex justify-center">
             <Link href="/">
               <Image
-                src="/images/logo.svg"
-                alt="African Market Hub"
+                src="/logo.svg"
+                alt="Afrovending Online Marketplace"
                 width={180}
                 height={40}
                 style={{ height: "40px" }}
@@ -86,15 +86,19 @@ export default function ForgetPassword() {
           >
             <div>
               <label className="block text-sm font-medium mb-1">
-                Email Address
+                Enter your email address
               </label>
               <input
+                id="email-address"
                 type="email"
+                name="email"
+                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="input"
-                required
+                autoComplete="email"
+                inputMode="email"
+                placeholder="mary.j@example.ca"
+                className="input appearance-none"
               />
             </div>
 
@@ -111,8 +115,8 @@ export default function ForgetPassword() {
 
               <button
                 type="button"
-                className="btn btn-gray w-full"
-                onClick={() => router.push("/login")}
+                className="btn btn-gray w-full "
+                onClick={() => router.replace("/login")}
               >
                 Back to login
               </button>

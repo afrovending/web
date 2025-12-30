@@ -23,13 +23,13 @@ export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
 
   const handleLogout = () => {
     clearAuth();
-    router.push("/login");
+    router.replace("/");
   };
 
   const userName = user?.name || user?.email || "Seller";
 
   return (
-    <header className="sticky top-0 z-30 flex items-center h-16 bg-white border-b border-gray-200 px-8">
+    <header className="sticky top-0 z-30 flex items-center h-16 bg-white border-b border-gray-200 px-3">
       <button
         onClick={toggleSidebar}
         className="md:hidden text-gray-700 mr-3 focus:outline-none"
@@ -41,7 +41,15 @@ export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
 
       <div className="flex-1 flex justify-center md:hidden">
         <Link href="/dashboard">
-          <img src="/logo.svg" className="h-10 w-auto" alt="logo" />
+          <Image
+            src="/logo.svg"
+            alt="Afrovending Online Marketplace"
+            className="cursor-pointer"
+            width={140}
+            height={30}
+            priority
+            unoptimized
+          />
         </Link>
       </div>
 
@@ -49,7 +57,7 @@ export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
         <NotificationMenu />
 
         <Menu as="div" className="relative">
-          <MenuButton className="flex items-center space-x-2 transition-colors duration-150 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-50">
+          <MenuButton className="flex items-center space-x-2 transition-colors duration-150 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-50">
             <span className="hidden sm:block text-gray-700">{userName}</span>
             <Image
               src={user.profile_photo || "/default-avatar.png"}
@@ -69,7 +77,7 @@ export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <MenuItems className="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-2xl ring-1 ring-red-50 ring-opacity-5 focus:outline-none">
+            <MenuItems className="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-2xl ring-1 ring-green-50 ring-opacity-5 focus:outline-none">
               <div className="px-4 py-3">
                 <p className="text-sm font-semibold text-gray-900">
                   {userName}
@@ -81,7 +89,7 @@ export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
                 <MenuItem>
                   {({ active }) => (
                     <Link
-                      href="/account-settings"
+                      href="/dashboard/account-settings"
                       className={`flex items-center px-4 py-2 text-sm ${
                         active ? "bg-gray-100 text-gray-900" : "text-gray-700"
                       }`}
@@ -92,7 +100,7 @@ export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
                 </MenuItem>
               </div>
 
-              <div className="py-1 border-t border-red-50">
+              <div className="py-1 border-t border-green-50">
                 <MenuItem>
                   {({ active }) => (
                     <button

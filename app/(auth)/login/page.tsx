@@ -5,35 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import GoogleSignInButton from "@/app/components/common/GoogleSignInButton";
-import { loginUser } from "@/lib/api/auth/auth";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
-
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (options: {
-            client_id: string;
-            callback: (response: CredentialResponse) => void;
-            auto_select?: boolean;
-            cancel_on_tap_outside?: boolean;
-          }) => void;
-          prompt: () => void;
-        };
-      };
-    };
-  }
-}
-
-type CredentialResponse = {
-  credential?: string;
-  select_by?: string;
-  clientId?: string;
-};
+import { loginUser } from "@/lib/api/auth/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -48,31 +24,26 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Detect device/browser info
-      const device_name = navigator.userAgent || "web";
+      const device_name =
+        typeof window !== "undefined" ? navigator.userAgent : "web";
 
-      const payload = {
-        email,
-        password,
-        device_name,
-      };
+      const result = await loginUser({ email, password, device_name });
 
-      const result = await loginUser(payload);
-      // Store in Zustand auth store
+      // 1. Sync State
       useAuthStore.getState().setAuth(result.token, result.user);
 
+      // 2. Set Secure Cookies
+      const cookieConfig = "path=/; SameSite=Lax; Secure";
+      document.cookie = `token=${result.token}; ${cookieConfig}`;
+      document.cookie = `role=${result.user.role}; ${cookieConfig}`;
+
+      // 3. Optimized Redirect Logic
+      const { role } = result.user;
       const hasShop = !!result.hasShop;
-      // Store in cookies
-      document.cookie = `token=${result.token}; path=/;`;
-      document.cookie = `role=${result.user.role}; path=/;`;
 
-      // Redirect based on role
-      const role = result.user.role;
-
-      // Redirect logic
       if (role === "customer") {
-        router.replace("/account");
         toast.success("Welcome Back");
+        router.replace("/account");
       } else if (role === "vendor") {
         if (hasShop) {
           toast.success("Welcome Back");
@@ -82,7 +53,6 @@ export default function LoginPage() {
           router.replace("/seller-onboarding");
         }
       } else {
-        // Fallback (should not happen)
         router.replace("/");
       }
     } catch (error) {
@@ -95,8 +65,6 @@ export default function LoginPage() {
           message = error.response.data.message;
         }
       }
-      console.error("Authentication failed on the server:", error);
-
       toast.error(message);
     } finally {
       setLoading(false);
@@ -104,88 +72,90 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex">
-      {/* Left Column: Image */}
-      <div className="relative hidden lg:block h-full w-1/2">
+    <div className="flex min-h-screen">
+      {/* Left Column: Branding Image */}
+      <div className="relative hidden lg:block w-1/2">
         <Image
-          width={1200}
-          height={1600}
-          src="account-header.jpg"
-          alt="A woman in traditional African attire"
-          className="w-full h-full object-cover"
+          fill
+          src="/account-header.jpg"
+          alt="Afrovending Online Marketplace Branding"
+          className="object-cover"
+          priority
           unoptimized
         />
-        <div className="absolute inset-0 bg-gray-50 opacity-10"></div>
+        <div className="absolute inset-0 bg-black/5"></div>
       </div>
 
-      {/* Right Column: Form */}
-      <div className="flex items-center justify-center bg-gray-50 p-8 sm:p-12 w-full lg:w-1/2">
+      {/* Right Column: Auth UI */}
+      <div className="flex items-center justify-center bg-gray-50 p-8 w-full lg:w-1/2">
         <div className="w-full max-w-md">
-          {/* Logo */}
-          <div hidden className="mb-8 flex justify-center">
-            <Link href="/">
-              <Image
-                src="/images/logo.svg"
-                alt="African Market Hub"
-                width={180}
-                height={40}
-                style={{ height: "40px" }}
-                priority
-                unoptimized
-              />
-            </Link>
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
+            <p className="text-gray-500 mt-2">
+              Please enter your details to sign in
+            </p>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 text-center">
-            Log in
-          </h1>
-
-          {/* Google Button (Priority) */}
-          <div className="mb-6">
+          {/* Fancy Google Button Component */}
+          <div className="mb-8">
             <GoogleSignInButton />
           </div>
 
-          {/* Separator */}
-          <div className="my-6 flex items-center justify-center">
-            <div className="grow border-t border-gray-300"></div>
-            <span className="mx-4 text-sm text-gray-500">
-              or continue with email
-            </span>
-            <div className="grow border-t border-gray-300"></div>
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-gray-300"></span>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-gray-50 px-4 text-gray-500">
+                or continue with email
+              </span>
+            </div>
           </div>
 
-          {/* Login Form */}
-          <form onSubmit={handleLogin} className="space-y-4 text-gray-700">
-            {/* Email */}
+          <form onSubmit={handleLogin} className="space-y-5 text-gray-700">
             <div>
-              <label className="block text-sm font-medium  mb-1">Email</label>
+              <label className="block text-sm font-semibold mb-1.5">
+                Email Address
+              </label>
               <input
+                id="email-address"
                 type="email"
+                name="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input"
-                placeholder="you@example.com"
+                autoComplete="email"
+                inputMode="email"
+                placeholder="mary.j@example.ca"
+                className="input appearance-none"
               />
             </div>
 
-            {/* Password */}
-
             <div>
-              <label className="block text-sm font-medium mb-1">Password</label>
+              <label
+                htmlFor="password"
+                className="block text-sm font-semibold mb-1.5 text-gray-700"
+              >
+                Password
+              </label>
               <div className="relative">
                 <input
+                  id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="input"
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  className="input outline-none transition-all"
                   required
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-3.5 text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowPassword(!showPassword)}
+                  // Use tabIndex="-1" so the user doesn't accidentally tab onto the eye icon instead of the button
+                  tabIndex={-1}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none p-1"
                 >
                   {showPassword ? (
                     <EyeSlashIcon className="w-5 h-5" />
@@ -194,31 +164,41 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
-              <div className="text-right mt-1">
+
+              <div className="text-right mt-2">
                 <Link
                   href="/forget-password"
-                  className="text-sm text-red-800 hover:underline"
+                  className="text-sm font-medium text-hub-primary hover:text-hub-secondary transition-colors"
                 >
                   Forgot Password?
                 </Link>
               </div>
             </div>
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn btn-primary w-full!"
-            >
-              {loading ? "Logging in..." : "Log in"}
-            </button>
 
-            <button
-              type="button"
-              className="btn btn-gray w-full"
-              onClick={() => router.push("/register")}
-            >
-              Register
-            </button>
+            <div className="pt-2 space-y-3">
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn btn-primary w-full h-11 flex items-center justify-center transition-all disabled:opacity-70"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    Logging in...
+                  </span>
+                ) : (
+                  "Log in"
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => router.push("/register")}
+                className="btn btn-gray w-full h-11 border border-gray-300 bg-white hover:bg-gray-50 transition-colors text-gray-700"
+              >
+                Create an account
+              </button>
+            </div>
           </form>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Shop } from "./orders";
+import { Shop } from "./shop";
 
 export interface ProductResponse {
   status: string;
@@ -60,5 +60,6 @@ export interface Product {
     name: string;
   };
   average_rating: number;
+  variations?: any;
 }
 

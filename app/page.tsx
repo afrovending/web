@@ -1,15 +1,16 @@
-import BannerCarousel from "./components/BannerCarousel";
 import CategorySection from "./components/CategorySection";
-import RecommendedProducts from "./components/RecommendedProducts";
-import TodaysDeal from "./components/TodaysDeal";
+import HeroBanner from "./components/HeroBanner"; 
+import RecommendedItems from "./components/RecommendedItems"; 
 
 export default function Home() {
   return (
     <div className="bg-gray-50">
-      <BannerCarousel />
-      <CategorySection />
-      <RecommendedProducts />
-      <TodaysDeal />
+      <HeroBanner />
+      <CategorySection type="products" />
+      <CategorySection type="services" />
+      <RecommendedItems type="products" />
+      <RecommendedItems type="services" /> 
+      
     </div>
   );
 }

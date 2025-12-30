@@ -31,7 +31,17 @@ export function useItemForm(item: any) {
   // basic
   const [title, setTitle] = useState(item?.title ?? "");
   const [description, setDescription] = useState(item?.description ?? "");
-
+  const [keywords, setKeywords] = useState<string[]>(() => {
+    if (!item?.keywords) return [];
+    if (typeof item.keywords === "string") {
+      try {
+        return JSON.parse(item.keywords);
+      } catch (e) {
+        return item.keywords.split(",").map((k: string) => k.trim());
+      }
+    }
+    return Array.isArray(item.keywords) ? item.keywords : [];
+  });
   // pricing
   const [salesPrice, setSalesPrice] = useState<string>(
     item?.sales_price ? String(item.sales_price) : ""
@@ -106,7 +116,7 @@ export function useItemForm(item: any) {
     for (const cat of categories) {
       if (cat.value === id) return cat;
       const child = cat.children?.find((ch) => ch.value === id);
-      if (child) return cat; 
+      if (child) return cat;
     }
     return undefined;
   }
@@ -121,7 +131,6 @@ export function useItemForm(item: any) {
         setShopType(st);
 
         const { categories: cats } = await listCategories(100, 0, "", st);
-        console.log(cats);
         if (!mounted) return;
 
         const formatted = (cats ?? []).map((c: any) => ({
@@ -133,7 +142,7 @@ export function useItemForm(item: any) {
           })),
         }));
         setCategories(formatted);
- 
+
         const parentCategory = findCategory(
           formatted,
           String(item.category_id)
@@ -146,7 +155,6 @@ export function useItemForm(item: any) {
           );
           if (child) setSelectedChildCategory(child);
         }
-
       } catch (e) {
         console.error(e);
       }
@@ -171,7 +179,7 @@ export function useItemForm(item: any) {
 
     for (const file of files) {
       if (!VALID_IMAGE_TYPES.includes(file.type)) {
-        toast.error("Only JPG, PNG, WebP, GIF or SVG images are allowed");
+        toast.error("Only JPG, PNG, WebP, or JPEG images are allowed");
         return;
       }
       if (file.size > MAX_IMAGE_SIZE) {
@@ -193,29 +201,39 @@ export function useItemForm(item: any) {
 
   const removeExistingImage = async (idx: number) => {
     const publicId = existingImages.publicIds[idx];
+
     if (!publicId) {
-      toast.error("Image not found");
+      toast.error("Image identifier not found");
       return;
     }
+
+    const previousState = { ...existingImages };
+
     try {
-      // item might not have id when creating new
       if (!item?.id) throw new Error("Product ID missing");
+
+      const payload = new FormData();
+      payload.append("delete_public_ids[]", publicId);
+
       await deleteItemPhoto(item.id, publicId);
+
       setExistingImages((prev) => ({
         urls: prev.urls.filter((_, i) => i !== idx),
         publicIds: prev.publicIds.filter((_, i) => i !== idx),
       }));
-      toast.success("Image removed");
+
+      toast.success("Image removed successfully");
     } catch (e) {
-      console.error(e);
-      toast.error("Failed to delete image");
+      console.error("Deletion Error:", e);
+      setExistingImages(previousState);
+      toast.error("Failed to delete image. Please try again.");
     }
   };
 
   function validateForm(): string | null {
     if (!title || title.trim().length < 5)
       return "Title is required and must be at least 5 characters";
-    if (title.length > 100) return "Title must be at most 100 characters";
+    if (title.length > 250) return "Title must be at most 250 characters";
     if (!description || description.trim().length < 100)
       return "Description is required and must be at least 100 characters";
 
@@ -241,12 +259,23 @@ export function useItemForm(item: any) {
       return "Width must be a number between 0.1 and 10000 or left empty";
     if (!floatOK(heightVal))
       return "Height must be a number between 0.1 and 10000 or left empty";
+    if (!weightUnit) return "Weight unit is required for dimension";
+    if (!sizeUnit) return "Size unit is required for dimension";
 
     if (shopType === "services") {
       if (!pricingModel) return "Pricing model is required for services";
       if (!deliveryMethod) return "Delivery method is required for services";
-      if (!estimatedDeliveryTime || estimatedDeliveryTime.length > 255)
-        return "Estimated delivery time is required (max 255 chars)";
+      const deliveryRegex =
+        /^(?:[1-9][0-9]?\s*(?:second|minute|hour)s?\s*){1,2}$/i;
+
+      if (!estimatedDeliveryTime) {
+        return "Estimated delivery time is required";
+      }
+
+      if (!deliveryRegex.test(estimatedDeliveryTime.trim())) {
+        return "Format must be like '2 hours', '30 minutes', or '1 hour 15 minutes' (1-99)";
+      }
+      // ------------------------------------------------------
       if (!availableDays || availableDays.length === 0)
         return "Please choose at least one available day for services";
       if (!availableFrom || !availableTo)
@@ -290,6 +319,7 @@ export function useItemForm(item: any) {
     const fd = new FormData();
     fd.append("title", title);
     fd.append("description", description);
+    fd.append("keywords", JSON.stringify(keywords));
     const categoryId = selectedChildCategory.value || selectedCategory.value;
     if (categoryId) fd.append("category_id", categoryId);
 
@@ -325,7 +355,6 @@ export function useItemForm(item: any) {
         toast.success("Item added successfully");
       }
       onClose();
-      // prefer to update UI without reloading if possible
       window.location.reload();
     } catch (e) {
       let message = "An error occurred while saving the item";
@@ -353,7 +382,6 @@ export function useItemForm(item: any) {
   );
 
   return {
-    // state
     loading,
     shopType,
     categories,
@@ -361,6 +389,8 @@ export function useItemForm(item: any) {
     setTitle,
     description,
     setDescription,
+    keywords,
+    setKeywords,
     salesPrice,
     setSalesPrice,
     regularPrice,

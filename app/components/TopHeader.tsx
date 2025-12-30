@@ -9,17 +9,17 @@ import MobileSearch from "./common/MobileSearch";
 
 export default function TopHeader() {
   return (
-    <header className="relative w-full border-b bg-red-50 px-4 sm:px-6 py-3 flex items-center justify-between text-gray-500">
+    <header className="relative w-full bg-white px-2 sm:px-4 py-2 flex items-center justify-between text-gray-500">
       {/* Logo */}
       <div className="shrink-0">
         <Link href="/">
           <Image
-            src="/images/logo.svg"
-            alt="African Market Hub"
+            src="/logo.svg"
+            alt="Afrovending Online Marketplace"
             width={150}
             height={40}
             priority
-            unoptimized
+            quality={75}
           />
         </Link>
       </div>

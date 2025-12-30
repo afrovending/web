@@ -10,7 +10,7 @@ export async function getVendorOrderStatistics(range: string) {
 }
 
 export async function getSalesGraph(range: string) {
-  const { data } = await api.get(`/vendor/graph?month=${range}`);
+  const { data } = await api.get(`/vendor/graphy?month=${range}`);
   return data;
 }
 

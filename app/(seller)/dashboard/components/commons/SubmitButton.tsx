@@ -16,8 +16,8 @@ export function SubmitButton({
       disabled={loading}
       className={`w-full inline-flex items-center justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-bold rounded-md text-white  ${
         loading
-          ? "bg-red-400 cursor-not-allowed"
-          : "bg-red-400 hover:bg-red-600 cursor-pointer"
+          ? "bg-green-400 cursor-not-allowed"
+          : "bg-green-400 hover:bg-green-600 cursor-pointer"
       }`}
     >
       {loading ? (

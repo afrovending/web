@@ -1,27 +1,29 @@
 "use client";
 
-import { useEffect, useState, FC } from "react";
+import { useEffect, useState, FC, useMemo } from "react";
 import Image from "next/image";
-import { ShoppingBagIcon, HeartIcon } from "@heroicons/react/24/outline";
 import Product, { Category } from "@/interfaces/items";
 import { useRouter, useSearchParams } from "next/navigation";
 import Skeleton from "react-loading-skeleton";
 import { listItems } from "@/lib/api/items";
 import debounce from "lodash.debounce";
-import { useMemo } from "react";
-import { formatAmount } from "@/utils/formatCurrency";
+import ProductGrid from "./components/ProductGrid";
+import Link from "next/link";
+import FilterDrawer from "./components/FilterDrawer";
+import RequestLocation from "../components/common/RequestLocation";
 
 interface ItemsProps {
   params: { slug: string };
 }
+
 interface ApiResponse {
   status: string;
   message: string;
   category_info: Category | null;
   data: Product[];
   total: number;
-  offset: string | number;
-  limit: string | number;
+  offset: number;
+  limit: number;
   stats: Record<string, number>;
 }
 
@@ -35,17 +37,28 @@ const Items: FC<ItemsProps> = ({}) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [categoryInfo, setCategoryInfo] = useState<Category | null>(null);
-  const [filters, setFilters] = useState({
-    limit: 12,
+  const [total, setTotal] = useState(0);
+
+  const [filters, setFilters] = useState<{
+    limit: number;
+    offset: number;
+    search: string;
+    type: string;
+    status: string;
+    category: string;
+    sort: "asc" | "desc";
+    availability?: string;
+    rating?: number;
+  }>({
+    limit: 20,
     offset: 0,
     search: "",
     type: queryType,
     status: "active",
     category: queryCategory,
-    sort: "latest",
-    max_price: undefined as number | undefined,
-    availability: undefined as string | undefined,
-    rating: undefined as number | undefined,
+    sort: "asc",
+    availability: undefined,
+    rating: undefined,
   });
 
   // Fetch products
@@ -54,20 +67,22 @@ const Items: FC<ItemsProps> = ({}) => {
       try {
         setLoading(true);
 
-        const res: ApiResponse = await listItems(
-          filters.limit,
-          filters.offset,
-          filters.search,
-          filters.type,
-          filters.status,
-          filters.category,
-          filters.sort,
-          filters.max_price,
-          filters.availability
-        );
+        const params = {
+          limit: filters.limit,
+          offset: filters.offset,
+          search: filters.search || undefined,
+          type: filters.type,
+          status: filters.status,
+          category: filters.category || undefined,
+          direction: filters.sort,
+          availability: filters.availability,
+        };
+
+        const res: ApiResponse = await listItems(params);
 
         setProducts(res.data || []);
         setCategoryInfo(res.category_info || null);
+        setTotal(res.total || 0);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
@@ -83,6 +98,7 @@ const Items: FC<ItemsProps> = ({}) => {
       ...prev,
       type: queryType,
       category: queryCategory,
+      offset: 0,
     }));
   }, [queryType, queryCategory]);
 
@@ -90,7 +106,7 @@ const Items: FC<ItemsProps> = ({}) => {
   const debouncedSetSearch = useMemo(
     () =>
       debounce((value: string) => {
-        setFilters((prev) => ({ ...prev, search: value }));
+        setFilters((prev) => ({ ...prev, search: value, offset: 0 }));
       }, 500),
     []
   );
@@ -101,114 +117,122 @@ const Items: FC<ItemsProps> = ({}) => {
     };
   }, [debouncedSetSearch]);
 
-  // Skeleton UI while loading
-  const renderSkeletons = () =>
-    Array.from({ length: 12 }).map((_, idx) => (
-      <div
-        key={idx}
-        className="bg-white rounded-xl overflow-hidden shadow relative"
-      >
-        <Skeleton height={224} className="w-full h-56" />
-        <div className="p-3">
-          <Skeleton width={80} height={16} className="mb-2" />
-          <Skeleton height={16} className="mb-2" />
-          <Skeleton height={16} width={60} />
-        </div>
-      </div>
-    ));
+  const totalPages = Math.ceil(total / filters.limit);
+  const currentPage = Math.floor(filters.offset / filters.limit) + 1;
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setFilters((prev) => ({ ...prev, offset: (newPage - 1) * prev.limit }));
+  };
 
   return (
-    <div className="p-4 bg-white  h-full">
-      {loading ? (
-        // Skeleton for the header
-        <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
-          <Skeleton circle width={144} height={144} className="mb-4" />
-          <Skeleton height={36} width={250} className="mb-2" />
-          <Skeleton count={2} />
-        </div>
-      ) : (
-        categoryInfo && (
-          // The actual header content
-          <div className="mb-6 bg-white p-6 rounded-lg shadow-md flex flex-col md:flex-row items-center gap-6">
-            {categoryInfo.image && (
-              <Image
-                src={categoryInfo.image}
-                alt={categoryInfo.name}
-                width={150}
-                height={150}
-                className="w-36 h-36 rounded-full object-cover border-4 border-red-100 shrink-0"
-              />
-            )}
-            <div className="text-center md:text-left">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {categoryInfo.name}
-              </h1>
-              <div
-                className="text-gray-600 prose"
-                dangerouslySetInnerHTML={{ __html: categoryInfo.description }}
-              />
+    <>
+      {!categoryInfo && (
+        <div className="relative w-full h-40 md:h-48 lg:h-56">
+          <Image
+            src="/account-header.jpg"
+            alt="Account Header"
+            fill
+            className="object-cover brightness-39"
+            priority
+          />
+
+          <div className="absolute inset-0 flex flex-col justify-center px-5 md:px-10 text-white">
+            <h1 className="text-2xl md:text-3xl text-white! font-semibold">
+              All {queryType}
+            </h1>
+
+            <div className="text-sm mt-2 opacity-90">
+              <Link href="/" className="hover:underline">
+                Home
+              </Link>{" "}
+              /<span className="ml-1">{queryType}</span>
             </div>
           </div>
-        )
+        </div>
       )}
-      <main className="col-span-12 lg:col-span-9">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {loading ? (
-            renderSkeletons()
-          ) : products.length > 0 ? (
-            products.map((product) => (
-              <div
-                onClick={() => router.push(`/items/${product.slug}`)}
-                key={product.id}
-                className="bg-white rounded-xl overflow-hidden shadow relative group cursor-pointer"
-              >
-                {/* Image */}
-                <div className="relative">
+      <div className="mx-auto sm:px-4 px-4 py-12 min-h-screen">
+        {/* Category Header */}
+        {loading ? (
+          <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
+            <Skeleton circle width={144} height={144} className="mb-4" />
+            <Skeleton height={36} width={250} className="mb-2" />
+            <Skeleton count={2} />
+          </div>
+        ) : (
+          categoryInfo && (
+            <header className="relative mb-10 rounded-xl overflow-hidden shadow-xl">
+              {/* Background Image */}
+              {categoryInfo.image && (
+                <div className="absolute inset-0">
                   <Image
-                    src={product.images[0] || "/placeholder.png"}
-                    alt={product.title}
-                    width={400}
-                    height={400}
-                    className="w-full h-56 object-cover"
+                    src={categoryInfo.image}
+                    alt={categoryInfo.name}
+                    fill
+                    className="object-cover w-full h-full brightness-75"
                   />
-                  <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition">
-                    <button className="bg-white rounded-full p-2 shadow hover:bg-red-100">
-                      <ShoppingBagIcon className="w-5 h-5 text-black cursor-pointer" />
-                    </button>
-                    <button className="bg-white rounded-full p-2 shadow hover:bg-red-100">
-                      <HeartIcon className="w-5 h-5 text-black cursor-pointer" />
-                    </button>
-                  </div>
+                  <div className="absolute inset-0 bg-black/40"></div>
                 </div>
+              )}
 
-                {/* Info */}
-                <div className="p-3">
-                  <div className="flex items-center gap-1 text-yellow-400 mb-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <span key={i}>
-                        {i < product.average_rating ? "★" : "☆"}
-                      </span>
-                    ))}
-                  </div>
-
-                  <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-1">
-                    {product.title}
-                  </h3>
-
-                  <p className="text-sm font-semibold text-gray-800">
-                    {formatAmount(product.sales_price)}
+              {/* Caption Content */}
+              <div className="relative z-10 p-6 flex flex-col justify-end h-64">
+                <h1 className="sm:text-4xl text-sm font-extrabold text-white! mb-2">
+                  {categoryInfo.name}
+                </h1>
+                {categoryInfo.description && (
+                  <p className="sm:text-lg text-xs text-white/80! mb-4 line-clamp-2">
+                    {categoryInfo.description}
                   </p>
-                </div>
+                )}
               </div>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-10">
-              <p className="text-gray-500 text-lg">No items available.</p>
+            </header>
+          )
+        )}
+
+        {/* Product Grid */}
+        <div className="flex justify-start mb-4">
+          <FilterDrawer
+            filters={filters}
+            setFilters={setFilters}
+            debouncedSetSearch={debouncedSetSearch}
+            type={queryType}
+          />
+        </div>
+
+        <main className="col-span-12 lg:col-span-9">
+          <ProductGrid
+            products={products}
+            loading={loading}
+            columns="grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3"
+            onClickItem={(product) => router.push(`/items/${product.slug}`)}
+          />
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-12">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="btn btn-gray w-1/7"
+              >
+                Previous
+              </button>
+              <span className="text-green-800 font-medium">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="btn btn-gray w-1/7"
+              >
+                Next
+              </button>
             </div>
           )}
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+      <RequestLocation />
+    </>
   );
 };
 

@@ -33,7 +33,7 @@ export const OrderStatusTracker: React.FC<OrderStatusTrackerProps> = ({
         <h3 className="text-lg font-semibold text-gray-800">
           Order #{order.id}
         </h3>
-        <span className="bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full capitalize">
+        <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full capitalize">
           {order.shipping_status}
         </span>
       </div>
@@ -54,7 +54,7 @@ export const OrderStatusTracker: React.FC<OrderStatusTrackerProps> = ({
                   className={clsx(
                     "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
                     {
-                      "bg-red-800 text-white": isCompleted,
+                      "bg-green-800 text-white": isCompleted,
                       "bg-gray-200 text-gray-400": !isCompleted,
                     }
                   )}
@@ -77,7 +77,7 @@ export const OrderStatusTracker: React.FC<OrderStatusTrackerProps> = ({
               {!isLastStep && (
                 <div
                   className={clsx("flex-1 h-1 transition-colors", {
-                    "bg-red-800": isCompleted,
+                    "bg-green-800": isCompleted,
                     "bg-gray-200": !isCompleted,
                   })}
                 />

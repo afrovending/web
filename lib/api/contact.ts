@@ -34,3 +34,25 @@ export default async function contactUs(formData: Payload) {
     };
   }
 }
+
+export async function getPolicy(type: string) {
+  const response = await api.get(`/policy/${type}`);
+  return response.data.data;
+}
+export async function getFaq(type: string) {
+  const response = await api.get(`/faqs`, {
+    params: { type } 
+  });
+  return response.data.data;
+}
+export async function listTutorials(offset: number, limit: number) {
+  const response = await api.get(`/tutorials`, {
+    params: { offset, limit },
+  });
+  return response.data;
+}
+
+export async function getTutorialBySlug(slug: string) {
+  const response = await api.get(`/tutorials/${slug}`);
+  return response.data; 
+}

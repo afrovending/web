@@ -73,28 +73,7 @@ export type OrderListResponse = {
     // The 'data' field is an array of Order objects
     data: Order[];
 };
-
-export type Shop = {
-    id: number;
-    name: string;
-    slug: string;
-    address: string;
-    type: string;
-    logo: string;
-    logo_public_id: string;
-    banner: string;
-    banner_public_id: string;
-    description: string;
-    subscription_id: number;
-    state_id: string;
-    city_id: string;
-    country_id: string;
-    vendor_id: number;
-    category_id: number;
-    status: string;
-    created_at: string;
-    updated_at: string;
-};
+ 
 
 export type GraphPoint = {
   day: string;  

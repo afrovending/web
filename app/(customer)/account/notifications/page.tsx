@@ -39,20 +39,20 @@ export default function NotificationPage() {
     <>
       <div className="card mb-6">
         <h2 className="text-lg font-semibold flex items-center">
-          <FiBell className="text-red-800 text-xl mr-2" size={24} />
+          <FiBell className="text-green-800 text-xl mr-2" size={24} />
           Notifications
         </h2>
         <p className="text-sm mt-1 text-gray-600">
           From your account dashboard, you can easily get latest updates from
           your orders, products, coupons and other related
-          <span className="text-red-800"> notifications </span>.
+          <span className="text-green-800"> notifications </span>.
         </p>
       </div>
 
       {/* Empty State */}
       {!loading && notifications.length === 0 && (
         <div className="flex flex-col items-center justify-center py-10 text-gray-500 animate-fadeIn card">
-          <FiBell className="text-red-800 text-xl mr-2" size={24} />
+          <FiBell className="text-green-800 text-xl mr-2" size={24} />
           <h3 className="text-lg font-semibold mb-1">No Notifications</h3>
           <p className="text-sm text-gray-400 text-center max-w-xs">
             You're all caught up! New alerts and updates will appear here.
@@ -65,7 +65,7 @@ export default function NotificationPage() {
         {notifications.map((noti: any, index) => (
           <div
             key={index}
-            className="flex items-center gap-3 p-4 card bg-red-50/50!"
+            className="flex items-center gap-3 p-4 card bg-green-50/50!"
           >
             {noti.image ? (
               <Image
@@ -76,7 +76,7 @@ export default function NotificationPage() {
                 className="rounded-lg object-cover"
               />
             ) : (
-              <div className="w-12 h-12 bg-red-100 rounded-lg" />
+              <div className="w-12 h-12 bg-green-100 rounded-lg" />
             )}
 
             <div className="flex-1">

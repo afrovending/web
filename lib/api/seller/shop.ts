@@ -1,10 +1,13 @@
 import api from "../axios";
-
+ 
 export async function saveShop(formData: FormData) {
+  // If we are updating, Laravel often requires _method: PUT for multipart/form-data
+  if (!formData.has("_method")) {
+    formData.append("_method", "POST");
+  }
   const response = await api.post("/shop/save", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
-
   return response.data;
 }
 
@@ -15,34 +18,45 @@ export async function subscriptionCheckout(priceId: string) {
   return response.data;
 }
 
-export async function updateShopLogo(shopId: number, file: File) {
+export const verifySubscriptionCheckout = async (sessionId: string) => {
+  const response = await api.get(
+    `/vendor/subscription/checkout/verify?session_id=${sessionId}`
+  );
+  return response.data;
+};
+
+export async function verifyOnboardingStatus(){
+  const response = await api.get(
+    `/vendor/subscription/onboarding/verify`
+  );
+  return response.data;
+};
+export async function retryOnboardingStatus(){
+  const response = await api.get(`/vendor/subscription/onboarding/retry`);
+  return response.data;
+};
+
+export async function updateShopLogo(file: File) {
   const formData = new FormData();
-  formData.append("shop_id", String(shopId));
+  // Laravel "Method Spoofing" for file uploads via PUT
+  formData.append("_method", "PUT");
   formData.append("logo", file);
 
-  const response = await api.post(
-    `/vendor/shop/logo/update/${shopId}`,
-    formData,
-    {
-      headers: { "Content-Type": "multipart/form-data" },
-    }
-  );
+  const response = await api.post("/vendor/shop/logo/update", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 
   return response.data;
 }
 
-export async function updateShopBanner(shopId: number, file: File) {
+export async function updateShopBanner(file: File) {
   const formData = new FormData();
-  formData.append("shop_id", String(shopId));
+  formData.append("_method", "PUT");
   formData.append("banner", file);
 
-  const response = await api.post(
-    `/vendor/shop/banner/update/${shopId}`,
-    formData,
-    {
-      headers: { "Content-Type": "multipart/form-data" },
-    }
-  );
+  const response = await api.post("/vendor/shop/banner/update", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 
   return response.data;
 }

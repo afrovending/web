@@ -50,12 +50,13 @@ export default function CartDropdown() {
       button={
         <motion.div
           whileTap={{ scale: 0.95 }}
-          className="relative flex items-center gap-2 bg-red-200 text-red-900 px-2 sm:px-4 py-2 rounded-full hover:bg-red-200 transition cursor-pointer"
+          aria-label="Cart Items"
+          className="relative flex items-center gap-2 bg-hub-primary text-white px-2 sm:px-4 py-2 rounded-full hover:bg-hub-secondary transition cursor-pointer"
         >
           <div className="relative">
-            <ShoppingCartIcon className="w-4 h-4 lg:w-5 lg:h-5" />
+            <ShoppingCartIcon aria-label="Cart items" className="w-4 h-4 lg:w-5 lg:h-5 transition" />
             {totalItems > 0 && (
-              <span className="absolute -top-2 -right-3 bg-red-600 text-white text-[9px] font-extrabold rounded-full w-4 h-4 flex items-center justify-center">
+              <span className="absolute -top-2 -right-3 bg-white text-hub-secondary text-[9px] border font-extrabold rounded-full w-4 h-4 flex items-center justify-center">
                 {totalItems}
               </span>
             )}
@@ -80,7 +81,7 @@ export default function CartDropdown() {
       </div>
 
       {cart.length > 0 && (
-        <div className="p-3 border-t border-red-300">
+        <div className="p-3 border-t border-hub-primary">
           <div className="flex justify-between items-center mb-4">
             <span className="text-gray-600 font-medium">Subtotal:</span>
             <span className="text-gray-900 font-bold text-lg">
@@ -130,7 +131,7 @@ function CartItem({ item, updateQty, removeFromCart }: CartItemProps) {
       />
       <div className="flex-1 flex flex-col justify-between">
         <Link href={`/items/${item.slug}`}>
-          <h4 className="text-sm font-medium line-clamp-1 hover:text-red-600">
+          <h4 className="text-sm font-medium line-clamp-1 hover:text-hub-primary">
             {item.title}
           </h4>
         </Link>
@@ -158,8 +159,9 @@ function CartItem({ item, updateQty, removeFromCart }: CartItemProps) {
         </span>
         <button onClick={() => removeFromCart(item.id)}>
           <TrashIcon
-            className="w-5 h-5 hover:text-red-800 text-red-500 cursor-pointer"
+            className="w-5 h-5 hover:text-hub-secondary text-red-500 cursor-pointer"
             title="Remove"
+            aria-label="Trash icon"
           />
         </button>
       </div>

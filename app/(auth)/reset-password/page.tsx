@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { resetPassword } from "@/lib/api/auth/auth";
 import Link from "next/link";
 import Image from "next/image";
+import { resetPassword } from "@/lib/api/auth/auth";
 
 type ResetErrorResponse = {
   message?: string;
@@ -65,7 +65,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="flex">
+    <div className="flex max-h-screen">
       {/* Left Column: Image */}
       <div className="relative hidden lg:block h-full w-1/2">
         <Image
@@ -85,8 +85,8 @@ export default function ResetPassword() {
           <div hidden className="mb-8 flex justify-center">
             <Link href="/">
               <Image
-                src="/images/logo.svg"
-                alt="African Market Hub"
+                src="/logo.svg"
+                alt="Afrovending Online Marketplace"
                 width={180}
                 height={40}
                 style={{ height: "40px" }}
@@ -109,7 +109,8 @@ export default function ResetPassword() {
                 type="email"
                 value={email}
                 readOnly
-                className="w-full border border-gray-300 rounded-md px-4 py-2 bg-gray-100 cursor-not-allowed"
+                className="input"
+                autoComplete="email"
               />
             </div>
 
@@ -125,6 +126,7 @@ export default function ResetPassword() {
                   placeholder="Enter new password"
                   className="input"
                   required
+                  autoComplete="new-password"
                 />
                 <button
                   type="button"

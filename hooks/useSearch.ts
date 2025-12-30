@@ -2,18 +2,21 @@
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import debounce from "lodash/debounce";
-import { listItems } from "@/lib/api/items"; // Assuming this is your API function
+import { listItems } from "@/lib/api/items";
 import Item from "@/interfaces/items";
 
-const DEBOUNCE_TIME = 300; // Use a constant for debounce time
+const DEBOUNCE_TIME = 300;
 
 export function useSearch() {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isTouched, setIsTouched] = useState(false); // Track if user has searched
+  const [isTouched, setIsTouched] = useState(false);
 
-  // useMemo with an empty dependency array to create a stable debounced function
+  const limit = 10;
+  const offset = 0;
+
+  // Debounced fetch using new API signature
   const debouncedFetchItems = useMemo(() => {
     return debounce(async (query: string) => {
       if (!query.trim()) {
@@ -23,19 +26,24 @@ export function useSearch() {
       }
 
       try {
-        const response = await listItems(10, 0, query); // Limit 10, offset 0
+        const response = await listItems({
+          limit,
+          offset,
+          search: query,
+          status: "active",
+          type: "products",
+        });
+
         setResults(response?.data || []);
       } catch (error) {
-        // In production, you'd log this to a service like Sentry
         console.error("Error fetching items:", error);
-        setResults([]); // Clear results on error
+        setResults([]);
       } finally {
         setLoading(false);
       }
     }, DEBOUNCE_TIME);
-  }, []); // Empty array ensures this function is created only once
+  }, []);
 
-  // Effect to cancel debounce on unmount
   useEffect(() => {
     return () => {
       debouncedFetchItems.cancel();
@@ -47,7 +55,7 @@ export function useSearch() {
       const value = e.target.value;
       setSearchTerm(value);
       setLoading(true);
-      setIsTouched(true); // User has started searching
+      setIsTouched(true);
       debouncedFetchItems(value);
     },
     [debouncedFetchItems]

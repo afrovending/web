@@ -2,9 +2,15 @@
 
 import contactUs from "@/lib/api/contact";
 import { COMPANY_CONTACT_INFO } from "@/setting";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { FaBuilding, FaPhoneAlt, FaPaperPlane } from "react-icons/fa";
+import {
+  FaBuilding,
+  FaPhoneAlt,
+  FaPaperPlane,
+  FaWhatsapp,
+} from "react-icons/fa";
 import { ClipLoader } from "react-spinners";
 
 interface FormData {
@@ -278,7 +284,7 @@ const ContactUsPage: React.FC = () => {
         <header className="text-center py-16 bg-white rounded-xl shadow-lg mb-12">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
             Contact{" "}
-            <span className="text-red-600">
+            <span className="text-green-600">
               {COMPANY_CONTACT_INFO.companyName}
             </span>
           </h1>
@@ -291,7 +297,7 @@ const ContactUsPage: React.FC = () => {
         <div className="grid lg:grid-cols-3 gap-10">
           {/* Contact Info Sidebar (2/3) */}
           <div className="lg:col-span-1 space-y-8 p-6 lg:p-0">
-            <div className="bg-red-50 p-6 rounded-xl shadow-md border-l-4 border-red-600">
+            <div className="bg-green-50 p-6 rounded-xl shadow-md border-l-4 border-green-600">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 Get in Touch
               </h2>
@@ -300,51 +306,20 @@ const ContactUsPage: React.FC = () => {
                 inquiries.
               </p>
 
-              {/* Address */}
-              <div className="flex items-start mb-4">
-                <FaBuilding className="w-6 h-6 text-red-600 mt-1 shrink-0" />
-                <div className="ml-3">
-                  <p className="text-sm font-semibold text-gray-900">
-                    Physical Address
-                  </p>
-                  <p className="text-gray-700">
-                    {COMPANY_CONTACT_INFO.address}
-                  </p>
-                </div>
-              </div>
-
               {/* Phone */}
               <div className="flex items-start mb-4">
-                <FaPhoneAlt className="w-6 h-6 text-red-600 mt-1 shrink-0" />
+                <FaWhatsapp className="w-6 h-6 text-green-500 mt-1 shrink-0" />
                 <div className="ml-3">
                   <p className="text-sm font-semibold text-gray-900">
-                    Contact Number
+                    WhatsApp Us
                   </p>
-                  <p className="text-gray-700">{COMPANY_CONTACT_INFO.phone}</p>
+                  <p className="text-gray-700 hover:text-green-600 transition-colors">
+                    <Link href="https://wa.me/2348129022334">
+                      Send us a message
+                    </Link>
+                  </p>
                 </div>
               </div>
-
-              {/* Email (Derived) */}
-              <div className="flex items-start">
-                <FaPaperPlane className="w-6 h-6 text-red-600 mt-1 shrink-0" />
-                <div className="ml-3">
-                  <p className="text-sm font-semibold text-gray-900">
-                    Email Address
-                  </p>
-                  <p className="text-gray-700">{COMPANY_CONTACT_INFO.email}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Map Placeholder */}
-            <div className="bg-white p-6 rounded-xl shadow-xl h-68 flex items-center justify-center text-gray-400 border border-gray-100 overflow-hidden">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2493.8930236389942!2d0.43961977603890146!3d51.31309242488024!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47df34f2f3dc85f5%3A0xe6609bba8567e171!2s77%20The%20Lakes%2C%20Larkfield%2C%20Aylesford%20ME20%206SJ%2C%20UK!5e0!3m2!1sen!2ske!4v1764603232601!5m2!1sen!2ske"
-                className="w-full h-56 sm:h-64 md:h-72 lg:h-80"
-                style={{ border: 0 }}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              ></iframe>
             </div>
           </div>
 

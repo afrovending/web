@@ -4,7 +4,8 @@ import { setupCache } from "axios-cache-interceptor";
 import { toast } from "react-hot-toast";
 
 let api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://api.afrovending.com/api/v1",
+  baseURL:
+    process.env.NEXT_PUBLIC_API_URL || "https://api.afrovending.com/api/v1",
   headers: {
     "Content-Type": "application/json",
   },
@@ -41,6 +42,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 
 export default api;

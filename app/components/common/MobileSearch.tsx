@@ -20,7 +20,7 @@ export default function MobileSearch() {
   const openModal = () => setIsOpen(true);
   const closeModal = () => {
     setIsOpen(false);
-    clearSearch(); // Clear search state when closing modal
+    clearSearch();
   };
 
   return (
@@ -29,10 +29,13 @@ export default function MobileSearch() {
       <motion.button
         whileTap={{ scale: 0.9 }}
         onClick={openModal}
-        className="md:hidden px-2 py-2 flex items-center justify-center bg-red-200 rounded-full text-red-900"
+        className="md:hidden p-2 flex items-center justify-center rounded-full bg-hub-primary text-white"
         aria-label="Open search"
       >
-        <MagnifyingGlassIcon className="w-5 h-5" />
+        <MagnifyingGlassIcon
+          aria-label="Open search icon"
+          className="w-4 h-4 transition"
+        />
       </motion.button>
 
       {/* Full-Screen Search Modal */}
@@ -42,38 +45,50 @@ export default function MobileSearch() {
             initial={{ opacity: 0, y: "-100%" }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: "-100%" }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 z-50 bg-white"
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="fixed inset-0 z-50 backdrop-blur-md bg-white/60"
           >
-            {/* Modal Header */}
-            <div className="flex items-center w-full p-4 border-b">
-              <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search for products..."
-                className="flex-1 px-3 py-1 bg-transparent outline-none text-gray-900"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                autoFocus // Automatically focus input on modal open
-              />
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={closeModal}
-                className="p-1"
-                aria-label="Close search"
-              >
-                <XMarkIcon className="w-6 h-6 text-gray-500" />
-              </motion.button>
+            {/* SEARCH CONTAINER (shared border look) */}
+            <div className="p-4">
+              <div className="relative">
+                <div className="bg-white border border-hub-primary rounded-xl shadow-sm overflow-hidden">
+                  {/* Input */}
+                  <div className="flex items-center px-4 py-3">
+                    <MagnifyingGlassIcon className="w-5 h-5 text-hub-primary" />
+                    <input
+                      type="text"
+                      placeholder="Search items..."
+                      className="flex-1 ml-3 bg-transparent outline-none text-sm text-gray-900 placeholder-gray-400"
+                      value={searchTerm}
+                      onChange={handleSearchChange}
+                      autoFocus
+                    />
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={closeModal}
+                      className="ml-2 p-1"
+                      aria-label="Close search"
+                    >
+                      <XMarkIcon
+                        aria-label="Close search"
+                        className="w-5 h-5 text-gray-400"
+                      />
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Modal Body (Results) */}
-            <div className="overflow-y-auto h-[calc(100vh-65px)]">
-              <SearchResultsList
-                loading={loading}
-                results={results}
-                isTouched={isTouched}
-                onItemClick={closeModal}
-              />
+            {/* RESULTS */}
+            <div className="px-4">
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <SearchResultsList
+                  loading={loading}
+                  results={results}
+                  isTouched={isTouched}
+                  onItemClick={closeModal}
+                />
+              </div>
             </div>
           </motion.div>
         )}

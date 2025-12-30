@@ -6,8 +6,19 @@ export interface CheckoutPayload {
   shipping_fee: number;
   shipping_carrier: string;
   estimated_delivery: string | null;
-  shipping_service_code: any; 
-
+  discount_code?: string;
+  discount_amount?: number;
+  shipping_service_code: {
+    vendor_id: number;
+    total: number;
+    service_code: string;
+    carrier: string;
+    currency: string;
+    delivery_days: number;
+    estimated_delivery: string;
+    shipment_id: string;
+    rate_id: number;
+  }[];
 }
 
 interface CheckoutProduct {
@@ -16,7 +27,7 @@ interface CheckoutProduct {
 }
 
 export const checkoutStripe = async (payload: CheckoutPayload) => {
-  const res = await api.post("/session/checkout", {
+  const res = await api.post("stripe/checkout", {
     ...payload,
     device_name: navigator.userAgent,
   });
@@ -24,6 +35,13 @@ export const checkoutStripe = async (payload: CheckoutPayload) => {
 };
 
 export const verifyStripeSession = async (sessionId: string) => {
-  const res = await api.get(`/stripe/verify-session?session_id=${sessionId}`);
+  const res = await api.get(`/stripe/checkout/verify?session_id=${sessionId}`);
+  return res.data;
+};
+
+export const verifyOnboardingStripeSession = async (sessionId: string) => {
+  const res = await api.get(
+    `/stripe/verify-onboarding-session?session_id=${sessionId}`
+  );
   return res.data;
 };

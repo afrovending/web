@@ -10,12 +10,12 @@ export default function AccountHero() {
         src="/account-header.jpg"
         alt="Account Header"
         fill
-        className="object-cover brightness-25"
+        className="object-cover brightness-28"
         priority
       />
 
       <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-10 text-white">
-        <h1 className="text-2xl md:text-3xl font-semibold">My Account</h1>
+        <h1 className="text-2xl md:text-3xl text-white! font-semibold">My Account</h1>
 
         <div className="text-sm mt-2 opacity-90">
           <Link href="/" className="hover:underline">

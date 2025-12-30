@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { ContinueWithGoogle } from "./api/auth/auth";
 import toast from "react-hot-toast";
 import router from "next/router";
 import { useAuthStore } from "@/store/useAuthStore";
+import { ContinueWithGoogle } from "./api/auth/auth";
 
 declare global {
   interface Window {
@@ -71,7 +71,7 @@ export default function GoogleOneTap() {
     };
     const handleLoad = () => {
       if (window.google?.accounts.id) {
-        const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+        const clientId = process.env.NEXT_GOOGLE_CLIENT_ID;
         if (!clientId) {
           console.error("CLIENT_ID is missing from environment variables.");
           return;

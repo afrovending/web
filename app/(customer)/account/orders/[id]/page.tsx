@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Skeleton from "react-loading-skeleton";
-import dayjs from "dayjs";
 import { formatAmount } from "@/utils/formatCurrency";
 import { User } from "@/interfaces/user";
 import { Order, OrderItem as OrderItemType } from "@/interfaces/orders";
@@ -247,10 +246,9 @@ export default function OrderDetail() {
                 {orderMeta.tracking_url ? (
                   <a
                     href={orderMeta.tracking_url}
-                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-red-600 underline truncate block max-w-full"
-                    title={orderMeta.tracking_url} 
+                    title={orderMeta.tracking_url}
                   >
                     {orderMeta.tracking_url}
                   </a>

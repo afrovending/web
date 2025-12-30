@@ -4,7 +4,6 @@ import { trackOrder } from "@/lib/api/trackOrder";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { Order, OrderStatusTracker } from "./components/OrderStatusTracker";
-import { FiMapPin } from "react-icons/fi";
 interface OrderResponse {
   status: string;
   order?: Order;
@@ -41,42 +40,6 @@ const TrackOrderPage: React.FC = () => {
     }
   };
 
-  // return (
-  //   <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-  //     <div className="bg-white rounded-2xl shadow-sm w-full max-w-lg p-8">
-  //       <div className="mb-8">
-  //         <h2 className="text-xl font-bold text-gray-900">Track Your Order</h2>
-  //         <p className="text-sm text-gray-500 mt-1">
-  //           Enter your email to view your latest order status.
-  //         </p>
-
-  //         <form onSubmit={handleSearch} className="flex mt-5 gap-3">
-  //           <input
-  //             type="email"
-  //             value={email}
-  //             onChange={(e) => setEmail(e.target.value)}
-  //             placeholder="your@mail.com"
-  //             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800 transition text-gray-700"
-  //             required
-  //           />
-  //           <button
-  //             type="submit"
-  //             disabled={loading}
-  //             className="cursor-pointer px-6 py-2 bg-red-800 text-white font-semibold rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-800 disabled:bg-red-300 disabled:cursor-not-allowed transition"
-  //           >
-  //             {loading ? "Searching..." : "Track"}
-  //           </button>
-  //         </form>
-  //       </div>
-  //       {order && <OrderStatusTracker order={order} />}
-  //       {!order && !loading && (
-  //         <div className="text-center py-10 border-2 border-dashed rounded-lg">
-  //           <p className="text-gray-500">Your order status will appear here.</p>
-  //         </div>
-  //       )}
-  //     </div>
-  //   </main>
-  // );
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="bg-white rounded-2xl shadow-sm w-full max-w-lg p-8">
@@ -116,7 +79,7 @@ const TrackOrderPage: React.FC = () => {
           {order && <OrderStatusTracker order={order} />}
 
           {!order && !loading && (
-            <div className="text-center py-10 border-2 border-dashed border-red-200 rounded-lg">
+            <div className="text-center py-10 border-2 border-dashed border-green-200 rounded-lg">
               <p className="text-gray-500">
                 Your order status will appear here.
               </p>

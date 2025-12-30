@@ -1,13 +1,13 @@
 export const formatAmount = (
   value: string | number = 0,
-  currency: string = "USD", 
-  locale: string = "en-US" 
+  currency: string = "USD"
 ) => {
   const numericValue = Number(value);
-
-  return new Intl.NumberFormat(locale, {
+  const amount = isNaN(numericValue) ? 0 : numericValue;
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency,
+    currency: currency,
+    currencyDisplay: "symbol",
     minimumFractionDigits: 2,
-  }).format(isNaN(numericValue) ? 0 : numericValue);
+  }).format(amount);
 };

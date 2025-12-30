@@ -15,7 +15,7 @@ export default function ItemDetailSkeleton() {
             ))}
           </div>
           <div className="flex-1">
-            <div className="w-full h-[400px] bg-gray-200 rounded-lg shadow-md" />
+            <div className="w-full h-100 bg-gray-200 rounded-lg shadow-md" />
           </div>
         </div>
 
