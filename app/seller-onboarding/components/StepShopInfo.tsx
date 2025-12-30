@@ -350,7 +350,6 @@ export default function StepShopInfo({ onNext }: StepProps) {
         </div>
       </div>
 
-      {/* Spacer so content below doesn't overlap logo */}
       <div className="h-16 sm:h-20" />
 
       {initialLoading ? (
@@ -373,7 +372,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
               onChange={setName}
               placeholder="Shop name"
               required
-              maxLength={50}
+              maxLength={200}
             />
 
             <CategorySelector
@@ -399,7 +398,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
                   label="City"
                   value={city}
                   onChange={setCity}
-                  disabled={!!city}
+                  required
                 />
               </div>
               <div>
@@ -407,7 +406,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
                   label="ZIP"
                   value={zip}
                   onChange={setZip}
-                  disabled={!!zip}
+                  required
                 />
               </div>
               <div>
@@ -415,7 +414,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
                   label="State"
                   value={stateCode}
                   onChange={setStateCode}
-                  disabled={!!stateCode}
+                  required
                 />
               </div>
               <div>
@@ -423,7 +422,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
                   label="Country"
                   value={countryCode}
                   onChange={setCountryCode}
-                  disabled={!!countryCode}
+                  required
                 />
               </div>
             </div>
