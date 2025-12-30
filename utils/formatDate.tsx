@@ -5,7 +5,6 @@ import isTodayPlugin from "dayjs/plugin/isToday";
 import isYesterdayPlugin from "dayjs/plugin/isYesterday";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import localizedFormat from "dayjs/plugin/localizedFormat";
-import { CANADA_TIMEZONE } from "@/setting";
 import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
@@ -39,11 +38,11 @@ export const formatTimeAgo = (timestamp: string): string => {
 export function formatHumanReadableDate(timestamp: string): string {
   // Use .utc(timestamp, true) if your API date is a simple string like "2025-12-17"
   // to prevent it from shifting timezones incorrectly.
-  const date = dayjs.utc(timestamp).tz(CANADA_TIMEZONE, true);
+  const date = dayjs.utc(timestamp).tz(TIMEZONE, true);
 
   if (!date.isValid()) return "N/A";
 
-  const now = dayjs().tz(CANADA_TIMEZONE);
+  const now = dayjs().tz(TIMEZONE);
 
   if (date.isToday()) {
     return `Today, ${date.format("h:mma")}`;
@@ -67,11 +66,11 @@ export function formatHumanReadableDate(timestamp: string): string {
   return date.format("DD MMMM, YYYY");
 }
 export function formatHumanReadable(timestamp: string): string {
-let date = dayjs.utc(timestamp).tz(CANADA_TIMEZONE, true).hour(18).minute(0);
+let date = dayjs.utc(timestamp).tz(TIMEZONE, true).hour(18).minute(0);
 
 if (!date.isValid()) return "N/A";
 
-const now = dayjs().tz(CANADA_TIMEZONE);
+const now = dayjs().tz(TIMEZONE);
 const tomorrow = now.add(1, "day");
 
 // 2. Smart Logic for labels

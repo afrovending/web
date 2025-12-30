@@ -1,3 +1,4 @@
+import { TIMEZONE } from "@/setting";
 import { useEffect, useState } from "react";
 
 export default function useCanadaGreeting() {
@@ -8,10 +9,10 @@ export default function useCanadaGreeting() {
       const now = new Date();
  
       const canadaHour = Number(
-        new Intl.DateTimeFormat("en-CA", {
+        new Intl.DateTimeFormat("en-US", {
           hour: "numeric",
           hourCycle: "h23",
-          timeZone: "America/Toronto",
+          timeZone: TIMEZONE,
         }).format(now)
       );
 

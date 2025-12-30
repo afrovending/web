@@ -15,7 +15,6 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
 import { registerUser } from "@/lib/api/auth/auth";
-import { REGISTRATION_COUNTRY_LIST } from "@/setting";
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
@@ -27,9 +26,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState(""); // Default empty to force choice
-  const [selectedCountry, setSelectedCountry] = useState(
-    REGISTRATION_COUNTRY_LIST[0]
-  );
+  const [selectedCountry, setSelectedCountry] = useState();
   const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -241,9 +238,7 @@ export default function RegisterPage() {
                       maxLength={10}
                     />
                   </div>
-                  <p className="text-[10px] text-gray-500 mt-1">
-                    Currently accepting Canada-based numbers only.
-                  </p>
+                  
                 </div>
 
                 <div className="relative">

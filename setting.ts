@@ -29,7 +29,7 @@ import {
 } from "react-icons/lu";
 import { HiOutlineTicket, HiOutlineClipboardList } from "react-icons/hi";
 
-export const APP_NAME = "African Market Hub";
+export const APP_NAME = "Afrovending Online Marketplace";
 
 interface NavItem {
   id: number;
@@ -229,7 +229,7 @@ export const CARRIER_ICONS: Record<
   default: { icon: MdLocalShipping, color: "#FF9920" },
 };
 
-export const CANADA_TIMEZONE = "America/Toronto";
+export const TIMEZONE = "America/New_York";
 
 export const ALLOWED_COUNTRIES = [
   "CA", // Canada
@@ -256,13 +256,13 @@ export const COMPANY_CONTACT_INFO = {
   email: "info@africanmarkethub.ca",
   companyName: APP_NAME,
   about: `
-African Market Hub is a modern, people-focused food and service marketplace created to make everyday living simpler, faster, and more convenient. Built with the needs of today’s consumers in mind, African Market Hub connects individuals, families, and communities with high-quality foods, trusted sellers, essential products, and reliable home services — all through one easy-to-use digital platform.
+Afrovending Online Marketplace is a modern, people-focused food and service marketplace created to make everyday living simpler, faster, and more convenient. Built with the needs of today’s consumers in mind, Afrovending Online Marketplace connects individuals, families, and communities with high-quality foods, trusted sellers, essential products, and reliable home services — all through one easy-to-use digital platform.
 
-From freshly prepared meals to groceries, home essentials, and professional services, African Market Hub brings everything closer to you. Our platform empowers local vendors, supports small businesses, and ensures that customers enjoy competitive pricing, verified quality, and seamless delivery experiences.
+From freshly prepared meals to groceries, home essentials, and professional services, Afrovending Online Marketplace brings everything closer to you. Our platform empowers local vendors, supports small businesses, and ensures that customers enjoy competitive pricing, verified quality, and seamless delivery experiences.
 
-Whether you're shopping for daily essentials, placing a food order, booking a service professional, or exploring new offerings, African Market Hub is designed to save you time, reduce stress, and enhance convenience. We are committed to redefining lifestyle simplicity by merging technology, trust, and real human need into a single ecosystem that works for everyone.
+Whether you're shopping for daily essentials, placing a food order, booking a service professional, or exploring new offerings, Afrovending Online Marketplace is designed to save you time, reduce stress, and enhance convenience. We are committed to redefining lifestyle simplicity by merging technology, trust, and real human need into a single ecosystem that works for everyone.
 
-At African Market Hub, we don't just deliver products — we deliver comfort, reliability, and a better way to live every day.
+At Afrovending Online Marketplace, we don't just deliver products — we deliver comfort, reliability, and a better way to live every day.
 `,
   companyDescription: `
 Discover Africa's vibrant economy in one marketplace. We connect you directly with local entrepreneurs offering authentic African products—from stunning fashion and intricate crafts to farm-fresh produce and essential electronics. Buyers, find quality, heritage, and value. Sellers, access new markets and grow your business effortlessly. Your gateway to African excellence.`,
