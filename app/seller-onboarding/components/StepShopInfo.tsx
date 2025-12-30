@@ -1,10 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import toast from "react-hot-toast";
-import { BeatLoader } from "react-spinners";
-import { FaPencil } from "react-icons/fa6";
-
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { listCategories } from "@/lib/api/category";
 import {
   getMyShop,
@@ -13,18 +9,18 @@ import {
   updateShopBanner,
 } from "@/lib/api/seller/shop";
 import { numverifyValidatePhone } from "@/lib/api/ip/route";
+import toast from "react-hot-toast";
+import { BeatLoader } from "react-spinners";
 import { StepProps } from "@/interfaces/StepProps";
-
-import { countryCodeToFlag } from "@/utils/countryFlag";
+import { FaPencil } from "react-icons/fa6";
+import { DefaultOption } from "@/app/components/common/SelectField";
 import CategorySelector from "@/app/(seller)/dashboard/shop-management/components/CategorySelector";
+import FadeSlide from "@/app/(seller)/dashboard/shop-management/components/FadeSlide";
 import GoogleAddressAutocomplete from "@/app/(seller)/dashboard/shop-management/components/GoogleAddressAutocomplete";
 import PhoneInput from "@/app/(seller)/dashboard/shop-management/components/PhoneInput";
 import ShopHeaderCard from "@/app/(seller)/dashboard/shop-management/components/ShopHeaderCard";
 import TextareaField from "@/app/(seller)/dashboard/shop-management/components/TextareaField";
 import TextInput from "@/app/(seller)/dashboard/shop-management/components/TextInput";
-import { getAddress } from "@/lib/api/auth/shipping";
-import { DefaultOption } from "@/app/components/common/SelectField";
-import FadeSlide from "@/app/(seller)/dashboard/shop-management/components/FadeSlide";
 
 export interface Option extends DefaultOption {}
 
@@ -36,24 +32,11 @@ interface SelectOption {
   dial_code?: string;
 }
 
-const TYPES: SelectOption[] = [
-  { id: 2, name: "Products" },
-  { id: 1, name: "Services" },
-  { id: 1, name: "Retail Store" },
-];
-
 export default function StepShopInfo({ onNext }: StepProps) {
-  // --- Internal Persistence Flag ---
-  const [hasExistingShop, setHasExistingShop] = useState(false);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [categoriesError, setCategoriesError] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+  // form state
+  const [name, setName] = useState<string>("");
+  const [shopId, setShopId] = useState<number | null>(null);
 
-  // --- Form States ---
-  const [name, setName] = useState("");
-  const [type, setType] = useState("");
-  const [description, setDescription] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [addressLine, setAddressLine] = useState("");
   const [city, setCity] = useState("");
   const [stateCode, setStateCode] = useState("");
@@ -62,18 +45,72 @@ export default function StepShopInfo({ onNext }: StepProps) {
   const [lat, setLat] = useState<number | undefined>(undefined);
   const [lng, setLng] = useState<number | undefined>(undefined);
 
-  // --- Media & UI States ---
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [dialCode, setDialCode] = useState("");
+  const [description, setDescription] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [bannerUrl, setBannerUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
 
-  const [selectedType, setSelectedType] = useState(TYPES[0]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<any | null>(null);
-  const [isPhoneValid, setIsPhoneValid] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  // types + categories
+  const types: SelectOption[] = [
+    { id: 2, name: "Products" },
+    { id: 1, name: "Services" },
+  ];
+  const [selectedType, setSelectedType] = useState<SelectOption>(types[0]);
+  const [categories, setCategories] = useState<SelectOption[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<SelectOption | null>(
+    null
+  );
+
+  // phone validation
   const [isValidatingPhone, setIsValidatingPhone] = useState(false);
-  const [dialCode, setDialCode] = useState("");
+  const [isPhoneValid, setIsPhoneValid] = useState<boolean | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+
+  const LIMIT = 5000;
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadCats = async () => {
+      setCategoriesLoading(true);
+      setCategoriesError("");
+      try {
+        const r = await listCategories(
+          50,
+          0,
+          undefined,
+          selectedType.name.toLowerCase()
+        );
+        if (cancelled) return;
+        const formatted = (r?.categories ?? []).map((c: any) => ({
+          id: c.id,
+          name: c.name,
+        }));
+        setCategories(formatted);
+        setSelectedCategory((prev) => {
+          if (!prev) return formatted[0] ?? null;
+          const keep = formatted.find((f: Option) => f.id === prev.id);
+          return keep ?? formatted[0] ?? null;
+        });
+      } catch (err) {
+        console.error(err);
+        setCategoriesError("Failed to load categories.");
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    loadCats();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedType]);
 
   // phone validation
   const validatePhoneNumber = useCallback(async () => {
@@ -101,166 +138,16 @@ export default function StepShopInfo({ onNext }: StepProps) {
     return () => clearTimeout(timer);
   }, [phoneNumber, validatePhoneNumber]);
 
-  useEffect(() => {
-    let isMounted = true;
-    const loadAccountData = async () => {
-      try {
-        const [shopRes, addrRes] = await Promise.all([
-          getMyShop().catch(() => null),
-          getAddress().catch(() => null),
-        ]);
+  function countryCodeToFlag(code: string) {
+    if (!code) return "";
+    return code
+      .toUpperCase()
+      .replace(/./g, (char) =>
+        String.fromCodePoint(127397 + char.charCodeAt(0))
+      );
+  }
 
-        if (!isMounted) return;
-
-        if (shopRes?.status === "success" && shopRes.data) {
-          const s = shopRes.data;
-          setHasExistingShop(true);
-          setName(s.name || "");
-          if (s.type) {
-            const foundType = TYPES.find(
-              (t) => t.name.toLowerCase() === s.type.toLowerCase()
-            );
-            if (foundType) setSelectedType(foundType);
-          }
-          setDescription(s.description || "");
-          setLogoUrl(s.logo);
-          setBannerUrl(s.banner);
-          if (s.category) setSelectedCategory(s.category);
-        }
-
-        if (addrRes) {
-          setAddressLine(addrRes.street_address || "");
-          setCity(addrRes.city || "");
-          setPhoneNumber(addrRes.phone || "");
-          setZip(addrRes.zip_code || "");
-          setCountryCode(addrRes.country || "");
-          setStateCode(addrRes.state || "");
-          setLat(addrRes.lat);
-          setLng(addrRes.lng);
-        }
-      } finally {
-        if (isMounted) setInitialLoading(false);
-      }
-    };
-    loadAccountData();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    const loadCats = async () => {
-      setCategoriesLoading(true);
-      setCategoriesError("");
-      try {
-        const r = await listCategories(
-          50,
-          0,
-          undefined,
-          selectedType.name.toLowerCase()
-        );
-        if (cancelled) return;
-        const formatted = (r?.categories ?? []).map((c: any) => ({
-          id: c.id,
-          name: c.name,
-        }));
-        setCategories(formatted);
-        setSelectedCategory((prev: any) => {
-          if (!prev) return formatted[0] ?? null;
-          const keep = formatted.find((f: Option) => f.id === prev.id);
-          return keep ?? formatted[0] ?? null;
-        });
-      } catch (err) {
-        console.error(err);
-        setCategoriesError("Failed to load categories.");
-      } finally {
-        setCategoriesLoading(false);
-      }
-    };
-    loadCats();
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedType]);
-
-  const handleMediaChange = async (file: File, mode: "logo" | "banner") => {
-    const localPreview = URL.createObjectURL(file);
-    mode === "logo" ? setLogoUrl(localPreview) : setBannerUrl(localPreview);
-
-    if (hasExistingShop) {
-      const uploadPromise =
-        mode === "logo" ? updateShopLogo(file) : updateShopBanner(file);
-
-      toast.promise(uploadPromise, {
-        loading: `Uploading your ${mode}...`,
-        success: (res) => {
-          if (res.status !== "success") throw new Error(res.message);
-          return `${mode} updated!`;
-        },
-        error: (err) => `Upload failed: ${err.message || "Unknown error"}`,
-      });
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg("");
-
-    try {
-      const form = new FormData();
-      // Required Fields
-      form.append("name", name);
-      form.append("description", description);
-      form.append("phone", phoneNumber);
-      form.append("category_id", String(selectedCategory?.id));
-      form.append("type", selectedType.name.toLowerCase());
-
-      // Address Data
-      form.append("address", addressLine);
-      form.append("city", city);
-      form.append("state", stateCode);
-      form.append("zip", zip);
-      form.append("country", countryCode);
-
-      if (lat !== undefined) form.append("lat", String(lat));
-      if (lng !== undefined) form.append("lng", String(lng));
-
-      const res = await saveShop(form);
-
-      if (res.status === "success") {
-        toast.success(hasExistingShop ? "Shop updated!" : "Shop created!");
-        onNext?.();
-      }
-    } catch (err: any) {
-      const msg = err.response?.data?.message || "Something went wrong";
-      setErrorMsg(msg);
-      toast.error(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const [googleLoaded, setGoogleLoaded] = useState(false);
-
-  useEffect(() => {
-    if ((window.google as any)?.maps?.places) {
-      setGoogleLoaded(true);
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
-    script.async = true;
-    script.onload = () => setGoogleLoaded(true);
-    document.head.appendChild(script);
-
-    return () => {
-      script.remove();
-    };
-  }, []);
-
+  // Google address selection handler
   const handleAddressSelect = (addr: {
     street_address: string;
     city: string;
@@ -281,160 +168,315 @@ export default function StepShopInfo({ onNext }: StepProps) {
     setDialCode(addr.dialCode ?? "");
   };
 
-  if (initialLoading)
-    return (
-      <div className="flex flex-col items-center justify-center min-h-100">
-        <BeatLoader color="#ea580c" />
-        <p className="text-sm text-gray-500 mt-4">Syncing vendor profile...</p>
-      </div>
-    );
+  const handleBannerFile = async (file?: File) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File too large. Max 5 MB.");
+      return;
+    }
 
+    const previewUrl = URL.createObjectURL(file);
+    setBannerUrl(previewUrl);
+    setBannerFile(file);
+
+    // CREATE MODE → STOP HERE
+    if (!shopId) {
+      return; // Do NOT call API
+    }
+
+    // UPDATE MODE → upload
+    try {
+      const resp = await updateShopBanner(shopId, file);
+      if (resp?.status === "success") {
+        toast.success(resp?.message ?? "Banner uploaded successfully");
+      } else {
+        toast.error(resp?.message ?? "Banner upload failed");
+      }
+    } catch (err) {
+      console.error("Banner upload failed", err);
+      toast.error("Banner upload failed. Try again.");
+      setBannerUrl(null);
+    }
+  };
+
+  const handleLogoFile = async (file?: File) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File too large. Max 5 MB.");
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setLogoUrl(previewUrl);
+    setLogoFile(file);
+
+    // CREATE MODE → only preview
+    if (!shopId) {
+      return;
+    }
+
+    // UPDATE MODE → upload
+    try {
+      const resp = await updateShopLogo(shopId, file);
+      if (resp?.status === "success") {
+        toast.success(resp?.message ?? "Logo uploaded successfully");
+      } else {
+        toast.error(resp?.message ?? "Logo upload failed");
+      }
+    } catch (err) {
+      console.error("Logo upload failed", err);
+      toast.error("Logo upload failed. Try again.");
+      setLogoUrl(null);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCategory) return setErrorMsg("Please pick a category.");
+    setLoading(true);
+    setErrorMsg("");
+    try {
+      const form = new FormData();
+      form.append("name", name || "");
+      form.append("address", addressLine || "");
+      form.append("description", description || "");
+      form.append("phone", phoneNumber || "");
+      form.append("type", selectedType.name.toLowerCase());
+      form.append("country", countryCode || "");
+      form.append("state", stateCode || "");
+      form.append("city", city || "");
+      form.append("zip", zip || "");
+      form.append("category_id", String(selectedCategory.id));
+
+      // If your backend expects logo/banner URLs, send them
+      if (logoUrl) form.append("logo_url", logoUrl);
+      if (bannerUrl) form.append("banner_url", bannerUrl);
+
+      const response = await saveShop(form);
+
+      if (response.status === "success") {
+        toast.success("Shop updated successfully");
+        onNext?.({ shopId: response.data.id });
+      } else {
+        setErrorMsg(response.message || "Could not save shop.");
+        toast.error(response.message || "Could not save shop.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err?.response?.data?.message || "Unknown error");
+      toast.error(err?.response?.data?.message || "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isFormDisabled =
+    loading || categoriesLoading || !selectedCategory || isPhoneValid === false;
+
+  const [googleLoaded, setGoogleLoaded] = useState(false);
+
+  useEffect(() => {
+    if ((window.google as any)?.maps?.places) {
+      setGoogleLoaded(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
+    script.async = true;
+    script.onload = () => setGoogleLoaded(true);
+    document.head.appendChild(script);
+
+    return () => {
+      script.remove();
+    };
+  }, []);
   return (
-    <div className=" mx-auto pb-20">
-      <ShopHeaderCard subtitle="Your identity on the platform. Keep your info up to date." />
-
-      {/* Visual Identity Section */}
-      <div className="relative mb-24">
-        <div className="w-full h-52 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 group relative">
+    <div className="mx-auto">
+      <ShopHeaderCard subtitle="Update your shop details — use autocomplete for fast address entry." />
+      <div className="relative w-full">
+        {/* Banner */}
+        <div className="w-full h-40 sm:h-56 bg-gray-100 rounded-md overflow-hidden relative">
           {bannerUrl ? (
             <img
               src={bannerUrl}
-              className="w-full h-full object-cover"
               alt="Banner"
+              className="w-full h-full object-cover rounded-t-xl"
             />
           ) : (
-            <div className="flex items-center justify-center h-full text-slate-400">
-              No Banner Uploaded
+            <div className="w-full h-full flex items-center justify-center sm:text-xs text-gray-400">
+              Click on the pencil to add a new one
             </div>
           )}
-          <label className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex items-center justify-center">
-            <div className="bg-white p-3 rounded-full shadow-lg">
-              <FaPencil className="text-red-600" />
-            </div>
+
+          {/* Pencil Icon for Banner */}
+          <label className="absolute top-2 right-2 p-2 bg-white rounded-full cursor-pointer shadow hover:bg-gray-100">
+            <FaPencil className="text-red-700" />
             <input
               type="file"
+              accept="image/*"
               className="hidden"
               onChange={(e) =>
-                e.target.files?.[0] &&
-                handleMediaChange(e.target.files[0], "banner")
+                e.target.files && handleBannerFile(e.target.files[0])
               }
             />
           </label>
         </div>
 
-        <div className="absolute -bottom-16 left-10 group/logo">
-          <div className="w-32 h-32 rounded-full border-4 border-white bg-white shadow-xl overflow-hidden relative">
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                className="w-full h-full object-cover"
-                alt="Logo"
-              />
-            ) : (
-              <div className="h-full bg-slate-50" />
-            )}
-            <label className="absolute inset-0 bg-black/40 opacity-0 group-hover/logo:opacity-100 transition-opacity cursor-pointer flex items-center justify-center">
-              <FaPencil className="text-white" />
-              <input
-                type="file"
-                className="hidden"
-                onChange={(e) =>
-                  e.target.files?.[0] &&
-                  handleMediaChange(e.target.files[0], "logo")
-                }
-              />
-            </label>
-          </div>
+        {/* Logo - overlaps banner */}
+        <div className="absolute left-4 -translate-y-1/2 top-full w-24 h-24 sm:w-32 sm:h-32 border-2 border-red-900 rounded-full overflow-hidden bg-gray-50 shadow-xl">
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="Logo"
+              className="w-full h-full object-cover rounded-full"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-400">
+              No logo
+            </div>
+          )}
+
+          {/* Pencil Icon for Logo */}
+          <label className="absolute bottom-1 right-1 p-2 bg-white rounded-full cursor-pointer shadow hover:bg-gray-100">
+            <FaPencil className="text-red-700 text-sm sm:text-base" />
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) =>
+                e.target.files && handleLogoFile(e.target.files[0])
+              }
+            />
+          </label>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-10">
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-          <TextInput
-            label="Official Shop Name"
-            value={name}
-            onChange={setName}
-            required
-          />
-          <CategorySelector
-            types={TYPES}
-            selectedType={selectedType}
-            onTypeChange={setSelectedType}
-            categories={categories}
-            categoriesLoading={categoriesLoading}
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-            categoriesError={categoriesError}
-            isTypeDisabled={hasExistingShop} // 4. Pass the flag here
-          />
-        </section>
+      {/* Spacer so content below doesn't overlap logo */}
+      <div className="h-16 sm:h-20" />
 
-        <section className="space-y-6 bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-          <h3 className="text-lg font-bold text-slate-800">
-            Operational Address
-          </h3>
-          <FadeSlide keyId="address">
-            {googleLoaded && (
-              <GoogleAddressAutocomplete onSelect={handleAddressSelect} />
-            )}
-          </FadeSlide>
+      {initialLoading ? (
+        <div className="space-y-4">
+          <div className="h-12 bg-gray-100 rounded w-1/3 animate-pulse" />
+          <div className="h-40 bg-gray-100 rounded animate-pulse" />
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6 ">
+          {errorMsg && (
+            <div className="p-3 text-red-700 bg-red-100 rounded text-sm">
+              {errorMsg}
+            </div>
+          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-80">
-            <TextInput label="City" value={city} onChange={setCity} required />
-
+          <div className="grid grid-cols-1 gap-4">
             <TextInput
-              label="Postal/Zip Code"
-              value={zip}
-              onChange={setZip}
+              label="Shop name"
+              value={name}
+              onChange={setName}
+              placeholder="Shop name"
               required
+              maxLength={50}
             />
-            <TextInput
-              label="Province/State/Town"
-              value={stateCode}
-              onChange={setStateCode}
-              required
+
+            <CategorySelector
+              types={types}
+              selectedType={selectedType}
+              onTypeChange={setSelectedType}
+              categories={categories}
+              categoriesLoading={categoriesLoading}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              categoriesError={categoriesError}
             />
+
+            <FadeSlide keyId="address">
+              {googleLoaded && (
+                <GoogleAddressAutocomplete onSelect={handleAddressSelect} />
+              )}
+            </FadeSlide>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
+              <div>
+                <TextInput
+                  label="City"
+                  value={city}
+                  onChange={setCity}
+                  disabled={!!city}
+                />
+              </div>
+              <div>
+                <TextInput
+                  label="ZIP"
+                  value={zip}
+                  onChange={setZip}
+                  disabled={!!zip}
+                />
+              </div>
+              <div>
+                <TextInput
+                  label="State"
+                  value={stateCode}
+                  onChange={setStateCode}
+                  disabled={!!stateCode}
+                />
+              </div>
+              <div>
+                <TextInput
+                  label="Country"
+                  value={countryCode}
+                  onChange={setCountryCode}
+                  disabled={!!countryCode}
+                />
+              </div>
+            </div>
+
+            <PhoneInput
+              countryFlag={countryCodeToFlag(countryCode)}
+              dialCode={dialCode ?? ""}
+              value={phoneNumber}
+              onChange={setPhoneNumber}
+              validating={isValidatingPhone}
+              valid={isPhoneValid}
+            />
+
             <TextInput
-              label="Street Address"
+              label="Address (street / building)"
               value={addressLine}
               onChange={setAddressLine}
-              placeholder="street / building no"
+              placeholder="Street address"
               required
+            />
+
+            <TextareaField
+              label="Description"
+              value={description}
+              onChange={setDescription}
+              rows={5}
+              limit={LIMIT}
             />
           </div>
 
-          <PhoneInput
-            countryFlag={countryCodeToFlag(countryCode)}
-            dialCode={dialCode ?? ""}
-            value={phoneNumber}
-            onChange={setPhoneNumber}
-            validating={isValidatingPhone}
-            valid={isPhoneValid}
-            
-          />
-        </section>
-
-        <TextareaField
-          label="About the Shop"
-          value={description}
-          onChange={setDescription}
-          rows={4}
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn btn-primary gap-3 w-full"
-        >
-          {loading ? (
-            <BeatLoader size={8} color="white" />
-          ) : hasExistingShop ? (
-            "Update Shop Profile"
-          ) : (
-            "Create & Continue"
-          )}
-        </button>
-      </form>
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isFormDisabled}
+              className={`btn btn-primary w-full ${
+                isFormDisabled
+                  ? "opacity-60 cursor-not-allowed"
+                  : "hover:bg-red-700"
+              }`}
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <BeatLoader size={6} color="white" /> Saving...
+                </span>
+              ) : (
+                "Update Shop"
+              )}
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }
