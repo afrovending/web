@@ -27,7 +27,7 @@ import {
   LuRotateCcw,
   LuTruck,
 } from "react-icons/lu";
-import { HiOutlineTicket } from "react-icons/hi";
+import { HiOutlineClipboardList, HiOutlineTicket } from "react-icons/hi";
 
 export const APP_NAME = "Afrovending Online Marketplace";
 
@@ -106,12 +106,6 @@ export const VENDOR_MENU: NavItem[] = [
         href: "/dashboard/marketing/item-coupon",
         icon: HiOutlineTicket,
       },
-      // {
-      //   id: 52,
-      //   label: "Discounted Orders",
-      //   href: "/dashboard/marketing/discount-usage",
-      //   icon: HiOutlineClipboardList,
-      // },
     ],
   },
   {
@@ -125,6 +119,12 @@ export const VENDOR_MENU: NavItem[] = [
     label: "Earnings & Payouts",
     href: "/dashboard/finance-payment",
     icon: LuWallet,
+  },
+  {
+    id: 8,
+    label: "Seller Copilot",
+    href: "/dashboard/seller-copilot",
+    icon: HiOutlineClipboardList,
   },
   {
     id: 8,
@@ -230,7 +230,7 @@ export const CARRIER_ICONS: Record<
 };
 
 export const TIMEZONE = "America/New_York";
- 
+
 export const COMPANY_CONTACT_INFO = {
   address: "77 The Lakes, Larkfield, Aylesford, Kent ME20 6SJ, UK",
   phone: "+44 7930 173135",
