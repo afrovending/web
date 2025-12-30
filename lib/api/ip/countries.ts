@@ -1,3 +1,5 @@
+import api from "../axios";
+
 export async function getDialCode(countryCode: string): Promise<string> {
   try {
     const res = await fetch(
@@ -11,4 +13,9 @@ export async function getDialCode(countryCode: string): Promise<string> {
     console.error("getDialCode error:", err);
     return "";
   }
+}
+
+export async function listAllowedCountries() {
+  const response = await api.get("/countries");
+  return response.data;
 }

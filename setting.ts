@@ -27,7 +27,7 @@ import {
   LuRotateCcw,
   LuTruck,
 } from "react-icons/lu";
-import { HiOutlineTicket, HiOutlineClipboardList } from "react-icons/hi";
+import { HiOutlineTicket } from "react-icons/hi";
 
 export const APP_NAME = "Afrovending Online Marketplace";
 
@@ -230,30 +230,11 @@ export const CARRIER_ICONS: Record<
 };
 
 export const TIMEZONE = "America/New_York";
-
-export const ALLOWED_COUNTRIES = [
-  "CA", // Canada
-];
-
-export interface CountryOption {
-  code: string; // ISO 3166-1 alpha-2
-  dial_code: string; // E.164 dial code
-  flag: string; // Emoji or URL
-  name: string;
-}
-
-export const REGISTRATION_COUNTRY_LIST: CountryOption[] = [
-  {
-    code: "CA",
-    dial_code: "+1",
-    flag: "🇨🇦",
-    name: "Canada",
-  },
-];
+ 
 export const COMPANY_CONTACT_INFO = {
   address: "77 The Lakes, Larkfield, Aylesford, Kent ME20 6SJ, UK",
   phone: "+44 7930 173135",
-  email: "info@africanmarkethub.ca",
+  email: "info@afrovending.com",
   companyName: APP_NAME,
   about: `
 Afrovending Online Marketplace is a modern, people-focused food and service marketplace created to make everyday living simpler, faster, and more convenient. Built with the needs of today’s consumers in mind, Afrovending Online Marketplace connects individuals, families, and communities with high-quality foods, trusted sellers, essential products, and reliable home services — all through one easy-to-use digital platform.

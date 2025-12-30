@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ALLOWED_COUNTRIES } from "@/setting";
-import { getDialCode } from "@/lib/api/ip/countries";
+import { getDialCode, listAllowedCountries } from "@/lib/api/ip/countries";
 import toast from "react-hot-toast";
 
 type Address = {
@@ -25,8 +24,13 @@ type Props = {
 export default function GoogleAddressAutocomplete({
   onSelect,
   placeholder = "Start typing address...",
-  countryRestrictions = ALLOWED_COUNTRIES.map((c) => c.toLowerCase()),
+  countryRestrictions: initialRestrictions,
 }: Props) {
+  const [restrictedCountryCodes, setRestrictedCountryCodes] = useState<
+    string[]
+  >(initialRestrictions || []);
+  const [loadingCodes, setLoadingCodes] = useState(!initialRestrictions);
+
   const [value, setValue] = useState("");
   const [suggestions, setSuggestions] = useState<
     google.maps.places.AutocompleteSuggestion[]
@@ -36,6 +40,24 @@ export default function GoogleAddressAutocomplete({
     useState<google.maps.places.AutocompleteSessionToken | null>(null);
 
   const placesLib = useRef<google.maps.PlacesLibrary | null>(null);
+
+  useEffect(() => {
+    if (initialRestrictions) return; // Skip if passed via props
+
+    const fetchAllowed = async () => {
+      try {
+        const response = await listAllowedCountries();
+        const codes =
+          response.data?.map((c: any) => c.code.toLowerCase()) || [];
+        setRestrictedCountryCodes(codes);
+      } catch (error) {
+        console.error("Failed to fetch country restrictions:", error);
+      } finally {
+        setLoadingCodes(false);
+      }
+    };
+    fetchAllowed();
+  }, [initialRestrictions]);
 
   useEffect(() => {
     const init = async () => {
@@ -57,15 +79,15 @@ export default function GoogleAddressAutocomplete({
     const val = e.target.value;
     setValue(val);
 
-    if (val.length > 2 && placesLib.current && sessionToken) {
+    // Added check for loadingCodes to ensure we don't fetch before restrictions are set
+    if (val.length > 2 && placesLib.current && sessionToken && !loadingCodes) {
       const { AutocompleteSuggestion } = placesLib.current;
 
-      // This dynamically grabs the correct type from the function itself
       const request: Parameters<
         typeof AutocompleteSuggestion.fetchAutocompleteSuggestions
       >[0] = {
         input: val,
-        includedRegionCodes: countryRestrictions,
+        includedRegionCodes: restrictedCountryCodes,
         sessionToken: sessionToken,
       };
 
@@ -85,7 +107,6 @@ export default function GoogleAddressAutocomplete({
   const handleSelect = async (
     suggestion: google.maps.places.AutocompleteSuggestion
   ) => {
-    // Fix: Null check for placePrediction
     const predictionText = suggestion.placePrediction?.text?.text;
     if (!predictionText) return;
 
@@ -122,7 +143,7 @@ export default function GoogleAddressAutocomplete({
       if (types.includes("locality")) components.city = comp.longText ?? "";
       if (types.includes("administrative_area_level_1"))
         components.state = comp.shortText ?? comp.longText ?? "";
-      // if (types.includes("postal_code")) components.zip = comp.longText ?? "";
+
       if (types.includes("postal_code")) {
         const code = comp.longText ?? "";
         components.zip = code;
