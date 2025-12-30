@@ -175,7 +175,7 @@ export default function CartPage() {
           className="input text-gray-500!"
           placeholder="Enter coupon code"
         />
-        {error && <p className="text-green-800 text-sm mb-2">{error}</p>}
+        {error && <p className="text-red-800 text-sm mb-2">{error}</p>}
         <div className="flex justify-end gap-2 mt-4">
           <button
             onClick={() => setShowCouponModal(false)}
@@ -186,7 +186,7 @@ export default function CartPage() {
           <button
             onClick={handleApplyCoupon}
             disabled={loading || !couponCode}
-            className="px-4 py-2 bg-green-800 text-white rounded-md hover:bg-green-800 cursor-pointer disabled:opacity-50"
+            className="px-4 py-2 bg-red-800 text-white rounded-md hover:bg-red-800 cursor-pointer disabled:opacity-50"
           >
             {loading ? "Applying..." : "Apply"}
           </button>

@@ -182,7 +182,7 @@ export default function ConfirmResetCode() {
                   <button
                     type="button"
                     onClick={handleResend}
-                    className="text-green-800 font-bold hover:underline cursor-pointer disabled:opacity-50"
+                    className="text-red-800 font-bold hover:underline cursor-pointer disabled:opacity-50"
                     disabled={resending}
                   >
                     {resending ? "Resending..." : "Resend code"}

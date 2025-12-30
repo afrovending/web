@@ -145,7 +145,7 @@ const ProductGrid: FC<ProductGridProps> = ({
                   <h3 className="text-sm font-semibold text-gray-900 mb-1 truncate">
                     {product.title}
                   </h3>
-                  <div className="flex items-center text-[8px]! gap-1 text-green-400 mb-1">
+                  <div className="flex items-center text-[8px]! gap-1 text-red-400 mb-1">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <span key={i}>
                         {i < product.average_rating ? (

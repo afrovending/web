@@ -107,7 +107,7 @@ export default function TutorialDetailPage() {
         </h2>
         <Link
           href="/blogs"
-          className="text-green-500 flex items-center justify-center gap-2"
+          className="text-red-500 flex items-center justify-center gap-2"
         >
           <FaChevronLeft /> Back to tutorials
         </Link>
@@ -125,7 +125,7 @@ export default function TutorialDetailPage() {
         {/* Navigation */}
         <Link
           href="/blogs"
-          className="flex items-center gap-2 text-gray-500 hover:text-green-500 transition-colors mb-8 group"
+          className="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors mb-8 group"
         >
           <FaChevronLeft className="group-hover:-translate-x-1 transition-transform" />
           Back to all tutorials
@@ -177,7 +177,7 @@ export default function TutorialDetailPage() {
           {/* Sidebar: Latest Tutorials */}
           <div className="lg:col-span-1">
             <div className="sticky top-10">
-              <h3 className="text-2xl font-bold mb-6 text-gray-900 border-l-4 border-green-500 pl-4">
+              <h3 className="text-2xl font-bold mb-6 text-gray-900 border-l-4 border-red-500 pl-4">
                 Latest Tutorials
               </h3>
               <div className="space-y-6">
@@ -197,7 +197,7 @@ export default function TutorialDetailPage() {
                         />
                       </div>
                       <div>
-                        <h4 className="font-bold text-gray-900 line-clamp-2 group-hover:text-green-600 transition-colors">
+                        <h4 className="font-bold text-gray-900 line-clamp-2 group-hover:text-red-600 transition-colors">
                           {item.title}
                         </h4>
                         <p className="text-xs text-gray-400 mt-1">
@@ -209,14 +209,14 @@ export default function TutorialDetailPage() {
                 ))}
               </div>
 
-              <div className="mt-10 p-6 bg-green-50 rounded-3xl border border-green-100">
-                <p className="text-green-800 font-semibold mb-2">Need Help?</p>
-                <p className="text-sm text-green-700 mb-4">
+              <div className="mt-10 p-6 bg-red-50 rounded-3xl border border-red-100">
+                <p className="text-red-800 font-semibold mb-2">Need Help?</p>
+                <p className="text-sm text-red-700 mb-4">
                   Can't find what you are looking for? Contact our support team.
                 </p>
                 <Link
                   href="/contact-us"
-                  className="text-sm font-bold text-green-600 hover:underline"
+                  className="text-sm font-bold text-red-600 hover:underline"
                 >
                   Contact Support &rarr;
                 </Link>

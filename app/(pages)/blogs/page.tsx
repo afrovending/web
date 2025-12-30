@@ -78,9 +78,9 @@ export default function TutorialsPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="flex flex-col items-center justify-center py-20 text-center"
           >
-            <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-6">
+            <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-6">
               <svg
-                className="w-12 h-12 text-green-500"
+                className="w-12 h-12 text-red-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -127,7 +127,7 @@ export default function TutorialsPage() {
                   </div>
 
                   <div className="p-6 flex flex-col grow">
-                    <h3 className="text-xl font-bold text-gray-900 line-clamp-2 mb-3 group-hover:text-green-600 transition-colors">
+                    <h3 className="text-xl font-bold text-gray-900 line-clamp-2 mb-3 group-hover:text-red-600 transition-colors">
                       {tutorial.title}
                     </h3>
 
@@ -139,7 +139,7 @@ export default function TutorialsPage() {
                     <motion.div whileTap={{ scale: 0.95 }}>
                       <Link
                         href={`/blogs/${tutorial.slug}`}
-                        className="block w-full py-3 bg-green-500 hover:bg-green-600 text-white text-center font-bold rounded-xl transition-all shadow-md hover:shadow-green-200"
+                        className="block w-full py-3 bg-red-500 hover:bg-red-600 text-white text-center font-bold rounded-xl transition-all shadow-md hover:shadow-red-200"
                       >
                         Read More
                       </Link>
@@ -156,7 +156,7 @@ export default function TutorialsPage() {
                   whileTap={{ scale: 0.95 }}
                   onClick={handleLoadMore}
                   disabled={fetchingMore}
-                  className="px-10 py-3 border-2 border-green-500 text-green-500 font-bold rounded-xl hover:bg-green-500 hover:text-white disabled:opacity-50 transition-all duration-300 shadow-sm"
+                  className="px-10 py-3 border-2 border-red-500 text-red-500 font-bold rounded-xl hover:bg-red-500 hover:text-white disabled:opacity-50 transition-all duration-300 shadow-sm"
                 >
                   {fetchingMore ? (
                     <span className="flex items-center gap-2">

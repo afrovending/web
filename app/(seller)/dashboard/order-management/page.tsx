@@ -12,7 +12,7 @@ export default function Orders() {
     <div>
       <div className="card mb-6 hover:shadow-lg transition-all duration-300 rounded-xl bg-white cursor-default">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold flex items-center gap-2 text-green-800!">
+          <h2 className="text-lg font-semibold flex items-center gap-2 text-red-800!">
             <LuShoppingCart />
             All Orders
           </h2>
@@ -24,7 +24,7 @@ export default function Orders() {
         </div>
         <p className="text-sm mt-1 text-gray-600">
           From your dashboard, you can easily access and control your recent
-          <span className="text-green-800"> customer orders</span>
+          <span className="text-red-800"> customer orders</span>
         </p>
       </div>
       <div className="space-y-6 mt-6">

@@ -27,7 +27,7 @@ export default function CategoryFields(props: any) {
         (selectedCategory.children?.length > 0 ? (
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Subcategory <span className="text-green-500">(required)</span>
+              Subcategory <span className="text-red-500">(required)</span>
             </label>
             <SelectDropdown
               options={selectedCategory.children}

@@ -117,7 +117,6 @@ export default function ItemDetail({
               <h1 className="sm:text-2xl text-sm text-gray-800 font-semibold m-0">
                 {product.title}
               </h1>
-
             </div>
 
             <div className="flex items-center text-xs gap-1 -mt-2">
@@ -127,7 +126,6 @@ export default function ItemDetail({
                   {i < product.average_rating ? <StarFilled /> : <StarEmpty />}
                 </span>
               ))}
-              
               {product.type === "products" && (
                 <span
                   className={`text-white text-[8px] font-semibold px-2 py-1 rounded-full ${
@@ -276,9 +274,9 @@ export default function ItemDetail({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Share on WhatsApp"
-                className="p-2 rounded-full hover:bg-green-50 transition"
+                className="p-2 rounded-full hover:bg-red-50 transition"
               >
-                <FaWhatsapp className="w-5 h-5 fill-green-600" />
+                <FaWhatsapp className="w-5 h-5 fill-red-600" />
               </Link>
             </div>
           </div>

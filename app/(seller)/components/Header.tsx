@@ -57,7 +57,7 @@ export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
         <NotificationMenu />
 
         <Menu as="div" className="relative">
-          <MenuButton className="flex items-center space-x-2 transition-colors duration-150 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-50">
+          <MenuButton className="flex items-center space-x-2 transition-colors duration-150 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-50">
             <span className="hidden sm:block text-gray-700">{userName}</span>
             <Image
               src={user.profile_photo || "/default-avatar.png"}
@@ -77,7 +77,7 @@ export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <MenuItems className="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-2xl ring-1 ring-green-50 ring-opacity-5 focus:outline-none">
+            <MenuItems className="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-2xl ring-1 ring-red-50 ring-opacity-5 focus:outline-none">
               <div className="px-4 py-3">
                 <p className="text-sm font-semibold text-gray-900">
                   {userName}
@@ -100,7 +100,7 @@ export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
                 </MenuItem>
               </div>
 
-              <div className="py-1 border-t border-green-50">
+              <div className="py-1 border-t border-red-50">
                 <MenuItem>
                   {({ active }) => (
                     <button

@@ -15,7 +15,7 @@ function StarRating({ rating }: { rating: number }) {
         <svg
           key={index}
           className={`w-4 h-4 ${
-            index < rating ? "text-green-400" : "text-gray-400"
+            index < rating ? "text-red-400" : "text-gray-400"
           }`}
           fill="currentColor"
           viewBox="0 0 20 20"
@@ -105,7 +105,7 @@ export function RecentReviews() {
             </div>
           ) : (
             reviews.map((review) => (
-              <div key={review.id} className="border-b border-green-50">
+              <div key={review.id} className="border-b border-red-50">
                 <ReviewCard review={review} />
               </div>
             ))

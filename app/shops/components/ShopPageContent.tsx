@@ -84,7 +84,7 @@ export default function ShopPageContent() {
                       className="rounded-full border"
                     />
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-green-600 transition">
+                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-red-600 transition">
                         {shop.name}
                       </h3>
                       <p className="text-sm text-gray-500">
@@ -119,7 +119,7 @@ export default function ShopPageContent() {
               Previous
             </button>
 
-            <span className="text-green-700 font-medium">
+            <span className="text-red-700 font-medium">
               Page {page} of {totalPages || 1}
             </span>
 

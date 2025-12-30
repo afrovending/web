@@ -40,8 +40,8 @@ const StatGroup = ({
 }) => (
   <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col gap-6 relative overflow-hidden">
     <div className="flex justify-between items-start">
-      <div className="p-3 bg-green-50 rounded-xl">
-        <Icon className="text-green-400 text-xl" />
+      <div className="p-3 bg-red-50 rounded-xl">
+        <Icon className="text-red-400 text-xl" />
       </div>
       <button className="flex items-center gap-2 text-[10px] font-bold text-gray-400 border border-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors uppercase tracking-wider">
         {filterLabel} <FaChevronDown className="text-[8px]" />

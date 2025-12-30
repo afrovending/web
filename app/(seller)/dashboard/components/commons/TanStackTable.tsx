@@ -70,7 +70,7 @@ function TanStackTable<T>({
   //   <div className="w-full overflow-x-auto rounded-xl border border-amber-200 bg-white shadow-md">
   //     <table className="min-w-full divide-y divide-gray-200 text-sm">
   //       {/* Always show table head */}
-  //       <thead className="bg-green-50 text-xs font-semibold text-gray-700 uppercase">
+  //       <thead className="bg-red-50 text-xs font-semibold text-gray-700 uppercase">
   //         {table.getHeaderGroups().map((headerGroup) => (
   //           <tr key={headerGroup.id}>
   //             {headerGroup.headers.map((header) => (
@@ -119,7 +119,7 @@ function TanStackTable<T>({
   //           </tr>
   //         ) : (
   //           table.getRowModel().rows.map((row) => (
-  //             <tr key={row.id} className="hover:bg-green-50 transition">
+  //             <tr key={row.id} className="hover:bg-red-50 transition">
   //               {row.getVisibleCells().map((cell) => (
   //                 <td key={cell.id} className="px-4 py-3 whitespace-nowrap">
   //                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -162,7 +162,7 @@ function TanStackTable<T>({
   //               })
   //             }
   //             disabled={pagination.pageIndex === 0}
-  //             className="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-green-800 text-white rounded-md disabled:opacity-40 transition"
+  //             className="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-red-800 text-white rounded-md disabled:opacity-40 transition"
   //           >
   //             <ArrowLeftIcon className="w-4 h-4 mr-1" />
   //             Previous
@@ -187,7 +187,7 @@ function TanStackTable<T>({
   //               pagination.pageIndex >=
   //               Math.ceil(pagination.totalRows / pagination.pageSize) - 1
   //             }
-  //             className="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-green-800 text-white rounded-md disabled:opacity-40 transition"
+  //             className="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-red-800 text-white rounded-md disabled:opacity-40 transition"
   //           >
   //             Next
   //             <ArrowRightIcon className="w-4 h-4 ml-1" />
@@ -244,7 +244,7 @@ function TanStackTable<T>({
       <div className="hidden md:block overflow-hidden rounded-xl border border-amber-200 bg-white shadow-md">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-green-50 text-xs font-semibold text-gray-700 uppercase">
+            <thead className="bg-red-50 text-xs font-semibold text-gray-700 uppercase">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
@@ -277,7 +277,7 @@ function TanStackTable<T>({
                 : table.getRowModel().rows.map((row) => (
                     <tr
                       key={row.id}
-                      className="hover:bg-green-50/50 transition-colors"
+                      className="hover:bg-red-50/50 transition-colors"
                     >
                       {row.getVisibleCells().map((cell) => (
                         <td
@@ -332,7 +332,7 @@ function TanStackTable<T>({
               <ArrowLeftIcon className="w-5 h-5 text-gray-600" />
             </button>
 
-            <div className="px-4 py-1.5 bg-green-50 border border-amber-100 rounded-lg text-sm font-bold text-green-900">
+            <div className="px-4 py-1.5 bg-red-50 border border-amber-100 rounded-lg text-sm font-bold text-red-900">
               {pagination.pageIndex + 1} /{" "}
               {Math.max(
                 Math.ceil(pagination.totalRows / pagination.pageSize),

@@ -109,14 +109,14 @@ export function Sidebar({
                     onClick={() => toggleExpand(item.id)}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                       isActive
-                        ? "bg-green-50 text-green-800"
+                        ? "bg-red-50 text-red-800"
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
                     <div className="flex items-center">
                       <item.icon
                         className={`w-5 h-5 mr-3 ${
-                          isActive ? "text-green-800" : "text-gray-400"
+                          isActive ? "text-red-800" : "text-gray-400"
                         }`}
                       />
                       {item.label}
@@ -134,14 +134,14 @@ export function Sidebar({
                     onClick={() => window.innerWidth < 768 && toggleSidebar()}
                     className={`flex items-center px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
                       currentPath === item.href
-                        ? "bg-green-50 text-green-800 shadow-sm"
+                        ? "bg-red-50 text-red-800 shadow-sm"
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
                     <item.icon
                       className={`w-5 h-5 mr-3 ${
                         currentPath === item.href
-                          ? "text-green-800"
+                          ? "text-red-800"
                           : "text-gray-400"
                       }`}
                     />
@@ -163,7 +163,7 @@ export function Sidebar({
                           }
                           className={`flex items-center px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                             isChildActive
-                              ? "text-green-700 bg-green-50/50"
+                              ? "text-red-700 bg-red-50/50"
                               : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
                           }`}
                         >

@@ -109,7 +109,7 @@ const CouponTable: React.FC<CouponTableProps> = ({ limit, onEdit }) => {
         accessorKey: "id",
         cell: ({ row }) => (
           <button
-            className="text-green-800 font-semibold hover:underline cursor-pointer"
+            className="text-red-800 font-semibold hover:underline cursor-pointer"
             onClick={() => onEdit(row.original)} // Trigger Parent's drawer
           >
             Edit

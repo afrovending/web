@@ -308,7 +308,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
           )}
           <label className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex items-center justify-center">
             <div className="bg-white p-3 rounded-full shadow-lg">
-              <FaPencil className="text-green-600" />
+              <FaPencil className="text-red-600" />
             </div>
             <input
               type="file"

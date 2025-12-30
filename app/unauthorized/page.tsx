@@ -8,8 +8,8 @@ export default function UnauthorizedPage() {
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 via-white to-gray-100 px-6">
       <div className="bg-white shadow-xl rounded-3xl p-10 max-w-md w-full text-center animate-fadeIn">
         <div className="flex justify-center mb-6">
-          <div className="bg-green-100 p-6 rounded-full">
-            <FaShieldAlt className="text-green-600" size={60} />
+          <div className="bg-red-100 p-6 rounded-full">
+            <FaShieldAlt className="text-red-600" size={60} />
           </div>
         </div>
 

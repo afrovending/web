@@ -13,9 +13,7 @@ export default function PublicLayoutElements() {
   }
 
   if (!_hasHydrated) {
-    return (
-      <div className="w-full bg-green-50" style={{ height: "110px" }}></div>
-    );
+    return <div className="w-full bg-red-50" style={{ height: "110px" }}></div>;
   }
 
   return (

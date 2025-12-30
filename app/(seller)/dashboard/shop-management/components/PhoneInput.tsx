@@ -44,7 +44,7 @@ export default function PhoneInput({
           {validating ? (
             <BeatLoader size={6} />
           ) : valid === true ? (
-            <span className="text-green-600 text-lg">✓</span>
+            <span className="text-red-600 text-lg">✓</span>
           ) : valid === false ? (
             <span className="text-red-600 text-lg">✕</span>
           ) : null}

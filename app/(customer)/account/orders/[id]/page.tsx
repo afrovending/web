@@ -289,7 +289,7 @@ export default function OrderDetail() {
               <p
                 className={`font-semibold w-1/2 text-right ${
                   orderMeta.payment_status === "completed"
-                    ? "text-green-700"
+                    ? "text-red-700"
                     : "text-red-700"
                 }`}
               >

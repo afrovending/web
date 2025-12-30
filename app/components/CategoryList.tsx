@@ -74,7 +74,7 @@ export default function CategoryList({ onNavigate }: Props) {
                 className={`flex items-center justify-start gap-2 px-3 py-2 rounded-md transition cursor-pointer ${
                   isActive
                     ? "bg-hub-secondary text-white shadow-md"
-                    : "text-gray-700 hover:bg-green-50"
+                    : "text-gray-700 hover:bg-red-50"
                 }`}
               >
                 <Icon
@@ -104,7 +104,7 @@ export default function CategoryList({ onNavigate }: Props) {
                 onMouseEnter={() => setHoveredCategory(cat)}
                 className={`relative cursor-pointer transition ${
                   hoveredCategory?.id === cat.id
-                    ? "bg-green-50 shadow-sm rounded-md"
+                    ? "bg-red-50 shadow-sm rounded-md"
                     : ""
                 }`}
               >
@@ -143,7 +143,7 @@ export default function CategoryList({ onNavigate }: Props) {
               <Link
                 onClick={onNavigate}
                 href={`/categories?type=${selectedType}`}
-                className="flex items-center justify-between px-4 py-2 text-sm font-medium text-hub-primary cursor-pointer bg-green-50 rounded-md"
+                className="flex items-center justify-between px-4 py-2 text-sm font-medium text-hub-primary cursor-pointer bg-red-50 rounded-md"
               >
                 View All {typeMap[selectedType].label} Categories
                 <ChevronRightIcon className="w-4 h-4" />
@@ -190,7 +190,7 @@ export default function CategoryList({ onNavigate }: Props) {
                       key={sub.id}
                       onClick={onNavigate}
                       href={`/items?category=${sub.slug}&type=${selectedType}`}
-                      className="bg-green-50 hover:bg-green-100 p-2 rounded-md text-xs text-gray-950 transition block truncate"
+                      className="bg-red-50 hover:bg-red-100 p-2 rounded-md text-xs text-gray-950 transition block truncate"
                     >
                       {sub.name}
                     </Link>
@@ -202,7 +202,7 @@ export default function CategoryList({ onNavigate }: Props) {
                       onClick={onNavigate}
                       // href={`/categories?type=${selectedType}`}
                       href={`/categories/${hoveredCategory.slug}?type=${selectedType}`}
-                      className="flex items-center justify-between px-4 py-2 text-sm font-medium text-hub-primary cursor-pointer bg-green-50 rounded-md"
+                      className="flex items-center justify-between px-4 py-2 text-sm font-medium text-hub-primary cursor-pointer bg-red-50 rounded-md"
                     >
                       <span className="truncate" title={hoveredCategory.name}>
                         View All Categories in {hoveredCategory.name}{" "}

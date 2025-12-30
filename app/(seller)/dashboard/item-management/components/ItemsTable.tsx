@@ -113,7 +113,7 @@ function ProductActionCell({
         <div className="flex items-center gap-2 w-full md:w-auto justify-end md:justify-start order-3">
           {/* Update Button */}
           <button
-            className="flex-1 md:flex-none bg-green-800 text-white px-3 py-2 md:p-1.5 rounded-md hover:bg-green-900 flex items-center justify-center gap-1 cursor-pointer transition-colors text-sm font-medium"
+            className="flex-1 md:flex-none bg-red-800 text-white px-3 py-2 md:p-1.5 rounded-md hover:bg-red-900 flex items-center justify-center gap-1 cursor-pointer transition-colors text-sm font-medium"
             onClick={() => onEdit(productId)}
             title="Update Item"
           >
@@ -261,7 +261,7 @@ const ItemsTable: React.FC<ProductTableProps> = ({ limit, offset, status }) => {
                 <StarIcon
                   key={index}
                   className={`w-4 h-4 ${
-                    index < stars ? "text-green-800" : "text-gray-300"
+                    index < stars ? "text-red-800" : "text-gray-300"
                   }`}
                 />
               ))}

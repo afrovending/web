@@ -89,7 +89,7 @@ export default function OnboardingSuccessContent() {
   if (status === "loading") {
     return (
       <div className="text-center py-10">
-        <ArrowPathIcon className="h-12 w-12 text-green-500 animate-spin mx-auto mb-4" />
+        <ArrowPathIcon className="h-12 w-12 text-red-500 animate-spin mx-auto mb-4" />
         <h2 className="text-xl font-bold text-gray-800">
           Verifying Payout Status...
         </h2>
@@ -115,7 +115,7 @@ export default function OnboardingSuccessContent() {
           onClick={handleRetryOnboarding}
           aria-label="retry button"
           disabled={isRetrying}
-          className="cursor-pointer w-full flex items-center justify-center bg-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-700 transition-all disabled:opacity-50"
+          className="cursor-pointer w-full flex items-center justify-center bg-red-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-red-700 transition-all disabled:opacity-50"
         >
           {isRetrying ? "Generating Link..." : "Complete Stripe Setup"}
         </button>
@@ -133,8 +133,8 @@ export default function OnboardingSuccessContent() {
   return (
     <div className="text-center max-w-md mx-auto py-10">
       <div className="mb-6 relative">
-        <div className="absolute inset-0 bg-green-100 rounded-full scale-150 opacity-20 animate-pulse"></div>
-        <CheckCircleIcon className="h-24 w-24 text-green-500 mx-auto relative z-10" />
+        <div className="absolute inset-0 bg-red-100 rounded-full scale-150 opacity-20 animate-pulse"></div>
+        <CheckCircleIcon className="h-24 w-24 text-red-500 mx-auto relative z-10" />
       </div>
 
       <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
@@ -145,8 +145,8 @@ export default function OnboardingSuccessContent() {
         receiving payments.
       </p>
 
-      <div className="bg-green-50 border border-green-100 rounded-2xl p-4 mb-8">
-        <p className="text-sm text-green-800 font-medium">
+      <div className="bg-red-50 border border-red-100 rounded-2xl p-4 mb-8">
+        <p className="text-sm text-red-800 font-medium">
           Entering your dashboard in {countdown}s...
         </p>
       </div>

@@ -68,7 +68,7 @@ const CategorySection: FC<CategorySectionProps> = ({ type }) => {
             <div
               key={cat.id}
               onClick={() => handleClick(cat.slug)}
-              className="relative rounded-xl overflow-hidden group cursor-pointer border border-green-100"
+              className="relative rounded-xl overflow-hidden group cursor-pointer border border-red-100"
             >
               <Image
                 src={optimizeImage(cat.image, 400)}
@@ -112,7 +112,7 @@ const CategorySection: FC<CategorySectionProps> = ({ type }) => {
             blurDataURL="/placeholder.png"
           />
           <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center">
-            <p className="sm:text-2xl text-sm font-bold text-green-800 text-center">
+            <p className="sm:text-2xl text-sm font-bold text-red-800 text-center">
               {type === "services"
                 ? "Nearby Service Providers"
                 : "Essential Daily Needs"}
@@ -120,7 +120,7 @@ const CategorySection: FC<CategorySectionProps> = ({ type }) => {
 
             <button
               aria-label={type === "services" ? "Book now" : "Shop now"}
-              className="mt-4 bg-green-100 text-hub-secondary sm:px-6 sm:py-2 px-3 py-1 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2 hover:bg-green-200 transition cursor-pointer"
+              className="mt-4 bg-red-100 text-hub-secondary sm:px-6 sm:py-2 px-3 py-1 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2 hover:bg-red-200 transition cursor-pointer"
             >
               {type === "services" ? (
                 <>

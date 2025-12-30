@@ -106,10 +106,10 @@ export default function WithdrawalHistory() {
                 <span
                   className={`font-bold ${
                     w.status === "approved"
-                      ? "text-green-600"
+                      ? "text-red-600"
                       : w.status === "declined"
                       ? "text-red-600"
-                      : "text-green-600"
+                      : "text-red-600"
                   }`}
                 >
                   {w.status}
@@ -121,7 +121,7 @@ export default function WithdrawalHistory() {
                 {w.settlement_account.name})
               </p>
             </div>
-            <div className="text-xs text-green-800 flex items-center">
+            <div className="text-xs text-red-800 flex items-center">
               <FiClock /> {formatHumanReadableDate(w.created_at)}
             </div>
           </div>

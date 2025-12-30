@@ -110,7 +110,7 @@ export default function SuccessContent() {
         <button
           onClick={() => sessionId && verifyPayment(sessionId)}
           disabled={isRetrying}
-          className="flex items-center justify-center space-x-2 mx-auto bg-green-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-hub-secondary transition-all disabled:opacity-50"
+          className="flex items-center justify-center space-x-2 mx-auto bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-hub-secondary transition-all disabled:opacity-50"
         >
           {isRetrying ? (
             <ArrowPathIcon className="h-5 w-5 animate-spin" />
@@ -125,8 +125,8 @@ export default function SuccessContent() {
   return (
     <div className="text-center max-w-lg mx-auto py-8 px-4">
       <div className="mb-6 relative">
-        <div className="absolute inset-0 bg-green-100 rounded-full scale-150 opacity-20 animate-pulse"></div>
-        <CheckCircleIcon className="h-24 w-24 text-green-500 mx-auto relative z-10" />
+        <div className="absolute inset-0 bg-red-100 rounded-full scale-150 opacity-20 animate-pulse"></div>
+        <CheckCircleIcon className="h-24 w-24 text-red-500 mx-auto relative z-10" />
       </div>
 
       <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
@@ -136,7 +136,7 @@ export default function SuccessContent() {
         Your subscription is active. Now, let's set up your payouts.
       </p>
 
-      <div className="bg-green-50 border border-green-100 rounded-2xl p-6 mb-8 text-left">
+      <div className="bg-red-50 border border-red-100 rounded-2xl p-6 mb-8 text-left">
         <h3 className="text-hub-secondary font-bold mb-1">
           Next Step: Seller Verification
         </h3>
@@ -145,7 +145,7 @@ export default function SuccessContent() {
           identity and link your bank account so you can receive payments.
         </p>
         <div className="flex items-center text-hub-secondary font-semibold text-sm">
-          <div className="h-2 w-full bg-green-200 rounded-full overflow-hidden mr-3">
+          <div className="h-2 w-full bg-red-200 rounded-full overflow-hidden mr-3">
             <div
               className="h-full bg-hub-primary transition-all duration-1000 ease-linear"
               style={{ width: `${(countdown / 5) * 100}%` }}

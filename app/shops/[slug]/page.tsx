@@ -39,7 +39,7 @@ const ReadMore: FC<ReadMoreProps> = ({ text, lines = 2 }) => {
       {text.split(" ").length > 15 && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="text-green-800 hover:underline mt-1 block cursor-pointer"
+          className="text-red-800 hover:underline mt-1 block cursor-pointer"
         >
           {expanded ? "Read Less" : "Read More"}
         </button>
@@ -130,7 +130,7 @@ const ShopItems: FC = () => {
                 className="object-cover"
               />
             ) : (
-              <div className="h-full w-full bg-linear-to-r from-green-200 to-amber-300" />
+              <div className="h-full w-full bg-linear-to-r from-red-200 to-amber-300" />
             )}
             {shop.logo && (
               <div className="absolute left-1/2 sm:left-6 top-full -translate-x-1/2 sm:translate-x-0 -translate-y-2/3">
@@ -191,7 +191,7 @@ const ShopItems: FC = () => {
           >
             Previous
           </button>
-          <span className="font-medium text-green-800">
+          <span className="font-medium text-red-800">
             Page {currentPage} of {totalPages}
           </span>
           <button

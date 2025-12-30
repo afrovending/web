@@ -11,13 +11,13 @@ export default function AddressBook() {
       {/* Welcome Box */}
       <div className="card mb-6">
         <h2 className="text-lg font-semibold flex items-center">
-          <FiMapPin className="text-green-800 text-xl mr-2" size={24} />
+          <FiMapPin className="text-red-800 text-xl mr-2" size={24} />
           Shipping Address
         </h2>
         <p className="text-sm mt-1 text-gray-600">
           From your account dashboard, you can easily check, modify and view
           your
-          <span className="text-green-800"> Shipping Address</span>
+          <span className="text-red-800"> Shipping Address</span>
         </p>
       </div>
       <ShippingSection user={user} />

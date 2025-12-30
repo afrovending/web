@@ -119,14 +119,14 @@ export default function BasicInfoFields({
           {keywords.map((keyword: string, index: number) => (
             <span
               key={index}
-              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800"
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800"
             >
               {keyword}
               <button
                 type="button"
                 aria-label="remove"
                 onClick={() => removeKeyword(index)}
-                className="ml-1.5 cursor-pointer inline-flex items-center justify-center text-green-400 hover:text-green-600 focus:outline-none"
+                className="ml-1.5 cursor-pointer inline-flex items-center justify-center text-red-400 hover:text-red-600 focus:outline-none"
               >
                 <FaTimes size={12} />
               </button>

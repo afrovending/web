@@ -27,9 +27,9 @@ export default function StepIndicator({
               className={`w-10 h-10 flex items-center justify-center rounded-full border transition-all
               ${
                 completed
-                  ? "bg-green-500 text-white border-green-500"
+                  ? "bg-red-500 text-white border-red-500"
                   : isActive
-                  ? "border-green-800 text-green-800"
+                  ? "border-red-800 text-red-800"
                   : "border-gray-300 text-gray-400"
               }`}
             >
@@ -44,7 +44,7 @@ export default function StepIndicator({
 
             <span
               className={`mt-2 ${
-                isActive ? "font-bold text-green-800" : "text-gray-500"
+                isActive ? "font-bold text-red-800" : "text-gray-500"
               }`}
             >
               {step.label}

@@ -284,7 +284,7 @@ const ContactUsPage: React.FC = () => {
         <header className="text-center py-16 bg-white rounded-xl shadow-lg mb-12">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
             Contact{" "}
-            <span className="text-green-600">
+            <span className="text-red-600">
               {COMPANY_CONTACT_INFO.companyName}
             </span>
           </h1>
@@ -297,7 +297,7 @@ const ContactUsPage: React.FC = () => {
         <div className="grid lg:grid-cols-3 gap-10">
           {/* Contact Info Sidebar (2/3) */}
           <div className="lg:col-span-1 space-y-8 p-6 lg:p-0">
-            <div className="bg-green-50 p-6 rounded-xl shadow-md border-l-4 border-green-600">
+            <div className="bg-red-50 p-6 rounded-xl shadow-md border-l-4 border-red-600">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 Get in Touch
               </h2>
@@ -308,12 +308,12 @@ const ContactUsPage: React.FC = () => {
 
               {/* Phone */}
               <div className="flex items-start mb-4">
-                <FaWhatsapp className="w-6 h-6 text-green-500 mt-1 shrink-0" />
+                <FaWhatsapp className="w-6 h-6 text-red-500 mt-1 shrink-0" />
                 <div className="ml-3">
                   <p className="text-sm font-semibold text-gray-900">
                     WhatsApp Us
                   </p>
-                  <p className="text-gray-700 hover:text-green-600 transition-colors">
+                  <p className="text-gray-700 hover:text-red-600 transition-colors">
                     <Link href="https://wa.me/2348129022334">
                       Send us a message
                     </Link>

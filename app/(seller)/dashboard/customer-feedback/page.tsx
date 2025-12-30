@@ -64,13 +64,13 @@ export default function Orders() {
       {/* HEADER CARD */}
       <div className="card mb-6 hover:shadow-lg transition-all duration-300 rounded-xl bg-white cursor-default p-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold flex items-center gap-2 text-green-800!">
+          <h2 className="text-lg font-semibold flex items-center gap-2 text-red-800!">
             <LuMessageCircle /> Customer Feedback
           </h2>
         </div>
         <p className="text-sm mt-1 text-gray-600">
           From your dashboard, you can easily access and control your recent
-          <span className="text-green-800"> customer reviews</span>.
+          <span className="text-red-800"> customer reviews</span>.
         </p>
       </div>
 
@@ -99,7 +99,7 @@ export default function Orders() {
 
         {/* EMPTY */}
         {!loading && reviews.length === 0 && (
-          <div className="py-6 card text-center text-green-800 text-sm">
+          <div className="py-6 card text-center text-red-800 text-sm">
             No customer reviews yet.
           </div>
         )}
@@ -130,7 +130,7 @@ export default function Orders() {
                         key={index}
                         className={`text-lg ${
                           index < review.rating
-                            ? "text-green-800"
+                            ? "text-red-800"
                             : "text-gray-300"
                         }`}
                       >

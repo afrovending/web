@@ -62,7 +62,7 @@ export default function CartSummary({
 
         <div className="border-t border-gray-300 pt-3 flex justify-between items-center">
           <span className="text-base font-bold text-gray-900">Total</span>
-          <span className="text-lg font-bold text-green-900">
+          <span className="text-lg font-bold text-red-900">
             {formatAmount(total)}
           </span>
         </div>
@@ -74,7 +74,7 @@ export default function CartSummary({
         className={`mt-6 w-full py-3.5 rounded-full font-bold text-sm shadow-lg transition-all active:scale-95 ${
           loading || hasOutOfStock || cart.length === 0
             ? "btn btn-gray cursor-not-allowed"
-            : "btn btn-primary cursor-pointer shadow-green-900/20"
+            : "btn btn-primary cursor-pointer shadow-red-900/20"
         }`}
       >
         {loading ? (

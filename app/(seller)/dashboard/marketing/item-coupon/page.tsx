@@ -32,7 +32,7 @@ export default function ItemCoupons() {
       <div className="card mb-6 hover:shadow-lg transition-all duration-300 rounded-xl bg-white p-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-lg font-semibold flex items-center gap-2 text-green-800">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-red-800">
               <LuTicket /> All Coupons
             </h2>
             <p className="text-sm mt-1 text-gray-600">
@@ -42,7 +42,7 @@ export default function ItemCoupons() {
 
           <button
             onClick={handleAdd}
-            className="btn bg-green-800 hover:bg-green-900 text-white flex items-center gap-2 p-2 lg:py-2 lg:px-4 rounded-xl shadow-md transition-all active:scale-95"
+            className="btn bg-red-800 hover:bg-red-900 text-white flex items-center gap-2 p-2 lg:py-2 lg:px-4 rounded-xl shadow-md transition-all active:scale-95"
           >
             <LuPlus className="text-xl lg:text-lg" />
             <span className="hidden lg:inline">Add Coupon</span>

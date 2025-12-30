@@ -85,9 +85,9 @@ export default function StepSubscription({ onNext }: StepProps) {
     if (lowerName.includes("standard")) {
       return {
         container:
-          "border-green-600 shadow-green-200 scale-105 z-10 ring-1 ring-green-600", // Added scale to make it pop
-        title: "text-green-700",
-        button: "text-white bg-green-700 hover:bg-green-800",
+          "border-red-600 shadow-red-200 scale-105 z-10 ring-1 ring-red-600", // Added scale to make it pop
+        title: "text-red-700",
+        button: "text-white bg-red-700 hover:bg-red-800",
       };
     }
 
@@ -123,9 +123,9 @@ export default function StepSubscription({ onNext }: StepProps) {
 
   return (
     <>
-      <div className="border border-green-100 p-4 rounded-md mb-6">
+      <div className="border border-red-100 p-4 rounded-md mb-6">
         <h2 className="text-lg font-semibold flex items-center">
-          <FaMoneyBill1Wave className="text-green-800 text-xl mr-2" size={24} />
+          <FaMoneyBill1Wave className="text-red-800 text-xl mr-2" size={24} />
           Business Subscription
         </h2>
         <p className="text-sm mt-1 text-gray-600">
@@ -176,7 +176,7 @@ export default function StepSubscription({ onNext }: StepProps) {
                   <ul role="list" className="mt-6 space-y-3 grow">
                     {plan.features.map((feature, index) => (
                       <li key={index} className="flex items-start">
-                        <CheckCircleIcon className="h-6 w-6 text-green-600 mr-2 shrink-0" />
+                        <CheckCircleIcon className="h-6 w-6 text-red-600 mr-2 shrink-0" />
                         <span className="text-base text-gray-600">
                           {feature}
                         </span>

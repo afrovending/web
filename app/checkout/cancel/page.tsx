@@ -1,24 +1,23 @@
 "use client";
 
 import { Suspense } from "react";
-import { useRouter  } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
-import { ArrowRightIcon } from "@heroicons/react/24/outline"; 
+import { ArrowRightIcon } from "@heroicons/react/24/outline";
 function CancelContent() {
-  const router = useRouter(); 
+  const router = useRouter();
 
   return (
     <div className="text-center max-w-md mx-auto">
       <div className="mb-6 relative">
-        <div className="absolute inset-0 bg-green-100 rounded-full scale-150 opacity-20 animate-pulse"></div>
-        <CheckCircleIcon className="h-24 w-24 text-green-500 mx-auto relative z-10" />
+        <div className="absolute inset-0 bg-red-100 rounded-full scale-150 opacity-20 animate-pulse"></div>
+        <CheckCircleIcon className="h-24 w-24 text-red-500 mx-auto relative z-10" />
       </div>
 
       <h1 className="text-3xl font-bold text-gray-900 mb-2">
         Thank you for trying!
       </h1>
       <p className="text-gray-600 mb-8">Your payment was not successful.</p>
- 
 
       <button
         onClick={() => router.push("/items")}

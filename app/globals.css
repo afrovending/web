@@ -48,10 +48,14 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  /* === Theme Colors === */
-  --color-hub-secondary: #03e500;
-  --color-hub-light-primary: #71ff71;
-  --color-hub-primary: #085f09;
+
+  /* === Eye-Friendly Red Theme === */
+  --color-hub-secondary: #e53e3e;
+  /* Muted Red: High visibility but less "neon" */
+  --color-hub-light-primary: #fef2f2;
+  /* Very Light Blush: Easy on the eyes for backgrounds */
+  --color-hub-primary: #7f1d1d;
+  /* Deep Maroon: Soft on eyes, high contrast for text */
 }
 
 /* Typography defaults */
@@ -101,7 +105,7 @@ input::-webkit-credentials-auto-fill-button {
 }
 
 .input {
-  @apply w-full border border-gray-300 p-3 rounded-lg focus:ring-2 text-gray-500 focus:ring-green-400 focus:outline-none bg-white;
+  @apply w-full border border-gray-300 p-3 rounded-lg focus:ring-2 text-gray-500 focus:ring-red-400 focus:outline-none bg-white;
 }
 
 /* ------------------------------

@@ -46,8 +46,8 @@ const COMPANY_DATA: CompanyData = {
 
 // Type the component props explicitly
 const ValueCard: React.FC<{ value: CoreValue }> = ({ value }) => (
-  <div className="flex flex-col items-center text-center p-6 bg-green-50 rounded-lg shadow-inner">
-    <value.icon className="w-8 h-8 text-green-700 mb-3" />
+  <div className="flex flex-col items-center text-center p-6 bg-red-50 rounded-lg shadow-inner">
+    <value.icon className="w-8 h-8 text-red-700 mb-3" />
     <h4 className="font-semibold text-lg text-gray-900 mb-1">{value.title}</h4>
     <p className="text-sm text-gray-600">{value.description}</p>
   </div>
@@ -59,13 +59,13 @@ const AboutPageContent: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <header className="text-center py-16 bg-white rounded-xl shadow-lg mb-12">
           <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
-            About <span className="text-green-600">{COMPANY_DATA.name}</span>
+            About <span className="text-red-600">{COMPANY_DATA.name}</span>
           </h1>
         </header>
 
         {/* Core Narrative */}
         <section className="py-12 px-6 bg-white rounded-xl shadow-lg mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-green-100 pb-2">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-red-100 pb-2">
             Our Story
           </h2>
           <p className="text-lg text-gray-700 leading-relaxed">
@@ -88,7 +88,7 @@ const AboutPageContent: React.FC = () => {
           </div>
         </section>
         <section className="py-12 px-6 bg-white rounded-xl shadow-lg mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-green-100 pb-2">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-b-2 border-red-100 pb-2">
             Our Marketplace
           </h2>
           <p className="text-lg text-gray-700 leading-relaxed">

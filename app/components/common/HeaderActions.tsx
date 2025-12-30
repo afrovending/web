@@ -27,7 +27,7 @@ export default function HeaderActions() {
         transition={{ type: "spring", stiffness: 300, damping: 15 }}
         className="px-2 sm:px-4 py-2 flex items-center justify-center bg-hub-primary rounded-full cursor-pointer
              text-white hover:bg-hub-secondary hover:text-white transition-all duration-300 
-             focus:outline-none focus:ring-2 focus:ring-green-400"
+             focus:outline-none focus:ring-2 focus:ring-red-400"
       >
         <RiUser3Line className="w-4 h-4 lg:w-5 lg:h-5" />
         <span className="hidden sm:inline ml-1">
@@ -42,7 +42,7 @@ export default function HeaderActions() {
         transition={{ type: "spring", stiffness: 300, damping: 15 }}
         className="px-2 sm:px-4 py-2 flex items-center justify-center bg-hub-primary rounded-full cursor-pointer
              text-white hover:bg-hub-secondary hover:text-white transition-all duration-300 
-             focus:outline-none focus:ring-2 focus:ring-green-400"
+             focus:outline-none focus:ring-2 focus:ring-red-400"
       >
         <MapPinIcon className="w-4 h-4 lg:w-5 lg:h-5" />
         <span className="hidden sm:inline ml-1">Track Order</span>

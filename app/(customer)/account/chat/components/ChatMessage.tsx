@@ -18,13 +18,16 @@ interface ChatMessagesProps {
   isloadingChatMessage: boolean;
 }
 
-export default function ChatMessages({ messages, isloadingChatMessage }: ChatMessagesProps) {
+export default function ChatMessages({
+  messages,
+  isloadingChatMessage,
+}: ChatMessagesProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
- 
+
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-white font-semibold! custom-scrollbar">
       {isloadingChatMessage ? (
@@ -46,8 +49,8 @@ export default function ChatMessages({ messages, isloadingChatMessage }: ChatMes
                 className={cn(
                   "max-w-[85%] md:max-w-[70%] rounded-2xl px-4 py-2 text-sm shadow-sm transition-all",
                   isMe
-                    ? "bg-green-400 rounded-tr-none" // Removed text-white from here
-                    : "bg-green-100/80 rounded-tl-none"
+                    ? "bg-red-400 rounded-tr-none" // Removed text-white from here
+                    : "bg-red-100/80 rounded-tl-none"
                 )}
               >
                 {/* Image Attachment */}
@@ -86,7 +89,7 @@ export default function ChatMessages({ messages, isloadingChatMessage }: ChatMes
                       {msg.is_read ? (
                         <LuCheckCheck className="text-white w-3 h-3" />
                       ) : (
-                        <LuCheck className="text-green-200 w-3 h-3" />
+                        <LuCheck className="text-red-200 w-3 h-3" />
                       )}
                     </span>
                   )}

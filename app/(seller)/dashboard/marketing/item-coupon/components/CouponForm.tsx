@@ -250,7 +250,7 @@ const CouponForm: React.FC<CouponFormProps> = ({ coupon, onClose }) => {
               checked={field.value}
               onChange={field.onChange}
               className={`${
-                field.value ? "bg-green-800" : "bg-gray-300"
+                field.value ? "bg-red-800" : "bg-gray-300"
               } relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75`}
             >
               <span className="sr-only">Notify users</span>

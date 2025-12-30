@@ -113,7 +113,7 @@ export default function ServiceFields(props: any) {
           </div>
           {/* Hidden preview to help the user see what's happening */}
           {(deliveryHours || deliveryMinutes) && (
-            <p className="mt-2 text-xs text-green-700 font-medium bg-green-50 p-2 rounded border border-green-100">
+            <p className="mt-2 text-xs text-red-700 font-medium bg-red-50 p-2 rounded border border-red-100">
               Will be saved as: {deliveryHours || 0}{" "}
               {parseInt(deliveryHours) === 1 ? "hour" : "hours"}{" "}
               {deliveryMinutes || 0}{" "}
@@ -143,8 +143,8 @@ export default function ServiceFields(props: any) {
                   }}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border cursor-pointer ${
                     isSelected
-                      ? "bg-green-800 border-green-800 text-white shadow-sm"
-                      : "bg-white border-gray-300 text-gray-700 hover:border-green-800"
+                      ? "bg-red-800 border-red-800 text-white shadow-sm"
+                      : "bg-white border-gray-300 text-gray-700 hover:border-red-800"
                   }`}
                 >
                   <span className="capitalize">{day}</span>

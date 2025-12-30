@@ -166,7 +166,7 @@ export default function ChatClientWrapper({
         ) : (
           <div className="flex-1 hidden md:flex flex-col items-center justify-center text-gray-400 gap-4 bg-gray-50/30">
             <div className="p-6 bg-white rounded-full shadow-sm">
-              <LuSend size={48} className="text-green-200" />
+              <LuSend size={48} className="text-red-200" />
             </div>
             <p className="font-medium text-gray-500">
               Select a conversation to start messaging

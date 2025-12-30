@@ -31,8 +31,8 @@ const NavMenu = () => {
               className={clsx(
                 "w-full flex items-center justify-between px-3 py-1.5 rounded-md text-xs font-semibold overflow-y-auto scrollbar-thin scrollbar-thumb-gray-50 hover:scrollbar-thumb-gray-100 scrollbar-track-transparent",
                 isActiveParent
-                  ? "text-green-500"
-                  : "text-gray-700 hover:text-green-500"
+                  ? "text-red-500"
+                  : "text-gray-700 hover:text-red-500"
               )}
             >
               <span className="flex items-center gap-x-3">
@@ -58,8 +58,8 @@ const NavMenu = () => {
                         className={clsx(
                           "block px-3 py-1.5 text-xs rounded-md",
                           isActiveSub
-                            ? "bg-green-50 text-green-600"
-                            : "text-gray-500 hover:text-green-500 hover:bg-green-50"
+                            ? "bg-red-50 text-red-600"
+                            : "text-gray-500 hover:text-red-500 hover:bg-red-50"
                         )}
                       >
                         {subItem.label}
