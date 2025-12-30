@@ -274,9 +274,9 @@ export default function ItemDetail({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Share on WhatsApp"
-                className="p-2 rounded-full hover:bg-red-50 transition"
+                className="p-2 rounded-full hover:bg-green-50 transition"
               >
-                <FaWhatsapp className="w-5 h-5 fill-red-600" />
+                <FaWhatsapp className="w-5 h-5 fill-green-600" />
               </Link>
             </div>
           </div>

@@ -62,7 +62,7 @@ export default function Footer() {
         <div className="mt-8 flex gap-4 justify-end items-center text-xl">
           {/* Facebook */}
           <Link
-            href="https://www.facebook.com/theafrovending"
+            href="https://www.facebook.com/afrovending"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-blue-600 transition duration-150 cursor-pointer text-white"
@@ -84,7 +84,7 @@ export default function Footer() {
 
           {/* X (Twitter) */}
           <Link
-            href="https://www.x.com/africanmkthub"
+            href="https://www.x.com/afrovending"
             target="_blank"
             rel="noopener"
             className="hover:text-black transition duration-150 cursor-pointer text-white"

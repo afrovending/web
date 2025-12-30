@@ -314,7 +314,7 @@ const ContactUsPage: React.FC = () => {
                     WhatsApp Us
                   </p>
                   <p className="text-gray-700 hover:text-red-600 transition-colors">
-                    <Link href="https://wa.me/2348129022334">
+                    <Link href="https://wa.me/1857560354">
                       Send us a message
                     </Link>
                   </p>
