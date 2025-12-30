@@ -382,13 +382,13 @@ export default function StepShopInfo({ onNext }: StepProps) {
             <TextInput label="City" value={city} onChange={setCity} disabled />
 
             <TextInput
-              label="Postal Code"
+              label="Postal/Zip Code"
               value={zip}
               onChange={setZip}
               disabled
             />
             <TextInput
-              label="Province"
+              label="Province/State/Town"
               value={stateCode}
               onChange={setStateCode}
               disabled

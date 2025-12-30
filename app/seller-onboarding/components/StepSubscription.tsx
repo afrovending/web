@@ -109,7 +109,7 @@ export default function StepSubscription({ onNext }: StepProps) {
   };
 
   const renderLoading = () => (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
       <Skeleton height={400} borderRadius={12} count={3} className="h-full" />
     </div>
   );
