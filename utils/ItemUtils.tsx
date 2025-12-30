@@ -42,12 +42,12 @@ export const getStockStatus = (quantity: number) => {
   if (quantity > 0 && percentage <= 33.3) {
     return {
       text: "Few Stock",
-      bgClass: "bg-red-500",
+      bgClass: "bg-yellow-500",
     };
   } else {
     return {
       text: "In Stock",
-      bgClass: "bg-red-500",
+      bgClass: "bg-green-500",
     };
   }
 };
