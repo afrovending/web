@@ -32,19 +32,19 @@ export default function PhoneInput({
           <span>{dialCode}</span>
         </div>
         <input
-          type="tel"
+          type="numeric"
           className="rounded-r-xl px-3 h-12.25 border border-gray-300 focus:border-hub-primary focus:ring-1 focus:ring-hub-primary outline-none w-full text-gray-900 text-sm"
           value={value}
           onChange={(e) => onChange(e.target.value.replace(/\D/g, ""))}
           placeholder="712 345 678"
-          maxLength={10}
+          maxLength={15}
           required
         />
         <div className="ml-3 w-8">
           {validating ? (
             <BeatLoader size={6} />
           ) : valid === true ? (
-            <span className="text-red-600 text-lg">✓</span>
+            <span className="text-green-600 text-lg">✓</span>
           ) : valid === false ? (
             <span className="text-red-600 text-lg">✕</span>
           ) : null}

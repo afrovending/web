@@ -39,6 +39,7 @@ interface SelectOption {
 const TYPES: SelectOption[] = [
   { id: 2, name: "Products" },
   { id: 1, name: "Services" },
+  { id: 1, name: "Retail Store" },
 ];
 
 export default function StepShopInfo({ onNext }: StepProps) {
@@ -379,19 +380,19 @@ export default function StepShopInfo({ onNext }: StepProps) {
           </FadeSlide>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-80">
-            <TextInput label="City" value={city} onChange={setCity} disabled />
+            <TextInput label="City" value={city} onChange={setCity} required />
 
             <TextInput
               label="Postal/Zip Code"
               value={zip}
               onChange={setZip}
-              disabled
+              required
             />
             <TextInput
               label="Province/State/Town"
               value={stateCode}
               onChange={setStateCode}
-              disabled
+              required
             />
             <TextInput
               label="Street Address"
@@ -409,6 +410,7 @@ export default function StepShopInfo({ onNext }: StepProps) {
             onChange={setPhoneNumber}
             validating={isValidatingPhone}
             valid={isPhoneValid}
+            
           />
         </section>
 
