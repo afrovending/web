@@ -186,91 +186,79 @@ export default function StepShopInfo({ onNext }: StepProps) {
     };
   }, [selectedType]);
 
-  const handleMediaChange = async (file: File, mode: "logo" | "banner") => {
-    const localPreview = URL.createObjectURL(file);
-    mode === "logo" ? setLogoUrl(localPreview) : setBannerUrl(localPreview);
+  const isImage = (file: File) => file.type.startsWith("image/");
+
+  const handleBannerFile = async (file?: File) => {
+    if (!file) return;
+    if (!isImage(file)) {
+      toast.error(
+        "Invalid file type. Please upload an image (PNG, JPEG, GIF)."
+      );
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File too large. Max 5 MB.");
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setBannerUrl(previewUrl);
+    setBannerFile(file);
 
     // CREATE MODE → STOP HERE
     if (!shopId) {
       return; // Do NOT call API
     }
 
-    if (hasExistingShop) {
-      const uploadPromise =
-        mode === "logo"
-          ? updateShopLogo(shopId, file)
-          : updateShopBanner(shopId, file);
-
-      toast.promise(uploadPromise, {
-        loading: `Uploading your ${mode}...`,
-        success: (res) => {
-          if (res.status !== "success") throw new Error(res.message);
-          return `${mode} updated!`;
-        },
-        error: (err) => `Upload failed: ${err.message || "Unknown error"}`,
-      });
+    // UPDATE MODE → upload
+    try {
+      const resp = await updateShopBanner(shopId, file);
+      if (resp?.status === "success") {
+        toast.success(resp?.message ?? "Banner uploaded successfully");
+      } else {
+        toast.error(resp?.message ?? "Banner upload failed");
+      }
+    } catch (err) {
+      console.error("Banner upload failed", err);
+      toast.error("Banner upload failed. Try again.");
+      setBannerUrl(null);
     }
   };
 
-   const handleBannerFile = async (file?: File) => {
-     if (!file) return;
-     if (file.size > 5 * 1024 * 1024) {
-       toast.error("File too large. Max 5 MB.");
-       return;
-     }
+  const handleLogoFile = async (file?: File) => {
+    if (!file) return;
+    if (!isImage(file)) {
+      toast.error(
+        "Invalid file type. Please upload an image (PNG, JPEG, GIF)."
+      );
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File too large. Max 5 MB.");
+      return;
+    }
 
-     const previewUrl = URL.createObjectURL(file);
-     setBannerUrl(previewUrl);
-     setBannerFile(file);
+    const previewUrl = URL.createObjectURL(file);
+    setLogoUrl(previewUrl);
+    setLogoFile(file);
 
-     // CREATE MODE → STOP HERE
-     if (!shopId) {
-       return; // Do NOT call API
-     }
+    if (!shopId) {
+      return;
+    }
 
-     // UPDATE MODE → upload
-     try {
-       const resp = await updateShopBanner(shopId, file);
-       if (resp?.status === "success") {
-         toast.success(resp?.message ?? "Banner uploaded successfully");
-       } else {
-         toast.error(resp?.message ?? "Banner upload failed");
-       }
-     } catch (err) {
-       console.error("Banner upload failed", err);
-       toast.error("Banner upload failed. Try again.");
-       setBannerUrl(null);
-     }
-   };
-
-   const handleLogoFile = async (file?: File) => {
-     if (!file) return;
-     if (file.size > 5 * 1024 * 1024) {
-       toast.error("File too large. Max 5 MB.");
-       return;
-     }
-
-     const previewUrl = URL.createObjectURL(file);
-     setLogoUrl(previewUrl);
-     setLogoFile(file);
-
-     if (!shopId) {
-       return;
-     }
-
-     try {
-       const resp = await updateShopLogo(shopId, file);
-       if (resp?.status === "success") {
-         toast.success(resp?.message ?? "Logo uploaded successfully");
-       } else {
-         toast.error(resp?.message ?? "Logo upload failed");
-       }
-     } catch (err) {
-       console.error("Logo upload failed", err);
-       toast.error("Logo upload failed. Try again.");
-       setLogoUrl(null);
-     }
-   };
+    try {
+      const resp = await updateShopLogo(shopId, file);
+      if (resp?.status === "success") {
+        toast.success(resp?.message ?? "Logo uploaded successfully");
+      } else {
+        toast.error(resp?.message ?? "Logo upload failed");
+      }
+    } catch (err) {
+      console.error("Logo upload failed", err);
+      toast.error("Logo upload failed. Try again.");
+      setLogoUrl(null);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -296,6 +284,12 @@ export default function StepShopInfo({ onNext }: StepProps) {
       if (lat !== undefined) form.append("lat", String(lat));
       if (lng !== undefined) form.append("lng", String(lng));
 
+      if (logoFile) {
+        form.append("logo", logoFile);
+      }
+      if (bannerFile) {
+        form.append("banner", bannerFile);
+      }
       const res = await saveShop(form);
 
       if (res.status === "success") {
@@ -383,9 +377,9 @@ export default function StepShopInfo({ onNext }: StepProps) {
             <input
               type="file"
               className="hidden"
+              accept="image/*"
               onChange={(e) =>
-                e.target.files?.[0] &&
-                handleMediaChange(e.target.files[0], "banner")
+                e.target.files?.[0] && handleBannerFile(e.target.files[0])
               }
             />
           </label>
@@ -407,9 +401,9 @@ export default function StepShopInfo({ onNext }: StepProps) {
               <input
                 type="file"
                 className="hidden"
+                accept="image/*"
                 onChange={(e) =>
-                  e.target.files?.[0] &&
-                  handleMediaChange(e.target.files[0], "logo")
+                  e.target.files?.[0] && handleLogoFile(e.target.files[0])
                 }
               />
             </label>
