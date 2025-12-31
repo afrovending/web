@@ -25,10 +25,10 @@ export const useAuthStore = create<AuthStore>()(
         set({ token: null, user: null });
 
         // Clear cookies
-        document.cookie.split(";").forEach((cookie) => {
-          const name = cookie.split("=")[0].trim();
-          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
-        });
+        const expiredDate = "Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = `token=; expires=${expiredDate}; path=/;`;
+        document.cookie = `role=; expires=${expiredDate}; path=/;`;
+        
         if (typeof window !== "undefined") {
           localStorage.removeItem("auth-storage");
           sessionStorage.clear();

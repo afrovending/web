@@ -28,8 +28,20 @@ export default async function proxy(req: Request) {
   const token = extractCookie(cookieHeader, "token");
   const role = extractCookie(cookieHeader, "role");
 
+  const unAuthRoutes = ["/login", "/register", "/auth/login", "/auth/register"]; // Adjust paths as necessary
+
+  if (token && unAuthRoutes.includes(pathname)) {
+    // Determine where to redirect based on the role, defaulting to /account
+    let destination = "/account";
+    if (role === "vendor") {
+      destination = "/dashboard";
+    }
+
+    return Response.redirect(`${url.origin}${destination}`, 302);
+  }
+
   // Not authenticated → redirect to login
-  if (!token) {
+  if (isProtected && !token) {
     const redirectUrl = new URL("/login", url.origin);
     redirectUrl.searchParams.set("redirect", pathname);
     return Response.redirect(redirectUrl.toString(), 302);
