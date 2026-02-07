@@ -23,9 +23,11 @@ import { VendorsPage, VendorPage } from './pages/VendorsPages';
 const LoadingScreen = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
     <div className="text-center">
-      <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-        <span className="text-primary-foreground font-heading font-bold text-xl">A</span>
-      </div>
+      <img 
+        src="https://customer-assets.emergentagent.com/job_4651b9b8-f544-4a9c-8c72-eb308d827774/artifacts/sdrbp7sb_AFROVENDINGLOGO%20copy.png" 
+        alt="Afrovending" 
+        className="h-20 w-auto mx-auto mb-4 animate-pulse"
+      />
       <p className="text-muted-foreground">Loading...</p>
     </div>
   </div>
