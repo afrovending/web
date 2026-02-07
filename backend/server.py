@@ -1863,7 +1863,108 @@ async def get_cart(user: dict = Depends(get_current_user)):
             items.append(item_response)
             subtotal += price * item["quantity"]
     
-    return CartResponse(items=items, subtotal=round(subtotal, 2), total=round(subtotal, 2))
+    # Check for applied coupon
+    applied_coupon = await db.cart_coupons.find_one({"user_id": user["id"]}, {"_id": 0})
+    discount = 0.0
+    discount_code = None
+    
+    if applied_coupon:
+        coupon = await db.coupons.find_one({"id": applied_coupon["coupon_id"]}, {"_id": 0})
+        if coupon and coupon.get("is_active"):
+            discount_code = coupon["code"]
+            if coupon["discount_type"] == "percentage":
+                discount = subtotal * (coupon["discount_value"] / 100)
+                if coupon.get("max_discount"):
+                    discount = min(discount, coupon["max_discount"])
+            else:
+                discount = min(coupon["discount_value"], subtotal)
+            discount = round(discount, 2)
+    
+    total = round(subtotal - discount, 2)
+    
+    return CartResponse(
+        items=items, 
+        subtotal=round(subtotal, 2), 
+        discount=discount,
+        discount_code=discount_code,
+        total=total
+    )
+
+@api_router.post("/cart/apply-coupon")
+async def apply_coupon_to_cart(request: ApplyCouponRequest, user: dict = Depends(get_current_user)):
+    """Apply a coupon code to the cart"""
+    code = request.code.upper().strip()
+    
+    coupon = await db.coupons.find_one({"code": code}, {"_id": 0})
+    if not coupon:
+        raise HTTPException(status_code=400, detail="Invalid coupon code")
+    
+    # Validate coupon
+    if not coupon.get("is_active"):
+        raise HTTPException(status_code=400, detail="This coupon is no longer active")
+    
+    now = datetime.now(timezone.utc)
+    if coupon.get("expiry_date"):
+        expiry = datetime.fromisoformat(coupon["expiry_date"].replace("Z", "+00:00"))
+        if now > expiry:
+            raise HTTPException(status_code=400, detail="This coupon has expired")
+    
+    if coupon.get("max_uses") and coupon.get("used_count", 0) >= coupon["max_uses"]:
+        raise HTTPException(status_code=400, detail="This coupon has reached its usage limit")
+    
+    user_usage = await db.coupon_usage.count_documents({
+        "coupon_id": coupon["id"],
+        "user_id": user["id"]
+    })
+    if user_usage >= coupon.get("max_uses_per_user", 1):
+        raise HTTPException(status_code=400, detail="You have already used this coupon")
+    
+    # Get cart subtotal to check minimum
+    cart_items = await db.cart_items.find({"user_id": user["id"]}, {"_id": 0}).to_list(100)
+    subtotal = 0.0
+    for item in cart_items:
+        product = await db.products.find_one({"id": item["product_id"]}, {"_id": 0})
+        if product:
+            price = product["price"]
+            if item.get("variant_id") and product.get("variants"):
+                variant = next((v for v in product["variants"] if v["id"] == item["variant_id"]), None)
+                if variant and variant.get("price") is not None:
+                    price = variant["price"]
+            subtotal += price * item["quantity"]
+    
+    if coupon.get("min_order_amount", 0) > subtotal:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Minimum order amount is ${coupon['min_order_amount']:.2f}"
+        )
+    
+    # Remove any existing coupon and apply new one
+    await db.cart_coupons.delete_many({"user_id": user["id"]})
+    await db.cart_coupons.insert_one({
+        "user_id": user["id"],
+        "coupon_id": coupon["id"],
+        "applied_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    # Calculate discount
+    if coupon["discount_type"] == "percentage":
+        discount = subtotal * (coupon["discount_value"] / 100)
+        if coupon.get("max_discount"):
+            discount = min(discount, coupon["max_discount"])
+    else:
+        discount = min(coupon["discount_value"], subtotal)
+    
+    return {
+        "message": f"Coupon applied! You save ${discount:.2f}",
+        "discount": round(discount, 2),
+        "code": coupon["code"]
+    }
+
+@api_router.delete("/cart/coupon")
+async def remove_coupon_from_cart(user: dict = Depends(get_current_user)):
+    """Remove applied coupon from cart"""
+    await db.cart_coupons.delete_many({"user_id": user["id"]})
+    return {"message": "Coupon removed"}
 
 @api_router.post("/cart/items")
 async def add_to_cart(item: CartItemBase, user: dict = Depends(get_current_user)):
