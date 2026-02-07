@@ -39,9 +39,11 @@ const LoginPage = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2 mb-6">
-              <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-primary-foreground font-heading font-bold text-2xl">A</span>
-              </div>
+              <img 
+                src="https://customer-assets.emergentagent.com/job_4651b9b8-f544-4a9c-8c72-eb308d827774/artifacts/sdrbp7sb_AFROVENDINGLOGO%20copy.png" 
+                alt="Afrovending" 
+                className="h-16 w-auto"
+              />
             </Link>
             <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground mb-2">
               Welcome Back
@@ -207,9 +209,11 @@ const RegisterPage = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2 mb-6">
-              <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-primary-foreground font-heading font-bold text-2xl">A</span>
-              </div>
+              <img 
+                src="https://customer-assets.emergentagent.com/job_4651b9b8-f544-4a9c-8c72-eb308d827774/artifacts/sdrbp7sb_AFROVENDINGLOGO%20copy.png" 
+                alt="Afrovending" 
+                className="h-16 w-auto"
+              />
             </Link>
             <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground mb-2">
               Create Account

@@ -10,10 +10,11 @@ const Footer = () => {
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-primary-foreground font-heading font-bold text-xl">A</span>
-              </div>
-              <span className="font-heading text-2xl font-bold">Afrovending</span>
+              <img 
+                src="https://customer-assets.emergentagent.com/job_4651b9b8-f544-4a9c-8c72-eb308d827774/artifacts/sdrbp7sb_AFROVENDINGLOGO%20copy.png" 
+                alt="Afrovending" 
+                className="h-14 w-auto"
+              />
             </div>
             <p className="text-background/70 text-sm leading-relaxed">
               The heartbeat of African commerce. Connecting African vendors with global customers.

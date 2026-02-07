@@ -39,12 +39,11 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2" data-testid="nav-logo">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-primary-foreground font-heading font-bold text-xl">A</span>
-            </div>
-            <span className="font-heading text-xl md:text-2xl font-bold text-foreground hidden sm:block">
-              Afrovending
-            </span>
+            <img 
+              src="https://customer-assets.emergentagent.com/job_4651b9b8-f544-4a9c-8c72-eb308d827774/artifacts/sdrbp7sb_AFROVENDINGLOGO%20copy.png" 
+              alt="Afrovending" 
+              className="h-12 w-auto"
+            />
           </Link>
 
           {/* Search Bar - Desktop */}
