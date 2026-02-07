@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Heart, Clock, User, Settings, Store, ChevronRight } from 'lucide-react';
+import { Package, Heart, Clock, User, Settings, Store, ChevronRight, Calendar, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
 import { Badge } from '../components/ui/badge';
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -14,24 +15,49 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const UserDashboard = () => {
   const { user, isAuthenticated, isVendor } = useAuth();
   const [orders, setOrders] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [confirmingDelivery, setConfirmingDelivery] = useState(null);
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`${API}/orders`);
-        setOrders(response.data);
+        const [ordersRes, bookingsRes] = await Promise.all([
+          axios.get(`${API}/orders`),
+          axios.get(`${API}/bookings`)
+        ]);
+        setOrders(ordersRes.data);
+        setBookings(bookingsRes.data);
       } catch (error) {
-        console.error('Failed to fetch orders:', error);
+        console.error('Failed to fetch data:', error);
       } finally {
         setLoading(false);
       }
     };
     
     if (isAuthenticated) {
-      fetchOrders();
+      fetchData();
     }
   }, [isAuthenticated]);
+
+  const handleConfirmDelivery = async (bookingId) => {
+    if (!window.confirm('Are you sure the service was completed satisfactorily? This will release payment to the vendor.')) {
+      return;
+    }
+    
+    setConfirmingDelivery(bookingId);
+    try {
+      await axios.put(`${API}/bookings/${bookingId}/confirm-delivery`);
+      toast.success('Service delivery confirmed! Payment released to vendor.');
+      // Refresh bookings
+      const response = await axios.get(`${API}/bookings`);
+      setBookings(response.data);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to confirm delivery');
+    } finally {
+      setConfirmingDelivery(null);
+    }
+  };
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
