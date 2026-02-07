@@ -40,22 +40,22 @@ const Footer = () => {
             <h4 className="font-heading font-semibold text-lg mb-4">Shop</h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/products" className="text-background/70 hover:text-primary transition-colors text-sm" data-testid="footer-products">
+                <Link to="/products" className="text-white/70 hover:text-primary transition-colors text-sm" data-testid="footer-products">
                   All Products
                 </Link>
               </li>
               <li>
-                <Link to="/products?category=fashion" className="text-background/70 hover:text-primary transition-colors text-sm" data-testid="footer-fashion">
+                <Link to="/products?category=fashion" className="text-white/70 hover:text-primary transition-colors text-sm" data-testid="footer-fashion">
                   Fashion
                 </Link>
               </li>
               <li>
-                <Link to="/products?category=art" className="text-background/70 hover:text-primary transition-colors text-sm" data-testid="footer-art">
+                <Link to="/products?category=art" className="text-white/70 hover:text-primary transition-colors text-sm" data-testid="footer-art">
                   Art & Crafts
                 </Link>
               </li>
               <li>
-                <Link to="/vendors" className="text-background/70 hover:text-primary transition-colors text-sm" data-testid="footer-vendors">
+                <Link to="/vendors" className="text-white/70 hover:text-primary transition-colors text-sm" data-testid="footer-vendors">
                   Vendors
                 </Link>
               </li>
@@ -67,22 +67,22 @@ const Footer = () => {
             <h4 className="font-heading font-semibold text-lg mb-4">Account</h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/login" className="text-background/70 hover:text-primary transition-colors text-sm" data-testid="footer-login">
+                <Link to="/login" className="text-white/70 hover:text-primary transition-colors text-sm" data-testid="footer-login">
                   Login
                 </Link>
               </li>
               <li>
-                <Link to="/register" className="text-background/70 hover:text-primary transition-colors text-sm" data-testid="footer-register">
+                <Link to="/register" className="text-white/70 hover:text-primary transition-colors text-sm" data-testid="footer-register">
                   Register
                 </Link>
               </li>
               <li>
-                <Link to="/dashboard" className="text-background/70 hover:text-primary transition-colors text-sm" data-testid="footer-dashboard">
+                <Link to="/dashboard" className="text-white/70 hover:text-primary transition-colors text-sm" data-testid="footer-dashboard">
                   My Account
                 </Link>
               </li>
               <li>
-                <Link to="/register?vendor=true" className="text-background/70 hover:text-primary transition-colors text-sm" data-testid="footer-become-vendor">
+                <Link to="/register?vendor=true" className="text-white/70 hover:text-primary transition-colors text-sm" data-testid="footer-become-vendor">
                   Become a Vendor
                 </Link>
               </li>
@@ -94,22 +94,22 @@ const Footer = () => {
             <h4 className="font-heading font-semibold text-lg mb-4">Support</h4>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-background/70 hover:text-primary transition-colors text-sm" data-testid="footer-help">
+                <a href="#" className="text-white/70 hover:text-primary transition-colors text-sm" data-testid="footer-help">
                   Help Center
                 </a>
               </li>
               <li>
-                <a href="#" className="text-background/70 hover:text-primary transition-colors text-sm" data-testid="footer-shipping">
+                <a href="#" className="text-white/70 hover:text-primary transition-colors text-sm" data-testid="footer-shipping">
                   Shipping Info
                 </a>
               </li>
               <li>
-                <a href="#" className="text-background/70 hover:text-primary transition-colors text-sm" data-testid="footer-returns">
+                <a href="#" className="text-white/70 hover:text-primary transition-colors text-sm" data-testid="footer-returns">
                   Returns & Refunds
                 </a>
               </li>
               <li>
-                <a href="#" className="text-background/70 hover:text-primary transition-colors text-sm" data-testid="footer-contact">
+                <a href="#" className="text-white/70 hover:text-primary transition-colors text-sm" data-testid="footer-contact">
                   Contact Us
                 </a>
               </li>
@@ -118,15 +118,15 @@ const Footer = () => {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-background/20 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-background/60 text-sm">
+        <div className="border-t border-white/20 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-white/60 text-sm">
             © {new Date().getFullYear()} Afrovending. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <a href="#" className="text-background/60 hover:text-primary transition-colors text-sm">
+            <a href="#" className="text-white/60 hover:text-primary transition-colors text-sm">
               Privacy Policy
             </a>
-            <a href="#" className="text-background/60 hover:text-primary transition-colors text-sm">
+            <a href="#" className="text-white/60 hover:text-primary transition-colors text-sm">
               Terms of Service
             </a>
           </div>
