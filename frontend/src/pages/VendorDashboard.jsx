@@ -192,6 +192,93 @@ const VendorDashboard = () => {
     }
   };
 
+  // Service handlers
+  const handleServiceSubmit = async (e) => {
+    e.preventDefault();
+    
+    const serviceData = {
+      name: serviceForm.name,
+      description: serviceForm.description,
+      price: parseFloat(serviceForm.price),
+      price_type: serviceForm.price_type,
+      duration_minutes: parseInt(serviceForm.duration_minutes) || 60,
+      location_type: serviceForm.location_type,
+      location_address: serviceForm.location_address || null,
+      category_id: serviceForm.category_id,
+      images: serviceForm.images.split(',').map(s => s.trim()).filter(Boolean),
+      tags: serviceForm.tags.split(',').map(s => s.trim()).filter(Boolean)
+    };
+    
+    try {
+      if (editingService) {
+        await axios.put(`${API}/services/${editingService.id}`, serviceData);
+        toast.success('Service updated!');
+      } else {
+        await axios.post(`${API}/services`, serviceData);
+        toast.success('Service created!');
+      }
+      
+      const servicesRes = await axios.get(`${API}/services?vendor_id=${vendor.id}&limit=100`);
+      setServices(servicesRes.data);
+      
+      setServiceDialogOpen(false);
+      setEditingService(null);
+      setServiceForm({
+        name: '',
+        description: '',
+        price: '',
+        price_type: 'fixed',
+        duration_minutes: '60',
+        location_type: 'both',
+        location_address: '',
+        category_id: '',
+        images: '',
+        tags: ''
+      });
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to save service');
+    }
+  };
+
+  const handleEditService = (service) => {
+    setEditingService(service);
+    setServiceForm({
+      name: service.name,
+      description: service.description,
+      price: service.price.toString(),
+      price_type: service.price_type,
+      duration_minutes: service.duration_minutes.toString(),
+      location_type: service.location_type,
+      location_address: service.location_address || '',
+      category_id: service.category_id,
+      images: service.images?.join(', ') || '',
+      tags: service.tags?.join(', ') || ''
+    });
+    setServiceDialogOpen(true);
+  };
+
+  const handleDeleteService = async (serviceId) => {
+    if (!window.confirm('Are you sure you want to delete this service?')) return;
+    
+    try {
+      await axios.delete(`${API}/services/${serviceId}`);
+      setServices(services.filter(s => s.id !== serviceId));
+      toast.success('Service deleted');
+    } catch (error) {
+      toast.error('Failed to delete service');
+    }
+  };
+
+  const handleUpdateBookingStatus = async (bookingId, status) => {
+    try {
+      await axios.put(`${API}/bookings/${bookingId}/status`, { status });
+      setBookings(bookings.map(b => b.id === bookingId ? { ...b, status } : b));
+      toast.success('Booking status updated');
+    } catch (error) {
+      toast.error('Failed to update booking status');
+    }
+  };
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
