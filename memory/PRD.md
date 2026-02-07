@@ -19,19 +19,6 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 2. **African Vendor** - Sells products and services, manages bookings, tracks payouts via Stripe Connect
 3. **Platform Admin** - Manages vendors, approves new sellers, monitors platform
 
-## Core Requirements (Static)
-- Multi-vendor marketplace for products AND services
-- User authentication (JWT-based)
-- Product catalog with categories
-- Service booking system with calendar
-- Shopping cart and wishlist
-- Stripe payment integration with escrow for services
-- Stripe Connect for vendor payouts
-- Vendor dashboard for product/service management
-- Vendor payout dashboard with earnings tracking
-- Admin dashboard for platform management
-- Product/Service reviews and ratings
-
 ## Architecture
 - **Frontend**: React 19 + Tailwind CSS + Shadcn UI
 - **Backend**: FastAPI (Python)
@@ -43,54 +30,83 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 
 ## What's Been Implemented (Feb 7, 2026)
 
-### Backend
-- User authentication (register, login, JWT tokens)
-- Product CRUD operations
-- Service CRUD operations with availability management
-- Booking system with time slots
-- Escrow payment flow with confirm-delivery endpoint
-- Vendor management with approval flow
-- Shopping cart functionality
-- Wishlist functionality
-- Order management
-- Product/Service reviews system
-- Category management (including 9 service subcategories)
-- Stripe checkout integration for products and services
-- Image upload endpoint (/api/upload/image)
-- Tracking endpoints (/api/tracking, /api/tracking/:type/:id)
-- SendGrid email notifications for bookings
-- **NEW: Vendor Payout Dashboard API**
-  - GET /api/vendor/payout/summary
-  - GET /api/vendor/payout/transactions
-  - POST /api/vendor/stripe/connect
-  - GET /api/vendor/stripe/status
-  - POST /api/vendor/payout/request
-  - GET /api/vendor/stripe/return
-  - GET /api/vendor/stripe/refresh
+### Backend API Endpoints
 
-### Frontend
+#### Authentication
+- POST /api/auth/register
+- POST /api/auth/login
+
+#### Products
+- GET/POST /api/products (with advanced filtering)
+- GET/PUT/DELETE /api/products/:id
+- GET /api/products/featured
+
+#### Services
+- GET/POST /api/services (with advanced filtering)
+- GET/PUT/DELETE /api/services/:id
+- GET /api/services/featured
+
+#### Search (NEW)
+- GET /api/search - Unified search for products and services
+- GET /api/search/suggestions - Autocomplete suggestions
+
+#### Bookings
+- GET/POST /api/bookings
+- GET /api/bookings/:id
+- PUT /api/bookings/:id/status
+- PUT /api/bookings/:id/confirm-delivery
+
+#### Vendor Payouts
+- GET /api/vendor/payout/summary
+- GET /api/vendor/payout/transactions
+- POST /api/vendor/stripe/connect
+- GET /api/vendor/stripe/status
+- POST /api/vendor/payout/request
+
+#### Tracking
+- GET /api/tracking
+- GET /api/tracking/:type/:id
+
+#### Upload
+- POST /api/upload/image
+- GET /api/uploads/:filename
+
+#### Admin
+- GET /api/admin/vendors
+- PUT /api/vendors/:id/approve
+- GET /api/admin/users
+- GET /api/admin/orders
+
+### Frontend Features
+
+#### Pages
 - Homepage with logo, hero, categories, featured sections
-- Desktop navigation with Products, Services, Vendors links
-- Products listing with filters and search
-- Services listing page with category filters
-- Service detail page with booking calendar and time slots
+- **Products page with advanced filtering** (NEW)
+  - Search input
+  - Sort by (Newest, Price Low/High, Rating, Name)
+  - Category multi-select filter
+  - Price range slider
+  - Rating filter
+  - In Stock filter
+  - Grid/List view toggle
+  - Clear all filters button
+  - URL persistence for shareable links
+- **Services page with advanced filtering** (NEW)
+  - All product filters plus Location Type filter (In Person, Remote, Both)
+- Service detail page with booking calendar
 - Booking detail page with Pay button and Confirm Delivery
-- User dashboard with Bookings tab showing customer bookings
-- User registration and login
-- Shopping cart and Wishlist
-- Vendor dashboard with Products, Services, Orders, Bookings tabs
-- **NEW: Vendor Payout Dashboard (Payouts tab)**
-  - Stripe Connect onboarding flow
-  - Earnings summary (Total Sales, Available, Pending, Paid Out)
-  - Platform fee display (10%)
-  - Transaction history with earnings, fees, and payouts
-  - Request Payout functionality
-- ImageUpload component for vendor product/service images
-- Admin dashboard (stats, vendors, users, orders)
-- Checkout success pages for products and services
-- Tracking page (/tracking) with All/Orders/Bookings filter
-- Tracking detail page with status timeline
-- "Track Orders" link in user dropdown menu
+- User dashboard with Bookings tab
+- Vendor dashboard with Products, Services, Orders, Bookings, Payouts tabs
+- Vendor Payout Dashboard (Stripe Connect integration)
+- Admin dashboard
+- Tracking page with timeline
+- Cart, Wishlist, Checkout pages
+
+#### Components
+- SearchFilters - Reusable filter sidebar component
+- ImageUpload - Image upload with preview
+- PayoutDashboard - Vendor earnings and payout management
+- ProductCard, ServiceCard
 
 ### Email Notifications (SendGrid)
 - New booking notification to vendor
@@ -98,32 +114,22 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Payment released notification to vendor
 - Order status update to customer
 
-### Design
-- Red/black color scheme matching user logo
-- Montserrat + Ubuntu typography
-- Rounded buttons and cards
-- Responsive layout
-
 ## Test Accounts
 - Admin: admin@example.com / password123
 - Vendor (Approved): vendor@afrovending.com / password123
 - Customer: testuser123@example.com / password123
 
 ## Testing Status (Feb 7, 2026)
-- Backend: 100% (29/29 tests passed)
+- Backend: 100% (31/31 tests passed)
 - Frontend: 100% (all features working)
-- Vendor Payout Dashboard: Fully tested and functional
+- Advanced Search: Fully tested and functional
 
 ## Prioritized Backlog
 
-### P0 (Critical - Next)
+### P1 (High Priority)
 - PayPal payment integration
 - Cloud storage for images (AWS S3)
-
-### P1 (High Priority)
-- Advanced search with filters
 - Product variants (size, color)
-- Order fulfillment workflow
 
 ### P2 (Nice to Have)
 - Social login (Google, Facebook)
@@ -131,62 +137,31 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Coupon/discount system
 - Analytics dashboard for vendors
 
-## API Endpoints
+## Search Filter Parameters
 
-### Authentication
-- POST /api/auth/register
-- POST /api/auth/login
+### Products (/api/products)
+- search: Full-text search on name, description, tags
+- category_ids: Comma-separated category IDs
+- vendor_id: Filter by vendor
+- min_price, max_price: Price range
+- min_rating: Minimum rating (1-5)
+- in_stock: Boolean, filter to in-stock items
+- tags: Comma-separated tags
+- sort_by: created_at, price, average_rating, name
+- sort_order: asc, desc
 
-### Products
-- GET/POST /api/products
-- GET/PUT/DELETE /api/products/:id
+### Services (/api/services)
+- All product filters plus:
+- location_type: in_person, remote, both
+- min_duration, max_duration: Duration range
 
-### Services
-- GET/POST /api/services
-- GET/PUT/DELETE /api/services/:id
-
-### Bookings
-- GET/POST /api/bookings
-- GET /api/bookings/:id
-- PUT /api/bookings/:id/status
-- PUT /api/bookings/:id/confirm-delivery
-
-### Vendor Payouts (NEW)
-- GET /api/vendor/payout/summary
-- GET /api/vendor/payout/transactions
-- POST /api/vendor/stripe/connect
-- GET /api/vendor/stripe/status
-- POST /api/vendor/payout/request
-
-### Tracking
-- GET /api/tracking
-- GET /api/tracking/:type/:id
-
-### Upload
-- POST /api/upload/image
-- GET /api/uploads/:filename
-
-### Admin
-- GET /api/admin/vendors
-- PUT /api/vendors/:id/approve
-- GET /api/admin/users
-- GET /api/admin/orders
-
-## Stripe Connect Flow
-1. Vendor clicks "Connect Stripe Account" in Payouts tab
-2. System creates Stripe Express account
-3. Vendor redirected to Stripe onboarding
-4. After completion, vendor returns to dashboard
-5. When customer confirms delivery, payout is available
-6. Vendor requests payout → funds transfer to their Stripe account
-
-## Platform Fee Structure
-- 10% platform commission on all sales
-- Fee deducted from vendor earnings automatically
-- Displayed in vendor payout dashboard
+### Unified Search (/api/search)
+- q: Search query
+- type: products, services, or both
+- All other product/service filters
 
 ## Next Tasks
 1. Implement PayPal checkout flow
 2. Add cloud storage for images (S3)
-3. Create advanced product search
-4. Add product variants support
+3. Create product variants support (size, color)
+4. Build analytics dashboard for vendors
