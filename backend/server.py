@@ -214,6 +214,96 @@ class CheckoutRequest(BaseModel):
 class PaymentStatusRequest(BaseModel):
     session_id: str
 
+# ==================== SERVICE MODELS ====================
+
+class ServiceBase(BaseModel):
+    name: str
+    description: str
+    category_id: str
+    price: float
+    price_type: str = "fixed"  # fixed, hourly, starting_from
+    duration_minutes: int = 60
+    location_type: str = "onsite"  # onsite, remote, both
+    location_address: Optional[str] = None
+    images: List[str] = []
+    is_active: bool = True
+    tags: List[str] = []
+
+class ServiceCreate(ServiceBase):
+    pass
+
+class ServiceUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    category_id: Optional[str] = None
+    price: Optional[float] = None
+    price_type: Optional[str] = None
+    duration_minutes: Optional[int] = None
+    location_type: Optional[str] = None
+    location_address: Optional[str] = None
+    images: Optional[List[str]] = None
+    is_active: Optional[bool] = None
+    tags: Optional[List[str]] = None
+
+class ServiceResponse(ServiceBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    vendor_id: str
+    vendor_name: Optional[str] = None
+    average_rating: float = 0.0
+    review_count: int = 0
+    created_at: str
+
+class ServiceAvailabilityBase(BaseModel):
+    day_of_week: int  # 0=Monday, 6=Sunday
+    start_time: str  # "09:00"
+    end_time: str  # "17:00"
+    is_available: bool = True
+
+class ServiceAvailabilityCreate(ServiceAvailabilityBase):
+    service_id: str
+
+class TimeSlotResponse(BaseModel):
+    date: str
+    time: str
+    is_available: bool
+
+class BookingCreate(BaseModel):
+    service_id: str
+    booking_date: str  # "2024-02-15"
+    booking_time: str  # "10:00"
+    notes: Optional[str] = None
+    customer_address: Optional[str] = None
+
+class BookingResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    service_id: str
+    service_name: str
+    service_image: Optional[str] = None
+    customer_id: str
+    customer_name: str
+    customer_email: str
+    vendor_id: str
+    vendor_name: str
+    booking_date: str
+    booking_time: str
+    duration_minutes: int
+    price: float
+    status: str  # pending, confirmed, in_progress, completed, cancelled
+    payment_status: str  # pending, paid, released, refunded
+    delivery_confirmed: bool = False
+    notes: Optional[str] = None
+    customer_address: Optional[str] = None
+    created_at: str
+
+class BookingStatusUpdate(BaseModel):
+    status: str
+
+class ServiceCheckoutRequest(BaseModel):
+    booking_id: str
+    origin_url: str
+
 # ==================== AUTH HELPERS ====================
 
 def hash_password(password: str) -> str:
