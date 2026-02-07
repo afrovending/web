@@ -366,6 +366,161 @@ async def require_admin(user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
+# ==================== EMAIL SERVICE ====================
+
+def send_email(to_email: str, subject: str, html_content: str):
+    """Send email using SendGrid"""
+    if not SENDGRID_API_KEY:
+        logger.warning("SendGrid API key not configured, skipping email")
+        return False
+    
+    try:
+        message = Mail(
+            from_email=Email(SENDER_EMAIL, "Afrovending"),
+            to_emails=To(to_email),
+            subject=subject,
+            html_content=Content("text/html", html_content)
+        )
+        
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
+        response = sg.send(message)
+        logger.info(f"Email sent to {to_email}, status: {response.status_code}")
+        return response.status_code == 202
+    except Exception as e:
+        logger.error(f"Failed to send email to {to_email}: {str(e)}")
+        return False
+
+def send_booking_created_email(vendor_email: str, vendor_name: str, booking: dict):
+    """Notify vendor of new booking"""
+    subject = f"New Booking: {booking['service_name']}"
+    html_content = f"""
+    <html>
+    <body style="font-family: 'Ubuntu', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="color: white; margin: 0; font-family: 'Montserrat', sans-serif;">New Booking!</h1>
+        </div>
+        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+            <p>Hi {vendor_name},</p>
+            <p>You have received a new booking for your service.</p>
+            
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #c41e3a;">
+                <h3 style="margin-top: 0; color: #1a1a1a;">{booking['service_name']}</h3>
+                <p><strong>Customer:</strong> {booking['customer_name']}</p>
+                <p><strong>Email:</strong> {booking['customer_email']}</p>
+                <p><strong>Date:</strong> {booking['booking_date']}</p>
+                <p><strong>Time:</strong> {booking['booking_time']}</p>
+                <p><strong>Duration:</strong> {booking['duration_minutes']} minutes</p>
+                <p><strong>Price:</strong> ${booking['price']:.2f}</p>
+                {f"<p><strong>Notes:</strong> {booking['notes']}</p>" if booking.get('notes') else ""}
+            </div>
+            
+            <p>Please log in to your vendor dashboard to manage this booking.</p>
+            <p style="color: #666; font-size: 12px;">This is an automated message from Afrovending.</p>
+        </div>
+    </body>
+    </html>
+    """
+    return send_email(vendor_email, subject, html_content)
+
+def send_booking_status_email(customer_email: str, customer_name: str, booking: dict, new_status: str):
+    """Notify customer of booking status change"""
+    status_messages = {
+        "confirmed": "Your booking has been confirmed by the vendor.",
+        "in_progress": "Your service is now in progress.",
+        "completed": "Your service has been marked as completed.",
+        "cancelled": "Your booking has been cancelled."
+    }
+    
+    subject = f"Booking Update: {booking['service_name']}"
+    html_content = f"""
+    <html>
+    <body style="font-family: 'Ubuntu', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="color: white; margin: 0; font-family: 'Montserrat', sans-serif;">Booking Update</h1>
+        </div>
+        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+            <p>Hi {customer_name},</p>
+            <p>{status_messages.get(new_status, f"Your booking status has been updated to: {new_status}")}</p>
+            
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #c41e3a;">
+                <h3 style="margin-top: 0; color: #1a1a1a;">{booking['service_name']}</h3>
+                <p><strong>Date:</strong> {booking['booking_date']}</p>
+                <p><strong>Time:</strong> {booking['booking_time']}</p>
+                <p><strong>Status:</strong> <span style="color: #c41e3a; font-weight: bold;">{new_status.upper()}</span></p>
+            </div>
+            
+            {"<p><strong>Next Step:</strong> After your service is completed, please confirm delivery in your dashboard to release the payment to the vendor.</p>" if new_status == "confirmed" else ""}
+            
+            <p style="color: #666; font-size: 12px;">This is an automated message from Afrovending.</p>
+        </div>
+    </body>
+    </html>
+    """
+    return send_email(customer_email, subject, html_content)
+
+def send_payment_released_email(vendor_email: str, vendor_name: str, booking: dict):
+    """Notify vendor that payment has been released"""
+    subject = f"Payment Released: {booking['service_name']}"
+    html_content = f"""
+    <html>
+    <body style="font-family: 'Ubuntu', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #22c55e 0%, #1a1a1a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="color: white; margin: 0; font-family: 'Montserrat', sans-serif;">Payment Released!</h1>
+        </div>
+        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+            <p>Hi {vendor_name},</p>
+            <p>Great news! The customer has confirmed delivery of your service, and the payment has been released to you.</p>
+            
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #22c55e;">
+                <h3 style="margin-top: 0; color: #1a1a1a;">{booking['service_name']}</h3>
+                <p><strong>Customer:</strong> {booking['customer_name']}</p>
+                <p><strong>Date:</strong> {booking['booking_date']}</p>
+                <p style="font-size: 24px; color: #22c55e; font-weight: bold;">Amount: ${booking['price']:.2f}</p>
+            </div>
+            
+            <p>Thank you for providing excellent service on Afrovending!</p>
+            <p style="color: #666; font-size: 12px;">This is an automated message from Afrovending.</p>
+        </div>
+    </body>
+    </html>
+    """
+    return send_email(vendor_email, subject, html_content)
+
+def send_order_status_email(customer_email: str, customer_name: str, order: dict, new_status: str):
+    """Notify customer of order status change"""
+    status_messages = {
+        "processing": "Your order is being processed.",
+        "shipped": "Your order has been shipped!",
+        "delivered": "Your order has been delivered.",
+        "cancelled": "Your order has been cancelled."
+    }
+    
+    subject = f"Order Update: #{order['id'][:8]}"
+    html_content = f"""
+    <html>
+    <body style="font-family: 'Ubuntu', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="color: white; margin: 0; font-family: 'Montserrat', sans-serif;">Order Update</h1>
+        </div>
+        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+            <p>Hi {customer_name},</p>
+            <p>{status_messages.get(new_status, f"Your order status has been updated to: {new_status}")}</p>
+            
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #c41e3a;">
+                <h3 style="margin-top: 0; color: #1a1a1a;">Order #{order['id'][:8]}</h3>
+                <p><strong>Items:</strong> {len(order.get('items', []))} item(s)</p>
+                <p><strong>Total:</strong> ${order['total']:.2f}</p>
+                <p><strong>Status:</strong> <span style="color: #c41e3a; font-weight: bold;">{new_status.upper()}</span></p>
+            </div>
+            
+            <p>Log in to your dashboard to view full order details.</p>
+            <p style="color: #666; font-size: 12px;">This is an automated message from Afrovending.</p>
+        </div>
+    </body>
+    </html>
+    """
+    return send_email(customer_email, subject, html_content)
+
 # ==================== AUTH ROUTES ====================
 
 @api_router.post("/auth/register", response_model=TokenResponse)
