@@ -72,14 +72,31 @@ const VendorDashboard = () => {
           const productsRes = await axios.get(`${API}/products?vendor_id=${myVendor.id}&limit=100`);
           setProducts(productsRes.data);
           
+          // Fetch vendor's services
+          const servicesRes = await axios.get(`${API}/services?vendor_id=${myVendor.id}&limit=100`);
+          setServices(servicesRes.data);
+          
           // Fetch vendor's orders
           const ordersRes = await axios.get(`${API}/vendor/orders`);
           setOrders(ordersRes.data);
+          
+          // Fetch vendor's bookings
+          const bookingsRes = await axios.get(`${API}/vendor/bookings`);
+          setBookings(bookingsRes.data);
         }
         
         // Fetch categories
         const categoriesRes = await axios.get(`${API}/categories`);
-        setCategories(categoriesRes.data);
+        const allCats = categoriesRes.data;
+        
+        // Separate product and service categories
+        const servicesParent = allCats.find(c => c.name === 'Services');
+        if (servicesParent) {
+          setServiceCategories(allCats.filter(c => c.parent_id === servicesParent.id));
+          setCategories(allCats.filter(c => !c.parent_id && c.name !== 'Services'));
+        } else {
+          setCategories(allCats.filter(c => !c.parent_id));
+        }
       } catch (error) {
         console.error('Failed to fetch data:', error);
       } finally {
