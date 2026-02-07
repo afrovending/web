@@ -136,11 +136,49 @@ const HomePage = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="font-heading font-semibold text-background text-lg">{category.name}</h3>
+                  <h3 className="font-heading font-semibold text-white text-lg">{category.name}</h3>
                 </div>
               </Link>
             ))}
           </div>
+
+          {/* Services Section */}
+          {categories.find(cat => cat.name === 'Services') && (
+            <div className="mt-8">
+              <div className="flex items-end justify-between mb-8">
+                <div>
+                  <h3 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-2">
+                    Services
+                  </h3>
+                  <p className="text-muted-foreground">Professional services from African providers</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                {categories
+                  .filter(cat => cat.parent_id === categories.find(c => c.name === 'Services')?.id)
+                  .map((service) => (
+                    <Link
+                      key={service.id}
+                      to={`/products?category=${service.id}`}
+                      className="group bg-card rounded-xl p-4 border border-border hover:border-primary/50 hover:shadow-lg transition-all"
+                      data-testid={`service-${service.id}`}
+                    >
+                      <div className="w-14 h-14 rounded-full overflow-hidden mb-3 mx-auto">
+                        <img
+                          src={service.image_url || 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=200'}
+                          alt={service.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <h4 className="font-heading font-semibold text-sm text-center text-foreground group-hover:text-primary transition-colors">
+                        {service.name}
+                      </h4>
+                    </Link>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
