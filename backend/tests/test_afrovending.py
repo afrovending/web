@@ -7,7 +7,7 @@ import requests
 import os
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://african-market-3.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://emarketafrica.preview.emergentagent.com').rstrip('/')
 
 # Test credentials
 VENDOR_EMAIL = "vendor.approved@example.com"
@@ -442,7 +442,7 @@ class TestEscrowPaymentFlow:
         response = requests.post(f"{BASE_URL}/api/bookings/{booking['id']}/checkout",
             json={
                 "booking_id": booking["id"],
-                "origin_url": "https://african-market-3.preview.emergentagent.com"
+                "origin_url": "https://emarketafrica.preview.emergentagent.com"
             },
             headers={"Authorization": f"Bearer {customer_auth['access_token']}"})
         
