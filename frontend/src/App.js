@@ -18,6 +18,9 @@ import UserDashboard from './pages/UserDashboard';
 import { VendorDashboard, VendorSetupPage } from './pages/VendorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import { VendorsPage, VendorPage } from './pages/VendorsPages';
+import ServicesPage from './pages/ServicesPage';
+import ServiceDetailPage from './pages/ServiceDetailPage';
+import { BookingDetailPage, BookingSuccessPage } from './pages/BookingPages';
 
 // Loading component
 const LoadingScreen = () => (
