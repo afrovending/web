@@ -1,29 +1,32 @@
 # Afrovending.com - Product Requirements Document
 
 ## Original Problem Statement
-Create a full e-commerce platform for Afrovending.com - an online marketplace for African Vendors to sell their products to global customers.
+Create a full e-commerce platform for Afrovending.com - an online marketplace for African Vendors to sell their products AND SERVICES to global customers.
 
 ## User Choices
-- Payment Integration: Stripe + PayPal
+- Payment Integration: Stripe (live key configured) + PayPal (pending)
 - User Features: Full functionality (accounts, order history, wishlist, reviews)
 - Admin Dashboard: Yes
-- Design Theme: Warm African-inspired colors (earth tones, vibrant accents)
+- Design Theme: Red/black color scheme matching user's logo
+- Fonts: Montserrat (headings) + Ubuntu (body)
+- Service Marketplace: Vendors can list services, customers can book
+- Escrow Payment: Vendors only receive payout after customer confirms service delivery
 
 ## User Personas
-1. **Global Customer** - Interested in authentic African products, browses by category, adds to cart/wishlist, completes checkout
-2. **African Vendor** - Sells handcrafted products, manages inventory, tracks orders and sales
-3. **Platform Admin** - Manages vendors, approves new sellers, monitors orders and revenue
+1. **Global Customer** - Browses products/services, creates bookings, confirms delivery
+2. **African Vendor** - Sells products and services, manages bookings, tracks payouts
+3. **Platform Admin** - Manages vendors, approves new sellers, monitors platform
 
 ## Core Requirements (Static)
-- Multi-vendor marketplace functionality
+- Multi-vendor marketplace for products AND services
 - User authentication (JWT-based)
 - Product catalog with categories
+- Service booking system with calendar
 - Shopping cart and wishlist
-- Stripe payment integration
-- Vendor dashboard for product management
+- Stripe payment integration with escrow for services
+- Vendor dashboard for product/service management
 - Admin dashboard for platform management
-- Product reviews and ratings
-- Search and filter functionality
+- Product/Service reviews and ratings
 
 ## Architecture
 - **Frontend**: React 19 + Tailwind CSS + Shadcn UI
@@ -37,49 +40,57 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 ### Backend
 - User authentication (register, login, JWT tokens)
 - Product CRUD operations
+- Service CRUD operations with availability management
+- Booking system with time slots
+- Escrow payment flow with confirm-delivery endpoint
 - Vendor management with approval flow
 - Shopping cart functionality
 - Wishlist functionality
 - Order management
-- Product reviews system
-- Category management (6 pre-seeded categories)
-- Stripe checkout integration
-- Admin endpoints (stats, user/vendor/order management)
+- Product/Service reviews system
+- Category management (including 9 service subcategories)
+- Stripe checkout integration for products and services
 
 ### Frontend
-- Homepage with hero, categories, featured products, vendor spotlight
+- Homepage with logo, hero, categories, featured sections
+- Desktop navigation with Products, Services, Vendors links
 - Products listing with filters and search
-- Product detail page with reviews
+- **Services listing page with category filters**
+- **Service detail page with booking calendar and time slots**
+- **Booking detail page with Pay button and Confirm Delivery**
+- **User dashboard with Bookings tab showing customer bookings**
 - User registration and login
-- Shopping cart
-- Wishlist
-- User dashboard (orders, profile)
-- Vendor dashboard (products, orders)
+- Shopping cart and Wishlist
+- Vendor dashboard with Products, Services, Orders, Bookings tabs
 - Admin dashboard (stats, vendors, users, orders)
-- Vendors listing and individual vendor pages
-- Checkout success page with payment status polling
+- Checkout success pages for products and services
 
 ### Design
-- African-inspired warm color palette (Terracotta, Savanna Green, Bone White)
-- Playfair Display + Manrope typography
+- Red/black color scheme matching user logo
+- Montserrat + Ubuntu typography
 - Rounded buttons and cards
 - Responsive layout
 
-## Test Accounts Created
-- Admin: admin@afrovending.com / admin123
-- Vendor: vendor1@afrovending.com / vendor123
+## Test Accounts
+- Admin: admin@example.com / password123
+- Vendor (Approved): vendor.approved@example.com / password123
 - Customer: testuser123@example.com / password123
+
+## Testing Status (Feb 7, 2026)
+- Backend: 100% (19/19 tests passed)
+- Frontend: 95% (all major features working)
+- Test data: 10+ services, 7+ bookings created
 
 ## Prioritized Backlog
 
 ### P0 (Critical - Next)
-- PayPal payment integration (backend ready, frontend flow needed)
+- PayPal payment integration
 - Order tracking page
-- Email notifications for orders
+- Email notifications for orders/bookings
 
 ### P1 (High Priority)
-- Product image upload to cloud storage
-- Vendor payout system
+- Product/Service image upload to cloud storage
+- Vendor payout dashboard
 - Advanced search with filters
 - Product variants (size, color)
 
@@ -91,7 +102,7 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 
 ## Next Tasks
 1. Implement PayPal checkout flow
-2. Add product image upload functionality
-3. Create order tracking/details page
+2. Add image upload functionality
+3. Create order/booking tracking page
 4. Add email notifications
-5. Implement vendor payout tracking
+5. Implement vendor payout tracking dashboard
