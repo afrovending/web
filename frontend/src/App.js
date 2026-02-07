@@ -85,6 +85,25 @@ const AppContent = () => {
             />
           </div>
         </CartProvider>
+      </Routes>
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppContent />
+        <Toaster 
+          position="top-right" 
+          richColors 
+          toastOptions={{
+            style: {
+              fontFamily: 'Manrope, sans-serif'
+            }
+          }}
+        />
       </AuthProvider>
     </BrowserRouter>
   );
