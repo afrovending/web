@@ -16,20 +16,20 @@ const Footer = () => {
                 className="h-14 w-auto"
               />
             </div>
-            <p className="text-background/70 text-sm leading-relaxed">
+            <p className="text-white/70 text-sm leading-relaxed">
               The heartbeat of African commerce. Connecting African vendors with global customers.
             </p>
             <div className="flex gap-4 mt-6">
-              <a href="#" className="text-background/70 hover:text-primary transition-colors" data-testid="footer-facebook">
+              <a href="#" className="text-white/70 hover:text-primary transition-colors" data-testid="footer-facebook">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-background/70 hover:text-primary transition-colors" data-testid="footer-twitter">
+              <a href="#" className="text-white/70 hover:text-primary transition-colors" data-testid="footer-twitter">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-background/70 hover:text-primary transition-colors" data-testid="footer-instagram">
+              <a href="#" className="text-white/70 hover:text-primary transition-colors" data-testid="footer-instagram">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-background/70 hover:text-primary transition-colors" data-testid="footer-email">
+              <a href="#" className="text-white/70 hover:text-primary transition-colors" data-testid="footer-email">
                 <Mail className="h-5 w-5" />
               </a>
             </div>
