@@ -104,6 +104,20 @@ class CategoryResponse(CategoryBase):
     model_config = ConfigDict(extra="ignore")
     id: str
 
+# Product Variant Models
+class VariantOption(BaseModel):
+    name: str  # e.g., "Size", "Color"
+    values: List[str]  # e.g., ["S", "M", "L", "XL"] or ["Red", "Blue", "Green"]
+
+class ProductVariant(BaseModel):
+    id: str = ""
+    sku: Optional[str] = None
+    options: Dict[str, str] = {}  # e.g., {"Size": "M", "Color": "Red"}
+    price: Optional[float] = None  # Override base price, None = use base price
+    compare_price: Optional[float] = None
+    stock: int = 0
+    image: Optional[str] = None  # Variant-specific image
+
 class ProductBase(BaseModel):
     name: str
     description: str
@@ -114,6 +128,10 @@ class ProductBase(BaseModel):
     stock: int = 0
     is_active: bool = True
     tags: List[str] = []
+    # Variant fields
+    has_variants: bool = False
+    variant_options: List[VariantOption] = []  # Available options (Size, Color, etc.)
+    variants: List[ProductVariant] = []  # Actual variant combinations
 
 class ProductCreate(ProductBase):
     pass
@@ -128,6 +146,9 @@ class ProductUpdate(BaseModel):
     stock: Optional[int] = None
     is_active: Optional[bool] = None
     tags: Optional[List[str]] = None
+    has_variants: Optional[bool] = None
+    variant_options: Optional[List[VariantOption]] = None
+    variants: Optional[List[ProductVariant]] = None
 
 class ProductResponse(ProductBase):
     model_config = ConfigDict(extra="ignore")
