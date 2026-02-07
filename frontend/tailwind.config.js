@@ -8,9 +8,9 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                heading: ['Playfair Display', 'serif'],
-                body: ['Manrope', 'sans-serif'],
-                accent: ['Space Grotesk', 'sans-serif'],
+                heading: ['Montserrat', 'sans-serif'],
+                body: ['Ubuntu', 'sans-serif'],
+                accent: ['Montserrat', 'sans-serif'],
             },
             borderRadius: {
                 lg: 'var(--radius)',
