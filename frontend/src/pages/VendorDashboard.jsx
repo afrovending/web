@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
-import { Package, DollarSign, TrendingUp, Plus, Edit, Trash2, Eye, Store } from 'lucide-react';
+import { Package, DollarSign, TrendingUp, Plus, Edit, Trash2, Eye, Store, Calendar, Clock, Briefcase } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -21,8 +21,11 @@ const VendorDashboard = () => {
   
   const [vendor, setVendor] = useState(null);
   const [products, setProducts] = useState([]);
+  const [services, setServices] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [serviceCategories, setServiceCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   
   // Product form
@@ -35,6 +38,22 @@ const VendorDashboard = () => {
     compare_price: '',
     category_id: '',
     stock: '',
+    images: '',
+    tags: ''
+  });
+  
+  // Service form
+  const [serviceDialogOpen, setServiceDialogOpen] = useState(false);
+  const [editingService, setEditingService] = useState(null);
+  const [serviceForm, setServiceForm] = useState({
+    name: '',
+    description: '',
+    price: '',
+    price_type: 'fixed',
+    duration_minutes: '60',
+    location_type: 'both',
+    location_address: '',
+    category_id: '',
     images: '',
     tags: ''
   });
