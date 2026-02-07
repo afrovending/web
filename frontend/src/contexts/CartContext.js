@@ -13,7 +13,7 @@ export const CartProvider = ({ children }) => {
 
   const fetchCart = useCallback(async () => {
     if (!isAuthenticated) {
-      setCart({ items: [], subtotal: 0, total: 0 });
+      setCart({ items: [], subtotal: 0, total: 0, discount: 0, discount_code: null });
       return;
     }
     
