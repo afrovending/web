@@ -48,11 +48,16 @@ export const AuthProvider = ({ children }) => {
     const response = await axios.post(`${API}/auth/register`, userData);
     const { access_token, user: newUser } = response.data;
     
+    // Set token in localStorage and axios headers synchronously
     localStorage.setItem('afrovending_token', access_token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
     
+    // Update state
     setToken(access_token);
     setUser(newUser);
+    
+    // Force a small delay to ensure state is updated before navigation
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     return newUser;
   };
