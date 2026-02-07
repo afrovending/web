@@ -8,7 +8,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export const CartProvider = ({ children }) => {
   const { isAuthenticated, token } = useAuth();
-  const [cart, setCart] = useState({ items: [], subtotal: 0, total: 0 });
+  const [cart, setCart] = useState({ items: [], subtotal: 0, total: 0, discount: 0, discount_code: null });
   const [loading, setLoading] = useState(false);
 
   const fetchCart = useCallback(async () => {
