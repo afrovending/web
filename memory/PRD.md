@@ -5,6 +5,7 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 
 ## User Choices
 - Payment Integration: Stripe (live key configured) + PayPal (pending)
+- Email Notifications: SendGrid (configured)
 - User Features: Full functionality (accounts, order history, wishlist, reviews)
 - Admin Dashboard: Yes
 - Design Theme: Red/black color scheme matching user's logo
@@ -33,6 +34,8 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - **Backend**: FastAPI (Python)
 - **Database**: MongoDB
 - **Payment**: Stripe Checkout API (via emergentintegrations)
+- **Email**: SendGrid API
+- **File Storage**: Local uploads (/app/backend/uploads/)
 - **Deployment**: Kubernetes container with Nginx proxy
 
 ## What's Been Implemented (Feb 7, 2026)
@@ -50,20 +53,35 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Product/Service reviews system
 - Category management (including 9 service subcategories)
 - Stripe checkout integration for products and services
+- **NEW: Image upload endpoint (/api/upload/image)**
+- **NEW: Tracking endpoints (/api/tracking, /api/tracking/:type/:id)**
+- **NEW: SendGrid email notifications for bookings**
 
 ### Frontend
 - Homepage with logo, hero, categories, featured sections
 - Desktop navigation with Products, Services, Vendors links
 - Products listing with filters and search
-- **Services listing page with category filters**
-- **Service detail page with booking calendar and time slots**
-- **Booking detail page with Pay button and Confirm Delivery**
-- **User dashboard with Bookings tab showing customer bookings**
+- Services listing page with category filters
+- Service detail page with booking calendar and time slots
+- Booking detail page with Pay button and Confirm Delivery
+- User dashboard with Bookings tab showing customer bookings
 - User registration and login
 - Shopping cart and Wishlist
 - Vendor dashboard with Products, Services, Orders, Bookings tabs
+- **NEW: ImageUpload component for vendor product/service images**
 - Admin dashboard (stats, vendors, users, orders)
 - Checkout success pages for products and services
+- **NEW: Tracking page (/tracking) with All/Orders/Bookings filter**
+- **NEW: Tracking detail page with status timeline**
+- **NEW: "Track Orders" link in user dropdown menu**
+
+### Email Notifications (SendGrid)
+- New booking notification to vendor
+- Booking status update to customer
+- Payment released notification to vendor
+- Order status update to customer
+
+**Note**: SendGrid requires sender domain verification. Current sender email (noreply@afrovending.com) needs to be verified in SendGrid dashboard, or use a verified sender email.
 
 ### Design
 - Red/black color scheme matching user logo
@@ -77,19 +95,19 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Customer: testuser123@example.com / password123
 
 ## Testing Status (Feb 7, 2026)
-- Backend: 100% (19/19 tests passed)
-- Frontend: 95% (all major features working)
-- Test data: 10+ services, 7+ bookings created
+- Backend: 100% (all endpoints working)
+- Frontend: All features working
+- New features tested: Tracking page, Image upload, Email integration
 
 ## Prioritized Backlog
 
 ### P0 (Critical - Next)
+- Verify SendGrid sender domain for email delivery
 - PayPal payment integration
-- Order tracking page
-- Email notifications for orders/bookings
+- Order/product checkout flow improvements
 
 ### P1 (High Priority)
-- Product/Service image upload to cloud storage
+- Cloud storage for images (AWS S3)
 - Vendor payout dashboard
 - Advanced search with filters
 - Product variants (size, color)
@@ -100,9 +118,43 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Coupon/discount system
 - Analytics dashboard for vendors
 
+## API Endpoints
+
+### Authentication
+- POST /api/auth/register
+- POST /api/auth/login
+
+### Products
+- GET/POST /api/products
+- GET/PUT/DELETE /api/products/:id
+
+### Services
+- GET/POST /api/services
+- GET/PUT/DELETE /api/services/:id
+
+### Bookings
+- GET/POST /api/bookings
+- GET /api/bookings/:id
+- PUT /api/bookings/:id/status
+- PUT /api/bookings/:id/confirm-delivery
+
+### Tracking (NEW)
+- GET /api/tracking
+- GET /api/tracking/:type/:id
+
+### Upload (NEW)
+- POST /api/upload/image
+- GET /api/uploads/:filename
+
+### Admin
+- GET /api/admin/vendors
+- PUT /api/vendors/:id/approve
+- GET /api/admin/users
+- GET /api/admin/orders
+
 ## Next Tasks
-1. Implement PayPal checkout flow
-2. Add image upload functionality
-3. Create order/booking tracking page
-4. Add email notifications
-5. Implement vendor payout tracking dashboard
+1. Verify SendGrid sender domain
+2. Implement PayPal checkout flow
+3. Add cloud storage for images (S3)
+4. Create vendor payout tracking dashboard
+5. Add advanced product search and filtering
