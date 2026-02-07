@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
-import { Package, DollarSign, TrendingUp, Plus, Edit, Trash2, Eye, Store, Calendar, Clock, Briefcase, Upload } from 'lucide-react';
+import { Package, DollarSign, TrendingUp, Plus, Edit, Trash2, Eye, Store, Calendar, Clock, Briefcase, Upload, Wallet } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
 import { ImageUpload } from '../components/ui/image-upload';
+import PayoutDashboard from '../components/PayoutDashboard';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import axios from 'axios';
