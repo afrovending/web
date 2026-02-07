@@ -255,9 +255,58 @@ class OrderResponse(BaseModel):
 class CheckoutRequest(BaseModel):
     payment_method: str  # stripe, paypal
     origin_url: str
+    coupon_code: Optional[str] = None
 
 class PaymentStatusRequest(BaseModel):
     session_id: str
+
+# ==================== COUPON MODELS ====================
+
+class CouponBase(BaseModel):
+    code: str
+    discount_type: str = "percentage"  # percentage, fixed
+    discount_value: float  # percentage (0-100) or fixed amount
+    min_order_amount: float = 0.0
+    max_discount: Optional[float] = None  # Cap for percentage discounts
+    max_uses: Optional[int] = None  # Total usage limit
+    max_uses_per_user: int = 1  # Per user limit
+    start_date: Optional[str] = None
+    expiry_date: Optional[str] = None
+    is_active: bool = True
+    applies_to: str = "all"  # all, products, services
+    vendor_id: Optional[str] = None  # None = platform-wide, vendor_id = vendor-specific
+
+class CouponCreate(CouponBase):
+    pass
+
+class CouponUpdate(BaseModel):
+    code: Optional[str] = None
+    discount_type: Optional[str] = None
+    discount_value: Optional[float] = None
+    min_order_amount: Optional[float] = None
+    max_discount: Optional[float] = None
+    max_uses: Optional[int] = None
+    max_uses_per_user: Optional[int] = None
+    start_date: Optional[str] = None
+    expiry_date: Optional[str] = None
+    is_active: Optional[bool] = None
+    applies_to: Optional[str] = None
+
+class CouponResponse(CouponBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    used_count: int = 0
+    created_by: str
+    created_at: str
+
+class ApplyCouponRequest(BaseModel):
+    code: str
+
+class CouponValidationResponse(BaseModel):
+    valid: bool
+    coupon: Optional[CouponResponse] = None
+    discount_amount: float = 0.0
+    message: str = ""
 
 # ==================== SERVICE MODELS ====================
 
