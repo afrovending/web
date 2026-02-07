@@ -2899,6 +2899,12 @@ async def startup_db_client():
     await db.vendor_payouts.create_index("id", unique=True)
     await db.vendor_payouts.create_index("vendor_id")
     
+    # Coupon indexes
+    await db.coupons.create_index("id", unique=True)
+    await db.coupons.create_index("code", unique=True)
+    await db.cart_coupons.create_index("user_id", unique=True)
+    await db.coupon_usage.create_index([("coupon_id", 1), ("user_id", 1)])
+    
     # Service indexes
     await db.services.create_index("id", unique=True)
     await db.services.create_index("vendor_id")
