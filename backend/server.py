@@ -612,6 +612,179 @@ async def delete_category(category_id: str, user: dict = Depends(require_admin))
 
 # ==================== PRODUCT ROUTES ====================
 
+class SearchFilters(BaseModel):
+    search: Optional[str] = None
+    category_id: Optional[str] = None
+    category_ids: Optional[List[str]] = None
+    vendor_id: Optional[str] = None
+    min_price: Optional[float] = None
+    max_price: Optional[float] = None
+    min_rating: Optional[float] = None
+    tags: Optional[List[str]] = None
+    in_stock: Optional[bool] = None
+    sort_by: str = "created_at"
+    sort_order: str = "desc"
+    skip: int = 0
+    limit: int = 20
+
+class SearchResult(BaseModel):
+    products: List[ProductResponse] = []
+    services: List[ServiceResponse] = []
+    total_products: int = 0
+    total_services: int = 0
+    filters_applied: Dict[str, Any] = {}
+
+@api_router.get("/search")
+async def unified_search(
+    q: Optional[str] = None,
+    type: Optional[str] = None,  # "products", "services", or None for both
+    category_id: Optional[str] = None,
+    category_ids: Optional[str] = None,  # comma-separated
+    vendor_id: Optional[str] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None,
+    min_rating: Optional[float] = None,
+    tags: Optional[str] = None,  # comma-separated
+    location_type: Optional[str] = None,
+    in_stock: Optional[bool] = None,
+    sort_by: str = "created_at",
+    sort_order: str = "desc",
+    skip: int = 0,
+    limit: int = 20
+):
+    """Unified search endpoint for products and services"""
+    
+    # Parse comma-separated values
+    category_list = category_ids.split(",") if category_ids else []
+    if category_id:
+        category_list.append(category_id)
+    tag_list = [t.strip() for t in tags.split(",")] if tags else []
+    
+    filters_applied = {}
+    if q:
+        filters_applied["search"] = q
+    if category_list:
+        filters_applied["categories"] = category_list
+    if min_price is not None:
+        filters_applied["min_price"] = min_price
+    if max_price is not None:
+        filters_applied["max_price"] = max_price
+    if min_rating is not None:
+        filters_applied["min_rating"] = min_rating
+    
+    results = {"products": [], "services": [], "total_products": 0, "total_services": 0, "filters_applied": filters_applied}
+    
+    sort_dir = -1 if sort_order == "desc" else 1
+    
+    # Search products
+    if type != "services":
+        product_query = {"is_active": True}
+        
+        if q:
+            product_query["$or"] = [
+                {"name": {"$regex": q, "$options": "i"}},
+                {"description": {"$regex": q, "$options": "i"}},
+                {"tags": {"$elemMatch": {"$regex": q, "$options": "i"}}}
+            ]
+        if category_list:
+            product_query["category_id"] = {"$in": category_list}
+        if vendor_id:
+            product_query["vendor_id"] = vendor_id
+        if min_price is not None:
+            product_query["price"] = {"$gte": min_price}
+        if max_price is not None:
+            product_query.setdefault("price", {})["$lte"] = max_price
+        if tag_list:
+            product_query["tags"] = {"$in": tag_list}
+        if in_stock:
+            product_query["stock"] = {"$gt": 0}
+        if min_rating is not None:
+            product_query["average_rating"] = {"$gte": min_rating}
+        
+        results["total_products"] = await db.products.count_documents(product_query)
+        products = await db.products.find(product_query, {"_id": 0}).sort(sort_by, sort_dir).skip(skip).limit(limit).to_list(limit)
+        
+        # Enrich with vendor names
+        for product in products:
+            vendor = await db.vendors.find_one({"id": product.get("vendor_id")}, {"_id": 0, "store_name": 1})
+            product["vendor_name"] = vendor.get("store_name") if vendor else "Unknown"
+        
+        results["products"] = products
+    
+    # Search services
+    if type != "products":
+        service_query = {"is_active": True}
+        
+        if q:
+            service_query["$or"] = [
+                {"name": {"$regex": q, "$options": "i"}},
+                {"description": {"$regex": q, "$options": "i"}},
+                {"tags": {"$elemMatch": {"$regex": q, "$options": "i"}}}
+            ]
+        if category_list:
+            service_query["category_id"] = {"$in": category_list}
+        if vendor_id:
+            service_query["vendor_id"] = vendor_id
+        if min_price is not None:
+            service_query["price"] = {"$gte": min_price}
+        if max_price is not None:
+            service_query.setdefault("price", {})["$lte"] = max_price
+        if tag_list:
+            service_query["tags"] = {"$in": tag_list}
+        if location_type:
+            service_query["location_type"] = location_type
+        if min_rating is not None:
+            service_query["average_rating"] = {"$gte": min_rating}
+        
+        results["total_services"] = await db.services.count_documents(service_query)
+        services = await db.services.find(service_query, {"_id": 0}).sort(sort_by, sort_dir).skip(skip).limit(limit).to_list(limit)
+        
+        # Enrich with vendor names
+        for service in services:
+            vendor = await db.vendors.find_one({"id": service.get("vendor_id")}, {"_id": 0, "store_name": 1})
+            service["vendor_name"] = vendor.get("store_name") if vendor else "Unknown"
+        
+        results["services"] = services
+    
+    return results
+
+@api_router.get("/search/suggestions")
+async def search_suggestions(q: str, limit: int = 10):
+    """Get search suggestions based on query"""
+    if len(q) < 2:
+        return {"suggestions": []}
+    
+    suggestions = set()
+    
+    # Search product names
+    products = await db.products.find(
+        {"name": {"$regex": q, "$options": "i"}, "is_active": True},
+        {"_id": 0, "name": 1}
+    ).limit(limit).to_list(limit)
+    
+    for p in products:
+        suggestions.add(p["name"])
+    
+    # Search service names
+    services = await db.services.find(
+        {"name": {"$regex": q, "$options": "i"}, "is_active": True},
+        {"_id": 0, "name": 1}
+    ).limit(limit).to_list(limit)
+    
+    for s in services:
+        suggestions.add(s["name"])
+    
+    # Search categories
+    categories = await db.categories.find(
+        {"name": {"$regex": q, "$options": "i"}},
+        {"_id": 0, "name": 1}
+    ).limit(5).to_list(5)
+    
+    for c in categories:
+        suggestions.add(c["name"])
+    
+    return {"suggestions": list(suggestions)[:limit]}
+
 @api_router.get("/products", response_model=List[ProductResponse])
 async def get_products(
     category_id: Optional[str] = None,
