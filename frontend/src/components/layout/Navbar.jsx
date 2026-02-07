@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, Heart, User, Menu, X, Store, LogOut, LayoutDashboard } from 'lucide-react';
+import { Search, ShoppingCart, Heart, User, Menu, X, Store, LogOut, LayoutDashboard, MapPin } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import {
