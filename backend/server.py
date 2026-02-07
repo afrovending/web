@@ -1098,7 +1098,7 @@ async def get_vendor_bookings(user: dict = Depends(require_vendor)):
     return bookings
 
 @api_router.put("/bookings/{booking_id}/status")
-async def update_booking_status(booking_id: str, status_update: BookingStatusUpdate, user: dict = Depends(get_current_user)):
+async def update_booking_status(booking_id: str, status_update: BookingStatusUpdate, background_tasks: BackgroundTasks, user: dict = Depends(get_current_user)):
     """Update booking status (vendor can confirm/complete, customer can cancel)"""
     booking = await db.bookings.find_one({"id": booking_id}, {"_id": 0})
     if not booking:
@@ -1121,6 +1121,16 @@ async def update_booking_status(booking_id: str, status_update: BookingStatusUpd
         raise HTTPException(status_code=403, detail="Customers can only cancel bookings")
     
     await db.bookings.update_one({"id": booking_id}, {"$set": {"status": status_update.status}})
+    
+    # Send email notification to customer
+    background_tasks.add_task(
+        send_booking_status_email,
+        booking["customer_email"],
+        booking["customer_name"],
+        booking,
+        status_update.status
+    )
+    
     return {"message": "Booking status updated"}
 
 @api_router.put("/bookings/{booking_id}/confirm-delivery")
