@@ -165,7 +165,7 @@ const VendorDashboard = () => {
       compare_price: product.compare_price?.toString() || '',
       category_id: product.category_id,
       stock: product.stock.toString(),
-      images: product.images?.join(', ') || '',
+      images: product.images || [],
       tags: product.tags?.join(', ') || ''
     });
     setProductDialogOpen(true);
