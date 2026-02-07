@@ -1015,7 +1015,7 @@ async def get_available_timeslots(service_id: str, date: str):
 # ==================== BOOKING ROUTES ====================
 
 @api_router.post("/bookings", response_model=BookingResponse)
-async def create_booking(booking: BookingCreate, user: dict = Depends(get_current_user)):
+async def create_booking(booking: BookingCreate, background_tasks: BackgroundTasks, user: dict = Depends(get_current_user)):
     service = await db.services.find_one({"id": booking.service_id}, {"_id": 0})
     if not service:
         raise HTTPException(status_code=404, detail="Service not found")
@@ -1031,6 +1031,7 @@ async def create_booking(booking: BookingCreate, user: dict = Depends(get_curren
         raise HTTPException(status_code=400, detail="This time slot is already booked")
     
     vendor = await db.vendors.find_one({"id": service["vendor_id"]}, {"_id": 0})
+    vendor_user = await db.users.find_one({"id": vendor["user_id"]}, {"_id": 0}) if vendor else None
     
     booking_id = str(uuid.uuid4())
     booking_doc = {
@@ -1056,6 +1057,16 @@ async def create_booking(booking: BookingCreate, user: dict = Depends(get_curren
     }
     
     await db.bookings.insert_one(booking_doc)
+    
+    # Send email notification to vendor
+    if vendor_user and vendor:
+        background_tasks.add_task(
+            send_booking_created_email,
+            vendor_user["email"],
+            vendor.get("store_name", "Vendor"),
+            booking_doc
+        )
+    
     return booking_doc
 
 @api_router.get("/bookings", response_model=List[BookingResponse])
