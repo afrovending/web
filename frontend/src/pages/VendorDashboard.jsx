@@ -617,28 +617,38 @@ const VendorDashboard = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
           <div className="bg-card rounded-xl p-5 border border-border">
             <Package className="h-6 w-6 text-primary mb-2" />
             <p className="text-2xl font-bold font-accent">{products.length}</p>
             <p className="text-sm text-muted-foreground">Products</p>
           </div>
           <div className="bg-card rounded-xl p-5 border border-border">
-            <DollarSign className="h-6 w-6 text-secondary mb-2" />
-            <p className="text-2xl font-bold font-accent">${totalRevenue.toFixed(2)}</p>
+            <Briefcase className="h-6 w-6 text-primary mb-2" />
+            <p className="text-2xl font-bold font-accent">{services.length}</p>
+            <p className="text-sm text-muted-foreground">Services</p>
+          </div>
+          <div className="bg-card rounded-xl p-5 border border-border">
+            <DollarSign className="h-6 w-6 text-green-600 mb-2" />
+            <p className="text-2xl font-bold font-accent">${(totalRevenue + serviceRevenue).toFixed(2)}</p>
             <p className="text-sm text-muted-foreground">Revenue</p>
           </div>
           <div className="bg-card rounded-xl p-5 border border-border">
-            <TrendingUp className="h-6 w-6 text-accent mb-2" />
+            <TrendingUp className="h-6 w-6 text-blue-600 mb-2" />
             <p className="text-2xl font-bold font-accent">{orders.length}</p>
             <p className="text-sm text-muted-foreground">Orders</p>
           </div>
           <div className="bg-card rounded-xl p-5 border border-border">
-            <Package className="h-6 w-6 text-primary mb-2" />
+            <Calendar className="h-6 w-6 text-purple-600 mb-2" />
+            <p className="text-2xl font-bold font-accent">{bookings.length}</p>
+            <p className="text-sm text-muted-foreground">Bookings</p>
+          </div>
+          <div className="bg-card rounded-xl p-5 border border-border">
+            <Clock className="h-6 w-6 text-yellow-600 mb-2" />
             <p className="text-2xl font-bold font-accent">
-              {orders.filter(o => o.status === 'pending').length}
+              {bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').length}
             </p>
-            <p className="text-sm text-muted-foreground">Pending</p>
+            <p className="text-sm text-muted-foreground">Upcoming</p>
           </div>
         </div>
 
@@ -648,8 +658,14 @@ const VendorDashboard = () => {
             <TabsTrigger value="products" className="rounded-full" data-testid="vendor-tab-products">
               Products
             </TabsTrigger>
+            <TabsTrigger value="services" className="rounded-full" data-testid="vendor-tab-services">
+              Services
+            </TabsTrigger>
             <TabsTrigger value="orders" className="rounded-full" data-testid="vendor-tab-orders">
               Orders
+            </TabsTrigger>
+            <TabsTrigger value="bookings" className="rounded-full" data-testid="vendor-tab-bookings">
+              Bookings
             </TabsTrigger>
           </TabsList>
 
