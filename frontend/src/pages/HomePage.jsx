@@ -36,8 +36,8 @@ const HomePage = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-foreground overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
+      <section className="relative bg-secondary overflow-hidden">
+        <div className="absolute inset-0 opacity-30">
           <img
             src="https://images.unsplash.com/photo-1734255026082-82fdc81991f0?w=1920"
             alt="African market"
@@ -46,7 +46,7 @@ const HomePage = () => {
         </div>
         <div className="relative max-w-7xl mx-auto px-4 md:px-8 py-20 md:py-32">
           <div className="max-w-2xl">
-            <span className="inline-block bg-primary/20 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-6">
+            <span className="inline-block bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium mb-6">
               Africa's Global Marketplace
             </span>
             <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-background leading-tight mb-6">
