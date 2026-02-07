@@ -1003,16 +1003,32 @@ async def approve_vendor(vendor_id: str, user: dict = Depends(require_admin)):
 @api_router.get("/services", response_model=List[ServiceResponse])
 async def get_services(
     category_id: Optional[str] = None,
+    category_ids: Optional[str] = None,
     vendor_id: Optional[str] = None,
     search: Optional[str] = None,
     location_type: Optional[str] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None,
+    min_rating: Optional[float] = None,
+    min_duration: Optional[int] = None,
+    max_duration: Optional[int] = None,
+    tags: Optional[str] = None,
+    sort_by: str = "created_at",
+    sort_order: str = "desc",
     skip: int = 0,
     limit: int = 20
 ):
     query = {"is_active": True}
     
+    # Category filter (single or multiple)
+    category_list = []
+    if category_ids:
+        category_list = [c.strip() for c in category_ids.split(",")]
     if category_id:
-        query["category_id"] = category_id
+        category_list.append(category_id)
+    if category_list:
+        query["category_id"] = {"$in": category_list} if len(category_list) > 1 else category_list[0]
+    
     if vendor_id:
         query["vendor_id"] = vendor_id
     if location_type:
@@ -1021,10 +1037,25 @@ async def get_services(
         query["$or"] = [
             {"name": {"$regex": search, "$options": "i"}},
             {"description": {"$regex": search, "$options": "i"}},
-            {"tags": {"$regex": search, "$options": "i"}}
+            {"tags": {"$elemMatch": {"$regex": search, "$options": "i"}}}
         ]
+    if min_price is not None:
+        query["price"] = {"$gte": min_price}
+    if max_price is not None:
+        query.setdefault("price", {})["$lte"] = max_price
+    if min_rating is not None:
+        query["average_rating"] = {"$gte": min_rating}
+    if min_duration is not None:
+        query["duration_minutes"] = {"$gte": min_duration}
+    if max_duration is not None:
+        query.setdefault("duration_minutes", {})["$lte"] = max_duration
+    if tags:
+        tag_list = [t.strip() for t in tags.split(",")]
+        query["tags"] = {"$in": tag_list}
     
-    services = await db.services.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    sort_dir = -1 if sort_order == "desc" else 1
+    
+    services = await db.services.find(query, {"_id": 0}).sort(sort_by, sort_dir).skip(skip).limit(limit).to_list(limit)
     
     for service in services:
         vendor = await db.vendors.find_one({"id": service.get("vendor_id")}, {"_id": 0, "store_name": 1})
