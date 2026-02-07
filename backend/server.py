@@ -1532,6 +1532,17 @@ async def startup_db_client():
     await db.reviews.create_index([("product_id", 1), ("user_id", 1)], unique=True)
     await db.payment_transactions.create_index("session_id", unique=True)
     
+    # Service indexes
+    await db.services.create_index("id", unique=True)
+    await db.services.create_index("vendor_id")
+    await db.services.create_index("category_id")
+    await db.service_availability.create_index("service_id")
+    await db.bookings.create_index("id", unique=True)
+    await db.bookings.create_index("customer_id")
+    await db.bookings.create_index("vendor_id")
+    await db.bookings.create_index([("service_id", 1), ("booking_date", 1), ("booking_time", 1)])
+    await db.service_reviews.create_index([("service_id", 1), ("user_id", 1)], unique=True)
+    
     # Seed categories if empty
     cat_count = await db.categories.count_documents({})
     if cat_count == 0:
