@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Filter, SlidersHorizontal, Grid, List, X } from 'lucide-react';
+import { Grid, List, Star, Heart } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Checkbox } from '../components/ui/checkbox';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../components/ui/sheet';
+import { Badge } from '../components/ui/badge';
+import SearchFilters from '../components/SearchFilters';
 import ProductCard from '../components/ProductCard';
 import axios from 'axios';
 
@@ -15,122 +13,107 @@ const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
   const [viewMode, setViewMode] = useState('grid');
 
-  const search = searchParams.get('search') || '';
-  const categoryId = searchParams.get('category') || '';
-  const sortBy = searchParams.get('sort') || 'created_at';
-  const minPrice = searchParams.get('min_price') || '';
-  const maxPrice = searchParams.get('max_price') || '';
+  // Parse initial filters from URL
+  const getInitialFilters = () => ({
+    search: searchParams.get('search') || '',
+    categoryIds: searchParams.get('categories')?.split(',').filter(Boolean) || [],
+    vendorId: searchParams.get('vendor') || '',
+    minPrice: parseFloat(searchParams.get('min_price')) || 0,
+    maxPrice: parseFloat(searchParams.get('max_price')) || 1000,
+    minRating: parseFloat(searchParams.get('min_rating')) || 0,
+    inStock: searchParams.get('in_stock') === 'true',
+    sortBy: searchParams.get('sort_by') || 'created_at',
+    sortOrder: searchParams.get('sort_order') || 'desc'
+  });
 
+  const [filters, setFilters] = useState(getInitialFilters);
+
+  // Fetch categories and vendors on mount
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    const fetchMeta = async () => {
       try {
-        const params = new URLSearchParams();
-        if (search) params.append('search', search);
-        if (categoryId) params.append('category_id', categoryId);
-        if (minPrice) params.append('min_price', minPrice);
-        if (maxPrice) params.append('max_price', maxPrice);
-        
-        const [sortField, sortOrder] = sortBy.split('-');
-        params.append('sort_by', sortField || 'created_at');
-        params.append('sort_order', sortOrder || 'desc');
-        params.append('limit', '50');
-
-        const [productsRes, categoriesRes] = await Promise.all([
-          axios.get(`${API}/products?${params.toString()}`),
-          axios.get(`${API}/categories`)
+        const [categoriesRes, vendorsRes] = await Promise.all([
+          axios.get(`${API}/categories`),
+          axios.get(`${API}/vendors?is_approved=true`)
         ]);
-        
-        setProducts(productsRes.data);
-        setCategories(categoriesRes.data);
+        // Filter to product categories (exclude service categories)
+        const productCategories = categoriesRes.data.filter(c => 
+          !c.parent_id || !['services', 'beauty-services', 'culinary-services', 'logistics-services', 
+            'event-services', 'professional-services', 'home-services', 'wellness-services', 
+            'education-services', 'creative-services'].includes(c.id)
+        );
+        setCategories(productCategories);
+        setVendors(vendorsRes.data);
       } catch (error) {
-        console.error('Failed to fetch products:', error);
-      } finally {
-        setLoading(false);
+        console.error('Failed to fetch metadata:', error);
       }
     };
-    fetchData();
-  }, [search, categoryId, sortBy, minPrice, maxPrice]);
+    fetchMeta();
+  }, []);
 
-  const updateFilter = (key, value) => {
-    const newParams = new URLSearchParams(searchParams);
-    if (value) {
-      newParams.set(key, value);
-    } else {
-      newParams.delete(key);
+  // Fetch products when filters change
+  const fetchProducts = useCallback(async (currentFilters) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      
+      if (currentFilters.search) params.append('search', currentFilters.search);
+      if (currentFilters.categoryIds.length > 0) params.append('category_ids', currentFilters.categoryIds.join(','));
+      if (currentFilters.vendorId) params.append('vendor_id', currentFilters.vendorId);
+      if (currentFilters.minPrice > 0) params.append('min_price', currentFilters.minPrice.toString());
+      if (currentFilters.maxPrice < 1000) params.append('max_price', currentFilters.maxPrice.toString());
+      if (currentFilters.minRating > 0) params.append('min_rating', currentFilters.minRating.toString());
+      if (currentFilters.inStock) params.append('in_stock', 'true');
+      params.append('sort_by', currentFilters.sortBy);
+      params.append('sort_order', currentFilters.sortOrder);
+      params.append('limit', '50');
+
+      const response = await axios.get(`${API}/products?${params.toString()}`);
+      setProducts(response.data);
+      setTotalCount(response.data.length);
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+    } finally {
+      setLoading(false);
     }
-    setSearchParams(newParams);
+  }, []);
+
+  useEffect(() => {
+    fetchProducts(filters);
+  }, [filters, fetchProducts]);
+
+  // Update URL when filters change
+  const handleFilterChange = useCallback((newFilters) => {
+    setFilters(newFilters);
+    
+    // Update URL params
+    const params = new URLSearchParams();
+    if (newFilters.search) params.set('search', newFilters.search);
+    if (newFilters.categoryIds.length > 0) params.set('categories', newFilters.categoryIds.join(','));
+    if (newFilters.vendorId) params.set('vendor', newFilters.vendorId);
+    if (newFilters.minPrice > 0) params.set('min_price', newFilters.minPrice.toString());
+    if (newFilters.maxPrice < 1000) params.set('max_price', newFilters.maxPrice.toString());
+    if (newFilters.minRating > 0) params.set('min_rating', newFilters.minRating.toString());
+    if (newFilters.inStock) params.set('in_stock', 'true');
+    if (newFilters.sortBy !== 'created_at') params.set('sort_by', newFilters.sortBy);
+    if (newFilters.sortOrder !== 'desc') params.set('sort_order', newFilters.sortOrder);
+    
+    setSearchParams(params);
+  }, [setSearchParams]);
+
+  const getPageTitle = () => {
+    if (filters.search) return `Search: "${filters.search}"`;
+    if (filters.categoryIds.length === 1) {
+      const cat = categories.find(c => c.id === filters.categoryIds[0]);
+      return cat?.name || 'Products';
+    }
+    return 'All Products';
   };
-
-  const clearFilters = () => {
-    setSearchParams({});
-  };
-
-  const hasFilters = search || categoryId || minPrice || maxPrice;
-
-  const FilterSidebar = ({ isMobile = false }) => (
-    <div className={isMobile ? '' : 'sticky top-24'}>
-      <div className="space-y-6">
-        {/* Categories */}
-        <div>
-          <h3 className="font-heading font-semibold text-foreground mb-4">Categories</h3>
-          <div className="space-y-2">
-            {categories.map((cat) => (
-              <label
-                key={cat.id}
-                className="flex items-center gap-3 cursor-pointer hover:text-primary transition-colors"
-              >
-                <Checkbox
-                  checked={categoryId === cat.id}
-                  onCheckedChange={(checked) => updateFilter('category', checked ? cat.id : '')}
-                  data-testid={`filter-category-${cat.id}`}
-                />
-                <span className="text-sm">{cat.name}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Price Range */}
-        <div>
-          <h3 className="font-heading font-semibold text-foreground mb-4">Price Range</h3>
-          <div className="flex gap-2">
-            <Input
-              type="number"
-              placeholder="Min"
-              value={minPrice}
-              onChange={(e) => updateFilter('min_price', e.target.value)}
-              className="h-10"
-              data-testid="filter-min-price"
-            />
-            <Input
-              type="number"
-              placeholder="Max"
-              value={maxPrice}
-              onChange={(e) => updateFilter('max_price', e.target.value)}
-              className="h-10"
-              data-testid="filter-max-price"
-            />
-          </div>
-        </div>
-
-        {hasFilters && (
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={clearFilters}
-            data-testid="clear-filters-btn"
-          >
-            <X className="h-4 w-4 mr-2" />
-            Clear Filters
-          </Button>
-        )}
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -138,80 +121,55 @@ const ProductsPage = () => {
       <div className="bg-card border-b border-border py-8 px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
           <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground mb-2">
-            {search ? `Search: "${search}"` : categoryId ? categories.find(c => c.id === categoryId)?.name || 'Products' : 'All Products'}
+            {getPageTitle()}
           </h1>
           <p className="text-muted-foreground">
-            {products.length} products found
+            {totalCount} products found
           </p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
         <div className="flex gap-8">
-          {/* Desktop Sidebar */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <FilterSidebar />
+          {/* Sidebar Filters */}
+          <aside className="w-72 flex-shrink-0">
+            <SearchFilters
+              type="products"
+              categories={categories}
+              vendors={vendors}
+              onFilterChange={handleFilterChange}
+              initialFilters={filters}
+            />
           </aside>
 
           {/* Main Content */}
           <div className="flex-1">
             {/* Toolbar */}
-            <div className="flex items-center justify-between mb-6 gap-4">
-              {/* Mobile Filter */}
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="outline" className="lg:hidden" data-testid="mobile-filter-btn">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filters
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left">
-                  <SheetHeader>
-                    <SheetTitle>Filters</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6">
-                    <FilterSidebar isMobile />
-                  </div>
-                </SheetContent>
-              </Sheet>
-
-              {/* Sort */}
-              <div className="flex items-center gap-4 ml-auto">
-                <Select value={sortBy} onValueChange={(v) => updateFilter('sort', v)}>
-                  <SelectTrigger className="w-[180px]" data-testid="sort-select">
-                    <SlidersHorizontal className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="created_at-desc">Newest First</SelectItem>
-                    <SelectItem value="created_at-asc">Oldest First</SelectItem>
-                    <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                    <SelectItem value="price-desc">Price: High to Low</SelectItem>
-                    <SelectItem value="average_rating-desc">Top Rated</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {/* View Toggle */}
-                <div className="hidden sm:flex border border-border rounded-lg">
-                  <Button
-                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                    size="icon"
-                    className="rounded-r-none"
-                    onClick={() => setViewMode('grid')}
-                    data-testid="view-grid-btn"
-                  >
-                    <Grid className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'list' ? 'default' : 'ghost'}
-                    size="icon"
-                    className="rounded-l-none"
-                    onClick={() => setViewMode('list')}
-                    data-testid="view-list-btn"
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                </div>
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-sm text-muted-foreground">
+                Showing {products.length} of {totalCount} products
+              </p>
+              
+              {/* View Toggle */}
+              <div className="flex border border-border rounded-lg">
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  size="icon"
+                  className="rounded-r-none"
+                  onClick={() => setViewMode('grid')}
+                  data-testid="view-grid-btn"
+                >
+                  <Grid className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  size="icon"
+                  className="rounded-l-none"
+                  onClick={() => setViewMode('list')}
+                  data-testid="view-list-btn"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
               </div>
             </div>
 
@@ -241,34 +199,96 @@ const ProductsPage = () => {
                     <Link
                       key={product.id}
                       to={`/products/${product.id}`}
-                      className="flex gap-4 bg-card rounded-xl p-4 border border-border hover:border-primary/30 transition-all"
+                      className="flex gap-4 bg-card rounded-xl p-4 border border-border hover:border-primary/30 transition-all group"
                       data-testid={`product-list-${product.id}`}
                     >
-                      <div className="w-32 h-32 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-40 h-40 rounded-lg overflow-hidden flex-shrink-0 relative">
                         <img
                           src={product.images?.[0] || 'https://images.unsplash.com/photo-1567696154083-9547fd0c8e1d?w=200'}
                           alt={product.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
+                        {product.compare_price && product.compare_price > product.price && (
+                          <Badge className="absolute top-2 left-2 bg-primary">
+                            {Math.round((1 - product.price / product.compare_price) * 100)}% OFF
+                          </Badge>
+                        )}
                       </div>
-                      <div className="flex-1">
-                        <p className="text-xs text-muted-foreground">{product.vendor_name}</p>
-                        <h3 className="font-heading font-semibold text-foreground mb-2">{product.name}</h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{product.description}</p>
-                        <span className="font-accent font-semibold text-lg">${product.price.toFixed(2)}</span>
+                      <div className="flex-1 py-2">
+                        <p className="text-xs text-muted-foreground mb-1">{product.vendor_name}</p>
+                        <h3 className="font-heading font-semibold text-lg text-foreground mb-2 group-hover:text-primary transition-colors">
+                          {product.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{product.description}</p>
+                        
+                        {/* Rating */}
+                        {product.average_rating > 0 && (
+                          <div className="flex items-center gap-1 mb-3">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-4 w-4 ${i < Math.round(product.average_rating) ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30'}`}
+                              />
+                            ))}
+                            <span className="text-sm text-muted-foreground ml-1">
+                              ({product.review_count || 0})
+                            </span>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-baseline gap-2">
+                            <span className="font-accent font-bold text-xl text-primary">
+                              ${product.price.toFixed(2)}
+                            </span>
+                            {product.compare_price && product.compare_price > product.price && (
+                              <span className="text-sm text-muted-foreground line-through">
+                                ${product.compare_price.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+                          {product.stock <= 5 && product.stock > 0 && (
+                            <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+                              Only {product.stock} left
+                            </Badge>
+                          )}
+                          {product.stock === 0 && (
+                            <Badge variant="outline" className="text-red-600 border-red-600">
+                              Out of Stock
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </Link>
                   )
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16">
-                <p className="text-muted-foreground text-lg mb-4">No products found</p>
-                {hasFilters && (
-                  <Button variant="outline" onClick={clearFilters} data-testid="no-results-clear-btn">
-                    Clear filters
-                  </Button>
-                )}
+              <div className="text-center py-16 bg-card rounded-xl border border-border">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Grid className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="font-heading font-semibold text-lg mb-2">No products found</h3>
+                <p className="text-muted-foreground mb-4">
+                  Try adjusting your filters or search terms
+                </p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleFilterChange({
+                    search: '',
+                    categoryIds: [],
+                    vendorId: '',
+                    minPrice: 0,
+                    maxPrice: 1000,
+                    minRating: 0,
+                    inStock: false,
+                    sortBy: 'created_at',
+                    sortOrder: 'desc'
+                  })}
+                  data-testid="no-results-clear-btn"
+                >
+                  Clear all filters
+                </Button>
               </div>
             )}
           </div>
