@@ -32,12 +32,19 @@ export const CartProvider = ({ children }) => {
     fetchCart();
   }, [fetchCart, token]);
 
-  const addToCart = async (productId, quantity = 1) => {
+  const addToCart = async (productId, quantity = 1, variantId = null, selectedOptions = null) => {
     if (!isAuthenticated) {
       throw new Error('Please login to add items to cart');
     }
     
-    await axios.post(`${API}/cart/items`, { product_id: productId, quantity });
+    const payload = { 
+      product_id: productId, 
+      quantity,
+      variant_id: variantId,
+      selected_options: selectedOptions
+    };
+    
+    await axios.post(`${API}/cart/items`, payload);
     await fetchCart();
   };
 
