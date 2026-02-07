@@ -1697,6 +1697,185 @@ async def get_all_orders(user: dict = Depends(require_admin), skip: int = 0, lim
     orders = await db.orders.find({}, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
     return orders
 
+# ==================== IMAGE UPLOAD ====================
+
+@api_router.post("/upload/image")
+async def upload_image(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
+    """Upload an image file for products or services"""
+    # Validate file type
+    allowed_types = ["image/jpeg", "image/png", "image/webp", "image/gif"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.")
+    
+    # Validate file size (max 5MB)
+    contents = await file.read()
+    if len(contents) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 5MB.")
+    
+    # Generate unique filename
+    ext = file.filename.split('.')[-1] if '.' in file.filename else 'jpg'
+    filename = f"{uuid.uuid4()}.{ext}"
+    filepath = UPLOAD_DIR / filename
+    
+    # Save file
+    async with aiofiles.open(filepath, 'wb') as f:
+        await f.write(contents)
+    
+    # Return the URL
+    image_url = f"/api/uploads/{filename}"
+    
+    logger.info(f"Image uploaded: {filename} by user {user['id']}")
+    return {"url": image_url, "filename": filename}
+
+@api_router.get("/uploads/{filename}")
+async def get_uploaded_image(filename: str):
+    """Serve uploaded images"""
+    from fastapi.responses import FileResponse
+    filepath = UPLOAD_DIR / filename
+    if not filepath.exists():
+        raise HTTPException(status_code=404, detail="Image not found")
+    return FileResponse(filepath)
+
+# ==================== ORDER/BOOKING TRACKING ====================
+
+class TrackingItem(BaseModel):
+    id: str
+    type: str  # "order" or "booking"
+    status: str
+    payment_status: str
+    total: float
+    created_at: str
+    items_count: int
+    vendor_name: Optional[str] = None
+    service_name: Optional[str] = None
+    booking_date: Optional[str] = None
+    booking_time: Optional[str] = None
+    delivery_confirmed: Optional[bool] = None
+    tracking_updates: List[Dict[str, Any]] = []
+
+@api_router.get("/tracking", response_model=List[TrackingItem])
+async def get_all_tracking(user: dict = Depends(get_current_user)):
+    """Get all orders and bookings for tracking"""
+    tracking_items = []
+    
+    # Get orders
+    orders = await db.orders.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(50)
+    for order in orders:
+        tracking_items.append(TrackingItem(
+            id=order["id"],
+            type="order",
+            status=order["status"],
+            payment_status=order.get("payment_status", "pending"),
+            total=order["total"],
+            created_at=order["created_at"],
+            items_count=len(order.get("items", [])),
+            tracking_updates=order.get("tracking_updates", [])
+        ))
+    
+    # Get bookings
+    bookings = await db.bookings.find({"customer_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(50)
+    for booking in bookings:
+        tracking_items.append(TrackingItem(
+            id=booking["id"],
+            type="booking",
+            status=booking["status"],
+            payment_status=booking["payment_status"],
+            total=booking["price"],
+            created_at=booking["created_at"],
+            items_count=1,
+            vendor_name=booking.get("vendor_name"),
+            service_name=booking.get("service_name"),
+            booking_date=booking.get("booking_date"),
+            booking_time=booking.get("booking_time"),
+            delivery_confirmed=booking.get("delivery_confirmed", False),
+            tracking_updates=booking.get("tracking_updates", [])
+        ))
+    
+    # Sort by created_at
+    tracking_items.sort(key=lambda x: x.created_at, reverse=True)
+    return tracking_items
+
+@api_router.get("/tracking/{item_type}/{item_id}")
+async def get_tracking_detail(item_type: str, item_id: str, user: dict = Depends(get_current_user)):
+    """Get detailed tracking info for an order or booking"""
+    if item_type == "order":
+        item = await db.orders.find_one({"id": item_id}, {"_id": 0})
+        if not item:
+            raise HTTPException(status_code=404, detail="Order not found")
+        if item["user_id"] != user["id"] and user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        # Generate tracking timeline
+        timeline = [
+            {"status": "placed", "title": "Order Placed", "timestamp": item["created_at"], "completed": True}
+        ]
+        
+        status_order = ["pending", "processing", "shipped", "delivered"]
+        current_idx = status_order.index(item["status"]) if item["status"] in status_order else -1
+        
+        for idx, status in enumerate(status_order[1:], 1):
+            timeline.append({
+                "status": status,
+                "title": status.replace("_", " ").title(),
+                "timestamp": None,
+                "completed": idx <= current_idx
+            })
+        
+        return {
+            **item,
+            "type": "order",
+            "timeline": timeline
+        }
+    
+    elif item_type == "booking":
+        item = await db.bookings.find_one({"id": item_id}, {"_id": 0})
+        if not item:
+            raise HTTPException(status_code=404, detail="Booking not found")
+        if item["customer_id"] != user["id"] and user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        # Generate tracking timeline
+        timeline = [
+            {"status": "created", "title": "Booking Created", "timestamp": item["created_at"], "completed": True}
+        ]
+        
+        status_order = ["pending", "confirmed", "in_progress", "completed"]
+        current_idx = status_order.index(item["status"]) if item["status"] in status_order else -1
+        
+        # Add payment status
+        if item["payment_status"] == "paid" or item["payment_status"] == "released":
+            timeline.append({
+                "status": "paid",
+                "title": "Payment Received",
+                "timestamp": None,
+                "completed": True
+            })
+        
+        for idx, status in enumerate(status_order[1:], 1):
+            timeline.append({
+                "status": status,
+                "title": status.replace("_", " ").title(),
+                "timestamp": None,
+                "completed": idx <= current_idx
+            })
+        
+        if item.get("delivery_confirmed"):
+            timeline.append({
+                "status": "released",
+                "title": "Payment Released",
+                "timestamp": None,
+                "completed": True
+            })
+        
+        return {
+            **item,
+            "type": "booking",
+            "timeline": timeline
+        }
+    
+    else:
+        raise HTTPException(status_code=400, detail="Invalid item type")
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/health")
