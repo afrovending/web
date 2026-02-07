@@ -586,12 +586,12 @@ const VendorDashboard = () => {
                     />
                   </div>
                   <div className="col-span-2">
-                    <Label>Image URLs (comma-separated)</Label>
-                    <Input
-                      value={productForm.images}
-                      onChange={(e) => setProductForm({ ...productForm, images: e.target.value })}
-                      placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-                      data-testid="product-images-input"
+                    <Label>Product Images</Label>
+                    <ImageUpload
+                      images={productForm.images}
+                      onImagesChange={(images) => setProductForm({ ...productForm, images })}
+                      maxImages={5}
+                      className="mt-2"
                     />
                   </div>
                   <div className="col-span-2">
