@@ -225,11 +225,32 @@ const CartPage = () => {
             <div className="bg-card rounded-xl p-6 border border-border sticky top-24">
               <h2 className="font-heading font-semibold text-xl mb-6">Order Summary</h2>
               
+              {/* Coupon Input */}
+              <div className="mb-6">
+                <CouponInput
+                  onCouponApplied={handleCouponApplied}
+                  appliedCode={cart.discount_code}
+                  onCouponRemoved={handleCouponRemoved}
+                />
+              </div>
+              
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span>${cart.subtotal.toFixed(2)}</span>
                 </div>
+                
+                {/* Discount Line */}
+                {cart.discount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600" data-testid="discount-line">
+                    <span className="flex items-center gap-1">
+                      <Tag className="h-3 w-3" />
+                      Discount ({cart.discount_code})
+                    </span>
+                    <span>-${cart.discount.toFixed(2)}</span>
+                  </div>
+                )}
+                
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
                   <span className="text-secondary">Free</span>
@@ -241,6 +262,11 @@ const CartPage = () => {
                   <span>Total</span>
                   <span className="font-accent">${cart.total.toFixed(2)}</span>
                 </div>
+                {cart.discount > 0 && (
+                  <p className="text-xs text-green-600 mt-1" data-testid="savings-message">
+                    You're saving ${cart.discount.toFixed(2)} on this order!
+                  </p>
+                )}
               </div>
               
               <Button
