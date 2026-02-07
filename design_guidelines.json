@@ -1,0 +1,193 @@
+{
+  "design_system": {
+    "identity": {
+      "name": "Afrovending",
+      "essence": "The heartbeat of African commerce. Authentic, vibrant, and trustworthy.",
+      "emotional_tone": "Warm, Earthy, Vibrant, Community-focused",
+      "archetype": "The Sage & The Creator (Wisdom of tradition + Innovation of commerce)"
+    },
+    "typography": {
+      "fonts": {
+        "heading": {
+          "family": "Playfair Display",
+          "fallback": "serif",
+          "weights": ["600", "700", "800"],
+          "usage": "Main headings (H1-H3), Feature Cards, Vendor Names"
+        },
+        "body": {
+          "family": "Manrope",
+          "fallback": "sans-serif",
+          "weights": ["400", "500", "600"],
+          "usage": "Paragraphs, UI elements, Buttons, Inputs"
+        },
+        "accent": {
+          "family": "Space Grotesk",
+          "fallback": "sans-serif",
+          "weights": ["500"],
+          "usage": "Price tags, Badges, Data metrics"
+        }
+      },
+      "scale": {
+        "h1": "text-5xl md:text-6xl lg:text-7xl tracking-tight leading-tight",
+        "h2": "text-4xl md:text-5xl tracking-tight leading-tight",
+        "h3": "text-2xl md:text-3xl font-semibold",
+        "body_lg": "text-lg leading-relaxed",
+        "body_base": "text-base leading-relaxed text-muted-foreground"
+      }
+    },
+    "colors": {
+      "palette": {
+        "primary": {
+          "name": "Terracotta Clay",
+          "hex": "#C05621",
+          "tailwind_var": "--primary",
+          "usage": "Primary CTAs, Brand Highlights, Active States"
+        },
+        "secondary": {
+          "name": "Savanna Green",
+          "hex": "#2F855A",
+          "tailwind_var": "--secondary",
+          "usage": "Success states, Secondary buttons, Trust indicators"
+        },
+        "background": {
+          "name": "Bone White",
+          "hex": "#FDFBF7",
+          "tailwind_var": "--background",
+          "usage": "Main page background (Warm off-white)"
+        },
+        "surface": {
+          "name": "White",
+          "hex": "#FFFFFF",
+          "tailwind_var": "--card",
+          "usage": "Cards, Modals, Dropdowns"
+        },
+        "text": {
+          "name": "Charcoal",
+          "hex": "#1A202C",
+          "tailwind_var": "--foreground",
+          "usage": "Main text"
+        },
+        "accent": {
+          "name": "Sunny Ochre",
+          "hex": "#D69E2E",
+          "tailwind_var": "--accent",
+          "usage": "Highlights, Badges, 'New' tags"
+        }
+      },
+      "css_variables": {
+        "root": {
+          "--background": "38 20% 98%",
+          "--foreground": "220 13% 14%",
+          "--card": "0 0% 100%",
+          "--card-foreground": "220 13% 14%",
+          "--popover": "0 0% 100%",
+          "--popover-foreground": "220 13% 14%",
+          "--primary": "20 70% 44%",
+          "--primary-foreground": "0 0% 100%",
+          "--secondary": "150 48% 35%",
+          "--secondary-foreground": "0 0% 100%",
+          "--muted": "38 20% 96%",
+          "--muted-foreground": "220 8% 46%",
+          "--accent": "42 66% 51%",
+          "--accent-foreground": "220 13% 14%",
+          "--destructive": "0 84.2% 60.2%",
+          "--destructive-foreground": "0 0% 98%",
+          "--border": "220 13% 91%",
+          "--input": "220 13% 91%",
+          "--ring": "20 70% 44%",
+          "--radius": "0.75rem"
+        }
+      }
+    },
+    "layout": {
+      "spacing": {
+        "container_padding": "px-4 md:px-8 lg:px-12",
+        "section_gap": "py-16 md:py-24",
+        "grid_gap": "gap-6 md:gap-8"
+      },
+      "grids": {
+        "marketing": "grid grid-cols-1 md:grid-cols-12 gap-8",
+        "product_list": "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6",
+        "dashboard": "grid grid-cols-1 lg:grid-cols-4 gap-6"
+      },
+      "border_radius": {
+        "default": "rounded-xl",
+        "card": "rounded-xl",
+        "button": "rounded-full"
+      }
+    },
+    "components": {
+      "buttons": {
+        "primary": "bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 py-6 font-semibold shadow-lg hover:shadow-xl transition-all duration-300",
+        "secondary": "bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full px-6 py-4 font-medium",
+        "outline": "border-2 border-primary text-primary hover:bg-primary/10 rounded-full px-6 py-4 font-medium"
+      },
+      "cards": {
+        "product": "group relative bg-card rounded-xl overflow-hidden border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg",
+        "vendor": "bg-card p-6 rounded-xl border border-border shadow-sm hover:shadow-md transition-all"
+      },
+      "inputs": {
+        "default": "h-12 rounded-lg border-border focus:ring-2 focus:ring-primary/20 focus:border-primary bg-background/50"
+      }
+    },
+    "assets": {
+      "images": {
+        "hero_bg": {
+          "url": "https://images.unsplash.com/photo-1734255026082-82fdc81991f0?crop=entropy&cs=srgb&fm=jpg&q=85",
+          "alt": "Vibrant African market scene with fresh produce",
+          "category": "hero"
+        },
+        "vendor_spotlight": [
+          {
+            "url": "https://images.unsplash.com/photo-1687422808565-929533931584?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "alt": "Happy market vendor with thumbs up",
+            "category": "vendor"
+          },
+          {
+            "url": "https://images.unsplash.com/photo-1761370980657-22586ea44093?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "alt": "Woman vendor smiling with bananas",
+            "category": "vendor"
+          }
+        ],
+        "categories": [
+          {
+            "url": "https://images.unsplash.com/photo-1567696154083-9547fd0c8e1d?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "alt": "Woven baskets and crafts",
+            "category": "crafts"
+          },
+          {
+            "url": "https://images.unsplash.com/photo-1760727467662-5f0943d196a8?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "alt": "Marketplace stall display",
+            "category": "market"
+          },
+          {
+            "url": "https://images.unsplash.com/photo-1633000098942-17449327bfc3?crop=entropy&cs=srgb&fm=jpg&q=85",
+            "alt": "Modern African fashion",
+            "category": "fashion"
+          }
+        ]
+      },
+      "icons": {
+        "library": "lucide-react",
+        "style": "Stroke width 1.5px, rounded caps"
+      }
+    },
+    "instructions_to_main_agent": [
+      "1. UPDATE TAILWIND CONFIG: Extend the theme with the colors and fonts defined above. Add 'Playfair Display' and 'Manrope' to font families.",
+      "2. UPDATE INDEX.CSS: Replace the root variables with the 'css_variables' provided in the colors section. This is CRITICAL for the theme to work.",
+      "3. INSTALL FONTS: Add the Google Fonts import for Playfair Display and Manrope to index.css or index.html.",
+      "4. COMPONENT STYLING: When using Shadcn components, override the default sharp corners with 'rounded-xl' or 'rounded-full' as specified.",
+      "5. LAYOUT: Use the 'marketing' grid for the homepage. Avoid simple single-column layouts. Create visual interest with asymmetrical grids.",
+      "6. IMAGES: Use the provided Unsplash URLs. Do not use placeholders.",
+      "7. ACCESSIBILITY: Ensure all text on the 'Terracotta' primary color is white. Ensure text on 'Bone White' background is 'Charcoal' or darker.",
+      "8. DATA-TESTID: Add data-testid attributes to all interactive elements (buttons, inputs, links)."
+    ],
+    "universal_guidelines": [
+      "Avoid generic 'AI slop' designs. Be bold with spacing and typography.",
+      "Use 'sonner' for toasts.",
+      "Use 'lucide-react' for icons.",
+      "Do not use gradients for backgrounds; use solid warm colors or subtle textures.",
+      "Ensure mobile responsiveness for all grids (grid-cols-1 on mobile)."
+    ]
+  }
+}
