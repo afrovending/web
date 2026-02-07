@@ -316,6 +316,7 @@ const VendorDashboard = () => {
   }
 
   const totalRevenue = orders.filter(o => o.payment_status === 'paid').reduce((sum, o) => sum + o.total, 0);
+  const serviceRevenue = bookings.filter(b => b.payment_status === 'released').reduce((sum, b) => sum + b.price, 0);
 
   return (
     <div className="min-h-screen bg-background py-8 md:py-12 px-4 md:px-8">
@@ -334,29 +335,182 @@ const VendorDashboard = () => {
             )}
           </div>
           
-          <Dialog open={productDialogOpen} onOpenChange={setProductDialogOpen}>
-            <DialogTrigger asChild>
-              <Button 
-                className="rounded-full"
-                onClick={() => {
-                  setEditingProduct(null);
-                  setProductForm({
-                    name: '',
-                    description: '',
-                    price: '',
-                    compare_price: '',
-                    category_id: '',
-                    stock: '',
-                    images: '',
-                    tags: ''
-                  });
-                }}
-                data-testid="add-product-btn"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Product
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Dialog open={serviceDialogOpen} onOpenChange={setServiceDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={() => {
+                    setEditingService(null);
+                    setServiceForm({
+                      name: '',
+                      description: '',
+                      price: '',
+                      price_type: 'fixed',
+                      duration_minutes: '60',
+                      location_type: 'both',
+                      location_address: '',
+                      category_id: '',
+                      images: '',
+                      tags: ''
+                    });
+                  }}
+                  data-testid="add-service-btn"
+                >
+                  <Briefcase className="h-4 w-4 mr-2" />
+                  Add Service
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="font-heading">
+                    {editingService ? 'Edit Service' : 'Add New Service'}
+                  </DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleServiceSubmit} className="space-y-4 mt-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                      <Label>Service Name</Label>
+                      <Input
+                        value={serviceForm.name}
+                        onChange={(e) => setServiceForm({ ...serviceForm, name: e.target.value })}
+                        required
+                        data-testid="service-name-input"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <Label>Description</Label>
+                      <Textarea
+                        value={serviceForm.description}
+                        onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
+                        rows={3}
+                        required
+                        data-testid="service-description-input"
+                      />
+                    </div>
+                    <div>
+                      <Label>Price ($)</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={serviceForm.price}
+                        onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
+                        required
+                        data-testid="service-price-input"
+                      />
+                    </div>
+                    <div>
+                      <Label>Price Type</Label>
+                      <Select
+                        value={serviceForm.price_type}
+                        onValueChange={(v) => setServiceForm({ ...serviceForm, price_type: v })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="fixed">Fixed Price</SelectItem>
+                          <SelectItem value="hourly">Per Hour</SelectItem>
+                          <SelectItem value="starting_from">Starting From</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Duration (minutes)</Label>
+                      <Input
+                        type="number"
+                        value={serviceForm.duration_minutes}
+                        onChange={(e) => setServiceForm({ ...serviceForm, duration_minutes: e.target.value })}
+                        data-testid="service-duration-input"
+                      />
+                    </div>
+                    <div>
+                      <Label>Location Type</Label>
+                      <Select
+                        value={serviceForm.location_type}
+                        onValueChange={(v) => setServiceForm({ ...serviceForm, location_type: v })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="onsite">On-site Only</SelectItem>
+                          <SelectItem value="remote">Remote Only</SelectItem>
+                          <SelectItem value="both">Both (Flexible)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="col-span-2">
+                      <Label>Service Category</Label>
+                      <Select
+                        value={serviceForm.category_id}
+                        onValueChange={(v) => setServiceForm({ ...serviceForm, category_id: v })}
+                      >
+                        <SelectTrigger data-testid="service-category-select">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {serviceCategories.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="col-span-2">
+                      <Label>Image URLs (comma-separated)</Label>
+                      <Input
+                        value={serviceForm.images}
+                        onChange={(e) => setServiceForm({ ...serviceForm, images: e.target.value })}
+                        placeholder="https://example.com/image1.jpg"
+                        data-testid="service-images-input"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <Label>Tags (comma-separated)</Label>
+                      <Input
+                        value={serviceForm.tags}
+                        onChange={(e) => setServiceForm({ ...serviceForm, tags: e.target.value })}
+                        placeholder="hair styling, braids, natural hair"
+                        data-testid="service-tags-input"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setServiceDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" data-testid="service-submit-btn">
+                      {editingService ? 'Update' : 'Create'} Service
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          
+            <Dialog open={productDialogOpen} onOpenChange={setProductDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  className="rounded-full"
+                  onClick={() => {
+                    setEditingProduct(null);
+                    setProductForm({
+                      name: '',
+                      description: '',
+                      price: '',
+                      compare_price: '',
+                      category_id: '',
+                      stock: '',
+                      images: '',
+                      tags: ''
+                    });
+                  }}
+                  data-testid="add-product-btn"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Product
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="font-heading">
