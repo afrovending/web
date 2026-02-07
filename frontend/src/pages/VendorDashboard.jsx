@@ -122,7 +122,7 @@ const VendorDashboard = () => {
       compare_price: productForm.compare_price ? parseFloat(productForm.compare_price) : null,
       category_id: productForm.category_id,
       stock: parseInt(productForm.stock) || 0,
-      images: productForm.images.split(',').map(s => s.trim()).filter(Boolean),
+      images: productForm.images,
       tags: productForm.tags.split(',').map(s => s.trim()).filter(Boolean)
     };
     
@@ -148,7 +148,7 @@ const VendorDashboard = () => {
         compare_price: '',
         category_id: '',
         stock: '',
-        images: '',
+        images: [],
         tags: ''
       });
     } catch (error) {
