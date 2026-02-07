@@ -632,6 +632,484 @@ async def approve_vendor(vendor_id: str, user: dict = Depends(require_admin)):
         raise HTTPException(status_code=404, detail="Vendor not found")
     return {"message": "Vendor approved"}
 
+# ==================== SERVICE ROUTES ====================
+
+@api_router.get("/services", response_model=List[ServiceResponse])
+async def get_services(
+    category_id: Optional[str] = None,
+    vendor_id: Optional[str] = None,
+    search: Optional[str] = None,
+    location_type: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 20
+):
+    query = {"is_active": True}
+    
+    if category_id:
+        query["category_id"] = category_id
+    if vendor_id:
+        query["vendor_id"] = vendor_id
+    if location_type:
+        query["location_type"] = {"$in": [location_type, "both"]}
+    if search:
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"description": {"$regex": search, "$options": "i"}},
+            {"tags": {"$regex": search, "$options": "i"}}
+        ]
+    
+    services = await db.services.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    for service in services:
+        vendor = await db.vendors.find_one({"id": service.get("vendor_id")}, {"_id": 0, "store_name": 1})
+        service["vendor_name"] = vendor.get("store_name") if vendor else "Unknown Vendor"
+    
+    return services
+
+@api_router.get("/services/featured", response_model=List[ServiceResponse])
+async def get_featured_services(limit: int = 8):
+    services = await db.services.find({"is_active": True}, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    for service in services:
+        vendor = await db.vendors.find_one({"id": service.get("vendor_id")}, {"_id": 0, "store_name": 1})
+        service["vendor_name"] = vendor.get("store_name") if vendor else "Unknown Vendor"
+    
+    return services
+
+@api_router.get("/services/{service_id}", response_model=ServiceResponse)
+async def get_service(service_id: str):
+    service = await db.services.find_one({"id": service_id}, {"_id": 0})
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    vendor = await db.vendors.find_one({"id": service.get("vendor_id")}, {"_id": 0, "store_name": 1})
+    service["vendor_name"] = vendor.get("store_name") if vendor else "Unknown Vendor"
+    
+    return service
+
+@api_router.post("/services", response_model=ServiceResponse)
+async def create_service(service: ServiceCreate, user: dict = Depends(require_vendor)):
+    vendor = await db.vendors.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not vendor and user["role"] != "admin":
+        raise HTTPException(status_code=400, detail="You must be a vendor to create services")
+    
+    service_id = str(uuid.uuid4())
+    vendor_id = vendor["id"] if vendor else user["id"]
+    
+    service_doc = {
+        "id": service_id,
+        "vendor_id": vendor_id,
+        **service.model_dump(),
+        "average_rating": 0.0,
+        "review_count": 0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.services.insert_one(service_doc)
+    
+    # Create default availability (Mon-Fri, 9-5)
+    for day in range(5):  # Monday to Friday
+        availability_doc = {
+            "id": str(uuid.uuid4()),
+            "service_id": service_id,
+            "vendor_id": vendor_id,
+            "day_of_week": day,
+            "start_time": "09:00",
+            "end_time": "17:00",
+            "is_available": True
+        }
+        await db.service_availability.insert_one(availability_doc)
+    
+    service_doc["vendor_name"] = vendor.get("store_name") if vendor else "Admin"
+    return service_doc
+
+@api_router.put("/services/{service_id}", response_model=ServiceResponse)
+async def update_service(service_id: str, service_update: ServiceUpdate, user: dict = Depends(require_vendor)):
+    existing = await db.services.find_one({"id": service_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    vendor = await db.vendors.find_one({"user_id": user["id"]}, {"_id": 0})
+    if user["role"] != "admin" and (not vendor or vendor["id"] != existing["vendor_id"]):
+        raise HTTPException(status_code=403, detail="Not authorized to update this service")
+    
+    update_data = {k: v for k, v in service_update.model_dump().items() if v is not None}
+    if update_data:
+        await db.services.update_one({"id": service_id}, {"$set": update_data})
+    
+    updated = await db.services.find_one({"id": service_id}, {"_id": 0})
+    vendor_doc = await db.vendors.find_one({"id": updated.get("vendor_id")}, {"_id": 0, "store_name": 1})
+    updated["vendor_name"] = vendor_doc.get("store_name") if vendor_doc else "Unknown"
+    
+    return updated
+
+@api_router.delete("/services/{service_id}")
+async def delete_service(service_id: str, user: dict = Depends(require_vendor)):
+    existing = await db.services.find_one({"id": service_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    vendor = await db.vendors.find_one({"user_id": user["id"]}, {"_id": 0})
+    if user["role"] != "admin" and (not vendor or vendor["id"] != existing["vendor_id"]):
+        raise HTTPException(status_code=403, detail="Not authorized to delete this service")
+    
+    await db.services.delete_one({"id": service_id})
+    await db.service_availability.delete_many({"service_id": service_id})
+    
+    return {"message": "Service deleted"}
+
+# ==================== SERVICE AVAILABILITY ROUTES ====================
+
+@api_router.get("/services/{service_id}/availability")
+async def get_service_availability(service_id: str):
+    availability = await db.service_availability.find({"service_id": service_id}, {"_id": 0}).to_list(20)
+    return availability
+
+@api_router.put("/services/{service_id}/availability")
+async def update_service_availability(
+    service_id: str, 
+    availability: List[ServiceAvailabilityBase], 
+    user: dict = Depends(require_vendor)
+):
+    service = await db.services.find_one({"id": service_id}, {"_id": 0})
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    vendor = await db.vendors.find_one({"user_id": user["id"]}, {"_id": 0})
+    if user["role"] != "admin" and (not vendor or vendor["id"] != service["vendor_id"]):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Delete existing availability
+    await db.service_availability.delete_many({"service_id": service_id})
+    
+    # Create new availability
+    for avail in availability:
+        avail_doc = {
+            "id": str(uuid.uuid4()),
+            "service_id": service_id,
+            "vendor_id": service["vendor_id"],
+            **avail.model_dump()
+        }
+        await db.service_availability.insert_one(avail_doc)
+    
+    return {"message": "Availability updated"}
+
+@api_router.get("/services/{service_id}/timeslots")
+async def get_available_timeslots(service_id: str, date: str):
+    """Get available time slots for a specific date"""
+    service = await db.services.find_one({"id": service_id}, {"_id": 0})
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    # Parse date and get day of week
+    try:
+        booking_date = datetime.strptime(date, "%Y-%m-%d")
+        day_of_week = booking_date.weekday()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+    
+    # Get availability for that day
+    availability = await db.service_availability.find_one({
+        "service_id": service_id,
+        "day_of_week": day_of_week,
+        "is_available": True
+    }, {"_id": 0})
+    
+    if not availability:
+        return []
+    
+    # Generate time slots based on service duration
+    duration = service.get("duration_minutes", 60)
+    start_hour, start_min = map(int, availability["start_time"].split(":"))
+    end_hour, end_min = map(int, availability["end_time"].split(":"))
+    
+    slots = []
+    current_time = datetime(booking_date.year, booking_date.month, booking_date.day, start_hour, start_min)
+    end_time = datetime(booking_date.year, booking_date.month, booking_date.day, end_hour, end_min)
+    
+    # Get existing bookings for that date
+    existing_bookings = await db.bookings.find({
+        "service_id": service_id,
+        "booking_date": date,
+        "status": {"$nin": ["cancelled"]}
+    }, {"booking_time": 1}).to_list(100)
+    booked_times = [b["booking_time"] for b in existing_bookings]
+    
+    while current_time + timedelta(minutes=duration) <= end_time:
+        time_str = current_time.strftime("%H:%M")
+        slots.append({
+            "time": time_str,
+            "is_available": time_str not in booked_times
+        })
+        current_time += timedelta(minutes=duration)
+    
+    return slots
+
+# ==================== BOOKING ROUTES ====================
+
+@api_router.post("/bookings", response_model=BookingResponse)
+async def create_booking(booking: BookingCreate, user: dict = Depends(get_current_user)):
+    service = await db.services.find_one({"id": booking.service_id}, {"_id": 0})
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    # Check if slot is available
+    existing = await db.bookings.find_one({
+        "service_id": booking.service_id,
+        "booking_date": booking.booking_date,
+        "booking_time": booking.booking_time,
+        "status": {"$nin": ["cancelled"]}
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="This time slot is already booked")
+    
+    vendor = await db.vendors.find_one({"id": service["vendor_id"]}, {"_id": 0})
+    
+    booking_id = str(uuid.uuid4())
+    booking_doc = {
+        "id": booking_id,
+        "service_id": service["id"],
+        "service_name": service["name"],
+        "service_image": service["images"][0] if service.get("images") else None,
+        "customer_id": user["id"],
+        "customer_name": f"{user['first_name']} {user['last_name']}",
+        "customer_email": user["email"],
+        "vendor_id": service["vendor_id"],
+        "vendor_name": vendor.get("store_name") if vendor else "Unknown",
+        "booking_date": booking.booking_date,
+        "booking_time": booking.booking_time,
+        "duration_minutes": service.get("duration_minutes", 60),
+        "price": service["price"],
+        "status": "pending",
+        "payment_status": "pending",
+        "delivery_confirmed": False,
+        "notes": booking.notes,
+        "customer_address": booking.customer_address,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.bookings.insert_one(booking_doc)
+    return booking_doc
+
+@api_router.get("/bookings", response_model=List[BookingResponse])
+async def get_my_bookings(user: dict = Depends(get_current_user)):
+    """Get bookings for the current user (as customer)"""
+    bookings = await db.bookings.find({"customer_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return bookings
+
+@api_router.get("/bookings/{booking_id}", response_model=BookingResponse)
+async def get_booking(booking_id: str, user: dict = Depends(get_current_user)):
+    booking = await db.bookings.find_one({"id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Check authorization
+    if user["role"] != "admin" and booking["customer_id"] != user["id"] and booking["vendor_id"] != user.get("vendor_id"):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    return booking
+
+@api_router.get("/vendor/bookings", response_model=List[BookingResponse])
+async def get_vendor_bookings(user: dict = Depends(require_vendor)):
+    """Get bookings for the vendor's services"""
+    vendor = await db.vendors.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    
+    bookings = await db.bookings.find({"vendor_id": vendor["id"]}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return bookings
+
+@api_router.put("/bookings/{booking_id}/status")
+async def update_booking_status(booking_id: str, status_update: BookingStatusUpdate, user: dict = Depends(get_current_user)):
+    """Update booking status (vendor can confirm/complete, customer can cancel)"""
+    booking = await db.bookings.find_one({"id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    valid_statuses = ["pending", "confirmed", "in_progress", "completed", "cancelled"]
+    if status_update.status not in valid_statuses:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
+    
+    # Authorization checks
+    is_customer = booking["customer_id"] == user["id"]
+    is_vendor = booking["vendor_id"] == user.get("vendor_id")
+    is_admin = user["role"] == "admin"
+    
+    if not (is_customer or is_vendor or is_admin):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Customers can only cancel
+    if is_customer and not is_admin and status_update.status not in ["cancelled"]:
+        raise HTTPException(status_code=403, detail="Customers can only cancel bookings")
+    
+    await db.bookings.update_one({"id": booking_id}, {"$set": {"status": status_update.status}})
+    return {"message": "Booking status updated"}
+
+@api_router.put("/bookings/{booking_id}/confirm-delivery")
+async def confirm_service_delivery(booking_id: str, user: dict = Depends(get_current_user)):
+    """Customer confirms that the service was delivered - releases payment to vendor"""
+    booking = await db.bookings.find_one({"id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Only the customer can confirm delivery
+    if booking["customer_id"] != user["id"] and user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only the customer can confirm delivery")
+    
+    if booking["payment_status"] != "paid":
+        raise HTTPException(status_code=400, detail="Payment must be completed first")
+    
+    if booking["delivery_confirmed"]:
+        raise HTTPException(status_code=400, detail="Delivery already confirmed")
+    
+    # Update booking
+    await db.bookings.update_one(
+        {"id": booking_id}, 
+        {"$set": {
+            "delivery_confirmed": True, 
+            "status": "completed",
+            "payment_status": "released"
+        }}
+    )
+    
+    # Add to vendor's pending payout (in real system, this would trigger actual payout)
+    await db.vendors.update_one(
+        {"id": booking["vendor_id"]},
+        {"$inc": {"pending_payout": booking["price"], "total_sales": booking["price"]}}
+    )
+    
+    return {"message": "Delivery confirmed. Payment released to vendor."}
+
+# ==================== SERVICE CHECKOUT ROUTES ====================
+
+@api_router.post("/bookings/{booking_id}/checkout")
+async def create_service_checkout(booking_id: str, checkout_req: ServiceCheckoutRequest, request: Request, user: dict = Depends(get_current_user)):
+    """Create a Stripe checkout session for a service booking"""
+    booking = await db.bookings.find_one({"id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    if booking["customer_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    if booking["payment_status"] == "paid":
+        raise HTTPException(status_code=400, detail="Booking already paid")
+    
+    # Create Stripe checkout session
+    host_url = str(request.base_url).rstrip('/')
+    webhook_url = f"{host_url}/api/webhook/stripe"
+    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+    
+    origin_url = checkout_req.origin_url.rstrip('/')
+    success_url = f"{origin_url}/bookings/{booking_id}/success?session_id={{CHECKOUT_SESSION_ID}}"
+    cancel_url = f"{origin_url}/bookings/{booking_id}"
+    
+    checkout_request = CheckoutSessionRequest(
+        amount=float(booking["price"]),
+        currency="usd",
+        success_url=success_url,
+        cancel_url=cancel_url,
+        metadata={"booking_id": booking_id, "user_id": user["id"], "type": "service"}
+    )
+    
+    session = await stripe_checkout.create_checkout_session(checkout_request)
+    
+    # Store payment transaction
+    transaction_doc = {
+        "id": str(uuid.uuid4()),
+        "booking_id": booking_id,
+        "user_id": user["id"],
+        "session_id": session.session_id,
+        "amount": booking["price"],
+        "currency": "usd",
+        "payment_method": "stripe",
+        "payment_status": "pending",
+        "payment_type": "service",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.payment_transactions.insert_one(transaction_doc)
+    
+    return {"checkout_url": session.url, "session_id": session.session_id}
+
+@api_router.get("/bookings/{booking_id}/payment-status")
+async def get_booking_payment_status(booking_id: str, session_id: str, request: Request, user: dict = Depends(get_current_user)):
+    """Check payment status for a service booking"""
+    booking = await db.bookings.find_one({"id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    host_url = str(request.base_url).rstrip('/')
+    webhook_url = f"{host_url}/api/webhook/stripe"
+    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+    
+    status = await stripe_checkout.get_checkout_status(session_id)
+    
+    if status.payment_status == "paid" and booking["payment_status"] != "paid":
+        await db.bookings.update_one(
+            {"id": booking_id},
+            {"$set": {"payment_status": "paid", "status": "confirmed"}}
+        )
+        await db.payment_transactions.update_one(
+            {"session_id": session_id},
+            {"$set": {"payment_status": "paid"}}
+        )
+    
+    return {
+        "status": status.status,
+        "payment_status": status.payment_status,
+        "amount_total": status.amount_total,
+        "currency": status.currency
+    }
+
+@api_router.get("/services/{service_id}/reviews", response_model=List[ReviewResponse])
+async def get_service_reviews(service_id: str):
+    reviews = await db.service_reviews.find({"service_id": service_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return reviews
+
+@api_router.post("/services/{service_id}/reviews", response_model=ReviewResponse)
+async def create_service_review(service_id: str, review: ReviewCreate, user: dict = Depends(get_current_user)):
+    service = await db.services.find_one({"id": service_id})
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    # Check if user has a completed booking for this service
+    completed_booking = await db.bookings.find_one({
+        "service_id": service_id,
+        "customer_id": user["id"],
+        "delivery_confirmed": True
+    })
+    if not completed_booking:
+        raise HTTPException(status_code=400, detail="You can only review services you have used")
+    
+    existing = await db.service_reviews.find_one({"service_id": service_id, "user_id": user["id"]})
+    if existing:
+        raise HTTPException(status_code=400, detail="You already reviewed this service")
+    
+    review_id = str(uuid.uuid4())
+    review_doc = {
+        "id": review_id,
+        "service_id": service_id,
+        "product_id": service_id,  # For compatibility with ReviewResponse model
+        "user_id": user["id"],
+        "user_name": f"{user['first_name']} {user['last_name']}",
+        "rating": review.rating,
+        "title": review.title,
+        "comment": review.comment,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.service_reviews.insert_one(review_doc)
+    
+    # Update service average rating
+    all_reviews = await db.service_reviews.find({"service_id": service_id}, {"rating": 1}).to_list(1000)
+    avg_rating = sum(r["rating"] for r in all_reviews) / len(all_reviews)
+    await db.services.update_one(
+        {"id": service_id}, 
+        {"$set": {"average_rating": round(avg_rating, 1), "review_count": len(all_reviews)}}
+    )
+    
+    return review_doc
+
 # ==================== CART ROUTES ====================
 
 @api_router.get("/cart", response_model=CartResponse)
