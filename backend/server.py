@@ -788,31 +788,50 @@ async def search_suggestions(q: str, limit: int = 10):
 @api_router.get("/products", response_model=List[ProductResponse])
 async def get_products(
     category_id: Optional[str] = None,
+    category_ids: Optional[str] = None,
     vendor_id: Optional[str] = None,
     search: Optional[str] = None,
     min_price: Optional[float] = None,
     max_price: Optional[float] = None,
+    min_rating: Optional[float] = None,
+    in_stock: Optional[bool] = None,
+    tags: Optional[str] = None,
     sort_by: str = "created_at",
     sort_order: str = "desc",
     skip: int = 0,
-    limit: int = 20
+    limit: int = 20,
+    include_count: bool = False
 ):
     query = {"is_active": True}
     
+    # Category filter (single or multiple)
+    category_list = []
+    if category_ids:
+        category_list = [c.strip() for c in category_ids.split(",")]
     if category_id:
-        query["category_id"] = category_id
+        category_list.append(category_id)
+    if category_list:
+        query["category_id"] = {"$in": category_list} if len(category_list) > 1 else category_list[0]
+    
     if vendor_id:
         query["vendor_id"] = vendor_id
     if search:
         query["$or"] = [
             {"name": {"$regex": search, "$options": "i"}},
             {"description": {"$regex": search, "$options": "i"}},
-            {"tags": {"$regex": search, "$options": "i"}}
+            {"tags": {"$elemMatch": {"$regex": search, "$options": "i"}}}
         ]
     if min_price is not None:
         query["price"] = {"$gte": min_price}
     if max_price is not None:
         query.setdefault("price", {})["$lte"] = max_price
+    if min_rating is not None:
+        query["average_rating"] = {"$gte": min_rating}
+    if in_stock:
+        query["stock"] = {"$gt": 0}
+    if tags:
+        tag_list = [t.strip() for t in tags.split(",")]
+        query["tags"] = {"$in": tag_list}
     
     sort_dir = -1 if sort_order == "desc" else 1
     
