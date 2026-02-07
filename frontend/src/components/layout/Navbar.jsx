@@ -183,7 +183,7 @@ const Navbar = () => {
               <div className="relative">
                 <Input
                   type="text"
-                  placeholder="Search products..."
+                  placeholder="Search products & services..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full h-11 pl-4 pr-12 rounded-full"
