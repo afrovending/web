@@ -72,6 +72,10 @@ const AppContent = () => {
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/vendors" element={<VendorsPage />} />
                     <Route path="/vendors/:vendorId" element={<VendorPage />} />
+                    <Route path="/services" element={<ServicesPage />} />
+                    <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
+                    <Route path="/bookings/:bookingId" element={<BookingDetailPage />} />
+                    <Route path="/bookings/:bookingId/success" element={<BookingSuccessPage />} />
                   </Routes>
                 </main>
                 <Footer />
