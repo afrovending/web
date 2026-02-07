@@ -169,6 +169,12 @@ const Navbar = () => {
                       </Link>
                     </DropdownMenuItem>
                   )}
+                  <DropdownMenuItem asChild>
+                    <Link to="/tracking" className="cursor-pointer" data-testid="menu-tracking">
+                      <MapPin className="mr-2 h-4 w-4" />
+                      Track Orders
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive" data-testid="menu-logout">
                     <LogOut className="mr-2 h-4 w-4" />
