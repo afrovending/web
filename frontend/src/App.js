@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
@@ -19,13 +19,30 @@ import { VendorDashboard, VendorSetupPage } from './pages/VendorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import { VendorsPage, VendorPage } from './pages/VendorsPages';
 
-function App() {
+// Loading component
+const LoadingScreen = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="text-center">
+      <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+        <span className="text-primary-foreground font-heading font-bold text-xl">A</span>
+      </div>
+      <p className="text-muted-foreground">Loading...</p>
+    </div>
+  </div>
+);
+
+// Inner app with auth check
+const AppContent = () => {
+  const { loading } = useAuth();
+  
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <div className="min-h-screen flex flex-col bg-background">
-            <Routes>
+    <CartProvider>
+      <div className="min-h-screen flex flex-col bg-background">
+        <Routes>
               {/* Auth pages without navbar */}
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
