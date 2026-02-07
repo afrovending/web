@@ -47,7 +47,7 @@ const Navbar = () => {
           </Link>
 
           {/* Search Bar - Desktop */}
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl mx-8">
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-4">
             <div className="relative w-full">
               <Input
                 type="text"
@@ -67,6 +67,19 @@ const Navbar = () => {
               </Button>
             </div>
           </form>
+
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center gap-6 mx-4">
+            <Link to="/products" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors" data-testid="nav-products">
+              Products
+            </Link>
+            <Link to="/services" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors" data-testid="nav-services">
+              Services
+            </Link>
+            <Link to="/vendors" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors" data-testid="nav-vendors">
+              Vendors
+            </Link>
+          </div>
 
           {/* Actions */}
           <div className="flex items-center gap-2 md:gap-4">
