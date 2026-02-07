@@ -151,6 +151,21 @@ const CartPage = () => {
                     >
                       {item.product_name}
                     </Link>
+                    
+                    {/* Variant Options */}
+                    {item.selected_options && Object.keys(item.selected_options).length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {Object.entries(item.selected_options).map(([key, value]) => (
+                          <span key={key} className="text-xs bg-muted px-2 py-0.5 rounded">
+                            {key}: {value}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {item.variant_sku && (
+                      <p className="text-xs text-muted-foreground mt-1">SKU: {item.variant_sku}</p>
+                    )}
+                    
                     <p className="font-accent font-semibold text-lg mt-1">
                       ${item.price.toFixed(2)}
                     </p>
