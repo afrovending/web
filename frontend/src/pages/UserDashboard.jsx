@@ -69,9 +69,22 @@ const UserDashboard = () => {
       processing: 'bg-blue-100 text-blue-800',
       shipped: 'bg-purple-100 text-purple-800',
       delivered: 'bg-secondary/20 text-secondary',
-      cancelled: 'bg-destructive/20 text-destructive'
+      cancelled: 'bg-destructive/20 text-destructive',
+      confirmed: 'bg-blue-100 text-blue-800',
+      in_progress: 'bg-purple-100 text-purple-800',
+      completed: 'bg-green-100 text-green-800'
     };
     return colors[status] || 'bg-muted text-muted-foreground';
+  };
+
+  const getPaymentStatusColor = (status) => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-800',
+      paid: 'bg-blue-100 text-blue-800',
+      released: 'bg-green-100 text-green-800',
+      refunded: 'bg-red-100 text-red-800'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
   return (
