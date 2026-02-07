@@ -670,6 +670,10 @@ const VendorDashboard = () => {
             <TabsTrigger value="bookings" className="rounded-full" data-testid="vendor-tab-bookings">
               Bookings
             </TabsTrigger>
+            <TabsTrigger value="payouts" className="rounded-full" data-testid="vendor-tab-payouts">
+              <Wallet className="h-4 w-4 mr-1" />
+              Payouts
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="products">
