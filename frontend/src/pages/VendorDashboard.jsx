@@ -459,12 +459,12 @@ const VendorDashboard = () => {
                       </Select>
                     </div>
                     <div className="col-span-2">
-                      <Label>Image URLs (comma-separated)</Label>
-                      <Input
-                        value={serviceForm.images}
-                        onChange={(e) => setServiceForm({ ...serviceForm, images: e.target.value })}
-                        placeholder="https://example.com/image1.jpg"
-                        data-testid="service-images-input"
+                      <Label>Service Images</Label>
+                      <ImageUpload
+                        images={serviceForm.images}
+                        onImagesChange={(images) => setServiceForm({ ...serviceForm, images })}
+                        maxImages={5}
+                        className="mt-2"
                       />
                     </div>
                     <div className="col-span-2">
