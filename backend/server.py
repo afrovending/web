@@ -900,10 +900,22 @@ async def create_product(product: ProductCreate, user: dict = Depends(require_ve
     product_id = str(uuid.uuid4())
     vendor_id = vendor["id"] if vendor else user["id"]
     
+    product_data = product.model_dump()
+    
+    # Generate IDs for variants if they exist
+    if product_data.get("variants"):
+        for variant in product_data["variants"]:
+            if not variant.get("id"):
+                variant["id"] = str(uuid.uuid4())
+    
+    # Calculate total stock from variants if has_variants
+    if product_data.get("has_variants") and product_data.get("variants"):
+        product_data["stock"] = sum(v.get("stock", 0) for v in product_data["variants"])
+    
     product_doc = {
         "id": product_id,
         "vendor_id": vendor_id,
-        **product.model_dump(),
+        **product_data,
         "average_rating": 0.0,
         "review_count": 0,
         "created_at": datetime.now(timezone.utc).isoformat()
@@ -928,6 +940,17 @@ async def update_product(product_id: str, product_update: ProductUpdate, user: d
         raise HTTPException(status_code=403, detail="Not authorized to update this product")
     
     update_data = {k: v for k, v in product_update.model_dump().items() if v is not None}
+    
+    # Generate IDs for new variants
+    if update_data.get("variants"):
+        for variant in update_data["variants"]:
+            if not variant.get("id"):
+                variant["id"] = str(uuid.uuid4())
+    
+    # Recalculate stock if has_variants
+    if update_data.get("has_variants") and update_data.get("variants"):
+        update_data["stock"] = sum(v.get("stock", 0) for v in update_data["variants"])
+    
     if update_data:
         await db.products.update_one({"id": product_id}, {"$set": update_data})
     
