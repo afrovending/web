@@ -127,11 +127,12 @@ const UserDashboard = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {[
             { icon: Package, label: 'Total Orders', value: orders.length },
-            { icon: Clock, label: 'Pending', value: orders.filter(o => o.status === 'pending').length },
-            { icon: Package, label: 'Delivered', value: orders.filter(o => o.status === 'delivered').length },
+            { icon: Calendar, label: 'Bookings', value: bookings.length },
+            { icon: Clock, label: 'Pending', value: orders.filter(o => o.status === 'pending').length + bookings.filter(b => b.status === 'pending').length },
+            { icon: Package, label: 'Delivered', value: orders.filter(o => o.status === 'delivered').length + bookings.filter(b => b.delivery_confirmed).length },
           ].map((stat, i) => (
             <div key={i} className="bg-card rounded-xl p-5 border border-border">
               <stat.icon className="h-6 w-6 text-primary mb-2" />
@@ -156,6 +157,10 @@ const UserDashboard = () => {
             <TabsTrigger value="orders" className="rounded-full" data-testid="tab-orders">
               <Package className="h-4 w-4 mr-2" />
               Orders
+            </TabsTrigger>
+            <TabsTrigger value="bookings" className="rounded-full" data-testid="tab-bookings">
+              <Calendar className="h-4 w-4 mr-2" />
+              Bookings
             </TabsTrigger>
             <TabsTrigger value="profile" className="rounded-full" data-testid="tab-profile">
               <User className="h-4 w-4 mr-2" />
