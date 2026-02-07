@@ -735,6 +735,76 @@ const VendorDashboard = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="services">
+            {services.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {services.map((service) => (
+                  <div
+                    key={service.id}
+                    className="bg-card rounded-xl border border-border overflow-hidden"
+                    data-testid={`vendor-service-${service.id}`}
+                  >
+                    <div className="aspect-video bg-muted overflow-hidden">
+                      <img
+                        src={service.images?.[0] || 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=400'}
+                        alt={service.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-heading font-semibold line-clamp-1">{service.name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {service.duration_minutes} min | ${service.price.toFixed(2)}
+                        {service.price_type === 'hourly' && '/hr'}
+                      </p>
+                      <Badge variant="outline" className="mt-2">
+                        {service.location_type === 'remote' ? 'Remote' : service.location_type === 'onsite' ? 'On-site' : 'Flexible'}
+                      </Badge>
+                      <div className="flex gap-2 mt-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditService(service)}
+                          data-testid={`edit-service-${service.id}`}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                        >
+                          <Link to={`/services/${service.id}`}>
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => handleDeleteService(service.id)}
+                          data-testid={`delete-service-${service.id}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-card rounded-xl border border-border">
+                <Briefcase className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+                <h3 className="font-heading font-semibold text-lg mb-2">No services yet</h3>
+                <p className="text-muted-foreground mb-4">Start offering your services to customers</p>
+                <Button onClick={() => setServiceDialogOpen(true)} className="rounded-full">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Your First Service
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+
           <TabsContent value="orders">
             {orders.length > 0 ? (
               <div className="space-y-4">
@@ -785,6 +855,67 @@ const VendorDashboard = () => {
                 <Package className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
                 <h3 className="font-heading font-semibold text-lg mb-2">No orders yet</h3>
                 <p className="text-muted-foreground">Orders will appear here when customers purchase your products</p>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="bookings">
+            {bookings.length > 0 ? (
+              <div className="space-y-4">
+                {bookings.map((booking) => (
+                  <div
+                    key={booking.id}
+                    className="bg-card rounded-xl p-6 border border-border"
+                    data-testid={`vendor-booking-${booking.id}`}
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="font-heading font-semibold">{booking.service_name}</span>
+                          <Badge>{booking.status}</Badge>
+                          <Badge variant="outline">{booking.payment_status}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Customer: {booking.customer_name}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {new Date(booking.booking_date).toLocaleDateString()} at {booking.booking_time}
+                        </p>
+                        {booking.delivery_confirmed && (
+                          <Badge className="mt-2 bg-green-100 text-green-800">Delivery Confirmed</Badge>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-4">
+                        <Select
+                          value={booking.status}
+                          onValueChange={(v) => handleUpdateBookingStatus(booking.id, v)}
+                          disabled={booking.status === 'completed' || booking.status === 'cancelled'}
+                        >
+                          <SelectTrigger className="w-[140px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="confirmed">Confirmed</SelectItem>
+                            <SelectItem value="in_progress">In Progress</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <span className="font-accent font-bold text-xl">
+                          ${booking.price.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-card rounded-xl border border-border">
+                <Calendar className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+                <h3 className="font-heading font-semibold text-lg mb-2">No bookings yet</h3>
+                <p className="text-muted-foreground">Bookings will appear here when customers book your services</p>
               </div>
             )}
           </TabsContent>
