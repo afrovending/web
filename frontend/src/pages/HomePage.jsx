@@ -49,10 +49,10 @@ const HomePage = () => {
             <span className="inline-block bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium mb-6">
               Africa's Global Marketplace
             </span>
-            <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-background leading-tight mb-6">
+            <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
               Discover Authentic African Treasures
             </h1>
-            <p className="text-background/80 text-lg md:text-xl leading-relaxed mb-8">
+            <p className="text-white/80 text-lg md:text-xl leading-relaxed mb-8">
               Connect with African artisans and vendors. Shop unique handcrafted products from across the continent, delivered to your doorstep.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
