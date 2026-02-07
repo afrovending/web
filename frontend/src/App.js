@@ -43,50 +43,39 @@ const AppContent = () => {
     <CartProvider>
       <div className="min-h-screen flex flex-col bg-background">
         <Routes>
-              {/* Auth pages without navbar */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              
-              {/* Main pages with navbar */}
-              <Route
-                path="*"
-                element={
-                  <>
-                    <Navbar />
-                    <main className="flex-1">
-                      <Routes>
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/products" element={<ProductsPage />} />
-                        <Route path="/products/:productId" element={<ProductDetailPage />} />
-                        <Route path="/cart" element={<CartPage />} />
-                        <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
-                        <Route path="/wishlist" element={<WishlistPage />} />
-                        <Route path="/dashboard" element={<UserDashboard />} />
-                        <Route path="/vendor/dashboard" element={<VendorDashboard />} />
-                        <Route path="/vendor/setup" element={<VendorSetupPage />} />
-                        <Route path="/admin" element={<AdminDashboard />} />
-                        <Route path="/vendors" element={<VendorsPage />} />
-                        <Route path="/vendors/:vendorId" element={<VendorPage />} />
-                      </Routes>
-                    </main>
-                    <Footer />
-                  </>
-                }
-              />
-            </Routes>
-            <Toaster 
-              position="top-right" 
-              richColors 
-              toastOptions={{
-                style: {
-                  fontFamily: 'Manrope, sans-serif'
-                }
-              }}
-            />
-          </div>
-        </CartProvider>
-      </Routes>
-    </div>
+          {/* Auth pages without navbar */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          
+          {/* Main pages with navbar */}
+          <Route
+            path="*"
+            element={
+              <>
+                <Navbar />
+                <main className="flex-1">
+                  <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/products" element={<ProductsPage />} />
+                    <Route path="/products/:productId" element={<ProductDetailPage />} />
+                    <Route path="/cart" element={<CartPage />} />
+                    <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+                    <Route path="/wishlist" element={<WishlistPage />} />
+                    <Route path="/dashboard" element={<UserDashboard />} />
+                    <Route path="/vendor/dashboard" element={<VendorDashboard />} />
+                    <Route path="/vendor/setup" element={<VendorSetupPage />} />
+                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/vendors" element={<VendorsPage />} />
+                    <Route path="/vendors/:vendorId" element={<VendorPage />} />
+                  </Routes>
+                </main>
+                <Footer />
+              </>
+            }
+          />
+        </Routes>
+      </div>
+    </CartProvider>
   );
 };
 
