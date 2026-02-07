@@ -152,6 +152,9 @@ const HomePage = () => {
                   </h3>
                   <p className="text-muted-foreground">Professional services from African providers</p>
                 </div>
+                <Link to="/services" className="text-primary font-medium hover:underline hidden sm:flex items-center gap-1">
+                  View All <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
               
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -160,7 +163,7 @@ const HomePage = () => {
                   .map((service) => (
                     <Link
                       key={service.id}
-                      to={`/products?category=${service.id}`}
+                      to={`/services?category=${service.id}`}
                       className="group bg-card rounded-xl p-4 border border-border hover:border-primary/50 hover:shadow-lg transition-all"
                       data-testid={`service-${service.id}`}
                     >
