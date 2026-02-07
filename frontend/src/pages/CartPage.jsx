@@ -12,8 +12,16 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const { cart, updateQuantity, removeFromCart, loading } = useCart();
+  const { cart, updateQuantity, removeFromCart, loading, fetchCart } = useCart();
   const { isAuthenticated } = useAuth();
+
+  const handleCouponApplied = () => {
+    fetchCart();
+  };
+
+  const handleCouponRemoved = () => {
+    fetchCart();
+  };
 
   const handleQuantityChange = async (itemId, newQuantity) => {
     try {
