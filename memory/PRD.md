@@ -14,11 +14,6 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Escrow Payment: Vendors only receive payout after customer confirms service delivery
 - Platform Fee: 10% commission on all sales
 
-## User Personas
-1. **Global Customer** - Browses products/services, creates bookings, confirms delivery
-2. **African Vendor** - Sells products and services, manages bookings, tracks payouts via Stripe Connect
-3. **Platform Admin** - Manages vendors, approves new sellers, monitors platform
-
 ## Architecture
 - **Frontend**: React 19 + Tailwind CSS + Shadcn UI
 - **Backend**: FastAPI (Python)
@@ -30,37 +25,68 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 
 ## What's Been Implemented (Feb 7, 2026)
 
-### Backend API Endpoints
+### Core Features
+1. **User Authentication** - Register, Login, JWT tokens
+2. **Product Management** - CRUD with advanced filtering
+3. **Service Marketplace** - Booking system with calendar
+4. **Shopping Cart** - With variant support
+5. **Wishlist** - Save favorite products
+6. **Order Management** - With tracking timeline
+7. **Reviews & Ratings** - For products and services
+8. **Vendor Dashboard** - Manage products, services, orders, bookings, payouts
+9. **Admin Dashboard** - Manage vendors, users, orders
+
+### Advanced Features
+1. **Advanced Search & Filtering** - Multi-category, price range, rating, sort options
+2. **Unified Search API** - Search products and services together
+3. **Search Suggestions** - Autocomplete functionality
+4. **Product Variants** (NEW) - Size, color options with individual pricing/stock
+5. **Stripe Connect** - Vendor payout system
+6. **Email Notifications** - SendGrid integration
+7. **Image Upload** - Local file storage
+8. **Order/Booking Tracking** - Timeline view with status updates
+
+### Product Variants Feature (NEW)
+- **Variant Options**: Products can have Size, Color, or custom options
+- **Individual Pricing**: Each variant can have its own price
+- **Stock Management**: Each variant has its own stock count
+- **SKU Support**: Each variant can have a unique SKU
+- **Visual Selectors**: Size buttons, color swatches
+- **Out of Stock Handling**: Disabled variants with visual indicators
+- **Cart Integration**: Cart displays selected variant options
+
+### API Endpoints
 
 #### Authentication
 - POST /api/auth/register
 - POST /api/auth/login
 
-#### Products
-- GET/POST /api/products (with advanced filtering)
+#### Products (with Variants)
+- GET/POST /api/products
 - GET/PUT/DELETE /api/products/:id
-- GET /api/products/featured
+
+#### Search
+- GET /api/search - Unified search
+- GET /api/search/suggestions - Autocomplete
 
 #### Services
-- GET/POST /api/services (with advanced filtering)
+- GET/POST /api/services
 - GET/PUT/DELETE /api/services/:id
-- GET /api/services/featured
-
-#### Search (NEW)
-- GET /api/search - Unified search for products and services
-- GET /api/search/suggestions - Autocomplete suggestions
 
 #### Bookings
 - GET/POST /api/bookings
-- GET /api/bookings/:id
 - PUT /api/bookings/:id/status
 - PUT /api/bookings/:id/confirm-delivery
+
+#### Cart
+- GET /api/cart
+- POST /api/cart/items (supports variant_id, selected_options)
+- PUT/DELETE /api/cart/items/:id
 
 #### Vendor Payouts
 - GET /api/vendor/payout/summary
 - GET /api/vendor/payout/transactions
 - POST /api/vendor/stripe/connect
-- GET /api/vendor/stripe/status
 - POST /api/vendor/payout/request
 
 #### Tracking
@@ -69,67 +95,28 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 
 #### Upload
 - POST /api/upload/image
-- GET /api/uploads/:filename
-
-#### Admin
-- GET /api/admin/vendors
-- PUT /api/vendors/:id/approve
-- GET /api/admin/users
-- GET /api/admin/orders
-
-### Frontend Features
-
-#### Pages
-- Homepage with logo, hero, categories, featured sections
-- **Products page with advanced filtering** (NEW)
-  - Search input
-  - Sort by (Newest, Price Low/High, Rating, Name)
-  - Category multi-select filter
-  - Price range slider
-  - Rating filter
-  - In Stock filter
-  - Grid/List view toggle
-  - Clear all filters button
-  - URL persistence for shareable links
-- **Services page with advanced filtering** (NEW)
-  - All product filters plus Location Type filter (In Person, Remote, Both)
-- Service detail page with booking calendar
-- Booking detail page with Pay button and Confirm Delivery
-- User dashboard with Bookings tab
-- Vendor dashboard with Products, Services, Orders, Bookings, Payouts tabs
-- Vendor Payout Dashboard (Stripe Connect integration)
-- Admin dashboard
-- Tracking page with timeline
-- Cart, Wishlist, Checkout pages
-
-#### Components
-- SearchFilters - Reusable filter sidebar component
-- ImageUpload - Image upload with preview
-- PayoutDashboard - Vendor earnings and payout management
-- ProductCard, ServiceCard
-
-### Email Notifications (SendGrid)
-- New booking notification to vendor
-- Booking status update to customer
-- Payment released notification to vendor
-- Order status update to customer
 
 ## Test Accounts
 - Admin: admin@example.com / password123
-- Vendor (Approved): vendor@afrovending.com / password123
+- Vendor: vendor@afrovending.com / password123
 - Customer: testuser123@example.com / password123
 
+## Test Data
+- **Product with Variants**: "African Ankara Dress" (ID: 41db2e79-2497-4cc4-a182-bd9c56e79451)
+  - Sizes: S, M, L, XL
+  - Colors: Red, Blue, Green, Yellow
+  - Different prices per size tier
+
 ## Testing Status (Feb 7, 2026)
-- Backend: 100% (31/31 tests passed)
+- Backend: 100% (all tests passed)
 - Frontend: 100% (all features working)
-- Advanced Search: Fully tested and functional
+- Product Variants: 100% (14/14 backend, 11/11 frontend tests)
 
 ## Prioritized Backlog
 
 ### P1 (High Priority)
 - PayPal payment integration
 - Cloud storage for images (AWS S3)
-- Product variants (size, color)
 
 ### P2 (Nice to Have)
 - Social login (Google, Facebook)
@@ -137,31 +124,30 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Coupon/discount system
 - Analytics dashboard for vendors
 
-## Search Filter Parameters
+## Variant Data Structure
 
-### Products (/api/products)
-- search: Full-text search on name, description, tags
-- category_ids: Comma-separated category IDs
-- vendor_id: Filter by vendor
-- min_price, max_price: Price range
-- min_rating: Minimum rating (1-5)
-- in_stock: Boolean, filter to in-stock items
-- tags: Comma-separated tags
-- sort_by: created_at, price, average_rating, name
-- sort_order: asc, desc
-
-### Services (/api/services)
-- All product filters plus:
-- location_type: in_person, remote, both
-- min_duration, max_duration: Duration range
-
-### Unified Search (/api/search)
-- q: Search query
-- type: products, services, or both
-- All other product/service filters
+```json
+{
+  "has_variants": true,
+  "variant_options": [
+    {"name": "Size", "values": ["S", "M", "L", "XL"]},
+    {"name": "Color", "values": ["Red", "Blue", "Green"]}
+  ],
+  "variants": [
+    {
+      "id": "uuid",
+      "sku": "ANK-M-RED",
+      "options": {"Size": "M", "Color": "Red"},
+      "price": 89.99,
+      "stock": 8,
+      "image": "optional-variant-image-url"
+    }
+  ]
+}
+```
 
 ## Next Tasks
 1. Implement PayPal checkout flow
 2. Add cloud storage for images (S3)
-3. Create product variants support (size, color)
-4. Build analytics dashboard for vendors
+3. Build social login (Google OAuth)
+4. Create coupon/discount system
