@@ -264,28 +264,47 @@ const ProductDetailPage = () => {
               </span>
             </div>
 
-            {/* Price */}
-            <div className="flex items-center gap-4">
-              <span className="font-accent text-4xl font-bold text-foreground" data-testid="product-price">
-                ${product.price.toFixed(2)}
-              </span>
-              {product.compare_price && (
-                <span className="text-xl text-muted-foreground line-through">
-                  ${product.compare_price.toFixed(2)}
+            {/* Price - Show base price if no variants or no variant selected */}
+            {(!product.has_variants || !selectedVariant) && (
+              <div className="flex items-center gap-4">
+                <span className="font-accent text-4xl font-bold text-foreground" data-testid="product-price">
+                  ${product.price.toFixed(2)}
                 </span>
-              )}
-            </div>
+                {product.compare_price && (
+                  <span className="text-xl text-muted-foreground line-through">
+                    ${product.compare_price.toFixed(2)}
+                  </span>
+                )}
+                {product.compare_price && product.compare_price > product.price && (
+                  <Badge className="bg-primary">
+                    {Math.round((1 - product.price / product.compare_price) * 100)}% OFF
+                  </Badge>
+                )}
+              </div>
+            )}
 
             {/* Description */}
             <p className="text-muted-foreground leading-relaxed">{product.description}</p>
 
-            {/* Stock */}
-            <div className="flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${product.stock > 0 ? 'bg-secondary' : 'bg-destructive'}`} />
-              <span className="text-sm">
-                {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
-              </span>
-            </div>
+            {/* Variant Selector */}
+            {product.has_variants && product.variant_options?.length > 0 && (
+              <VariantSelector
+                product={product}
+                onVariantSelect={handleVariantSelect}
+                selectedOptions={selectedOptions}
+                className="py-4 border-y border-border"
+              />
+            )}
+
+            {/* Stock - Show based on variant or product */}
+            {!product.has_variants && (
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${product.stock > 0 ? 'bg-secondary' : 'bg-destructive'}`} />
+                <span className="text-sm">
+                  {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                </span>
+              </div>
+            )}
 
             {/* Quantity & Add to Cart */}
             <div className="flex flex-col sm:flex-row gap-4">
