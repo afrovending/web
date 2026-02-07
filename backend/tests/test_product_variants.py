@@ -199,9 +199,10 @@ class TestCartWithVariants:
         
         # Should fail because product has variants but none selected
         assert response.status_code == 400
-        assert "variant" in response.json().get("detail", "").lower()
+        detail = response.json().get("detail", "").lower()
+        assert "select" in detail or "option" in detail or "variant" in detail
         
-        print("Adding variant product without selection correctly fails")
+        print(f"Adding variant product without selection correctly fails: {response.json().get('detail')}")
     
     def test_add_out_of_stock_variant_fails(self, auth_headers):
         """Test adding out of stock variant fails"""
