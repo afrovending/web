@@ -256,6 +256,145 @@ const UserDashboard = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="bookings">
+            {loading ? (
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="bg-card rounded-xl p-6 animate-pulse">
+                    <div className="flex gap-4">
+                      <div className="h-20 w-20 bg-muted rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-5 bg-muted rounded w-1/3" />
+                        <div className="h-4 bg-muted rounded w-1/2" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : bookings.length > 0 ? (
+              <div className="space-y-4">
+                {bookings.map((booking) => {
+                  const canConfirmDelivery = booking.payment_status === 'paid' && !booking.delivery_confirmed && booking.status !== 'cancelled';
+                  
+                  return (
+                    <div
+                      key={booking.id}
+                      className="bg-card rounded-xl p-6 border border-border"
+                      data-testid={`booking-${booking.id}`}
+                    >
+                      <div className="flex flex-col md:flex-row gap-4">
+                        {/* Service Image */}
+                        <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                          <img
+                            src={booking.service_image || 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=200'}
+                            alt={booking.service_name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        
+                        {/* Booking Info */}
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <Link 
+                                to={`/bookings/${booking.id}`}
+                                className="font-heading font-semibold text-lg hover:text-primary transition-colors"
+                              >
+                                {booking.service_name}
+                              </Link>
+                              <p className="text-sm text-muted-foreground">by {booking.vendor_name}</p>
+                            </div>
+                            <span className="font-accent font-bold text-xl">
+                              ${booking.price.toFixed(2)}
+                            </span>
+                          </div>
+                          
+                          <div className="flex flex-wrap items-center gap-2 mt-2">
+                            <Badge className={getStatusColor(booking.status)}>{booking.status}</Badge>
+                            <Badge className={getPaymentStatusColor(booking.payment_status)}>
+                              {booking.payment_status}
+                            </Badge>
+                            {booking.delivery_confirmed && (
+                              <Badge className="bg-green-100 text-green-800">
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Delivered
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              {new Date(booking.booking_date).toLocaleDateString()}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              {booking.booking_time} ({booking.duration_minutes} min)
+                            </span>
+                          </div>
+                          
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-3 mt-4">
+                            {canConfirmDelivery && (
+                              <Button
+                                size="sm"
+                                className="rounded-full bg-green-600 hover:bg-green-700"
+                                onClick={() => handleConfirmDelivery(booking.id)}
+                                disabled={confirmingDelivery === booking.id}
+                                data-testid={`confirm-delivery-${booking.id}`}
+                              >
+                                {confirmingDelivery === booking.id ? (
+                                  <>
+                                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                    Confirming...
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle className="h-4 w-4 mr-1" />
+                                    Confirm Delivery
+                                  </>
+                                )}
+                              </Button>
+                            )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="rounded-full"
+                              asChild
+                            >
+                              <Link to={`/bookings/${booking.id}`}>
+                                View Details
+                                <ChevronRight className="h-4 w-4 ml-1" />
+                              </Link>
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Escrow Info Box */}
+                      {booking.payment_status === 'paid' && !booking.delivery_confirmed && (
+                        <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <p className="text-sm text-blue-700">
+                            <strong>Payment held securely.</strong> Click "Confirm Delivery" after the service is completed to release payment to the vendor.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-card rounded-xl border border-border">
+                <Calendar className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+                <h3 className="font-heading font-semibold text-lg mb-2">No bookings yet</h3>
+                <p className="text-muted-foreground mb-4">Book services from African providers</p>
+                <Button asChild className="rounded-full">
+                  <Link to="/services">Browse Services</Link>
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+
           <TabsContent value="profile">
             <div className="bg-card rounded-xl p-6 border border-border">
               <h3 className="font-heading font-semibold text-lg mb-6">Profile Information</h3>
