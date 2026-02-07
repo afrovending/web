@@ -202,6 +202,8 @@ class CartItemResponse(BaseModel):
 class CartResponse(BaseModel):
     items: List[CartItemResponse]
     subtotal: float
+    discount: float = 0.0
+    discount_code: Optional[str] = None
     total: float
 
 class WishlistItemResponse(BaseModel):
