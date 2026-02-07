@@ -182,6 +182,8 @@ class VendorResponse(VendorBase):
 class CartItemBase(BaseModel):
     product_id: str
     quantity: int = 1
+    variant_id: Optional[str] = None  # Selected variant ID
+    selected_options: Optional[Dict[str, str]] = None  # e.g., {"Size": "M", "Color": "Red"}
 
 class CartItemResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -193,6 +195,9 @@ class CartItemResponse(BaseModel):
     quantity: int
     vendor_id: str
     vendor_name: str
+    variant_id: Optional[str] = None
+    selected_options: Optional[Dict[str, str]] = None
+    variant_sku: Optional[str] = None
 
 class CartResponse(BaseModel):
     items: List[CartItemResponse]
