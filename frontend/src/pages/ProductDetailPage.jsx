@@ -85,13 +85,32 @@ const ProductDetailPage = () => {
       return;
     }
     
+    // Check if product has variants and user hasn't selected one
+    if (product.has_variants && product.variants?.length > 0 && !selectedVariant) {
+      toast.error('Please select product options');
+      return;
+    }
+    
     try {
-      await addToCart(product.id, quantity);
+      await addToCart(product.id, quantity, selectedVariant?.id, selectedOptions);
       toast.success(`Added ${quantity} item(s) to cart`);
     } catch (error) {
-      toast.error('Failed to add to cart');
+      toast.error(error.response?.data?.detail || 'Failed to add to cart');
     }
   };
+
+  const handleVariantSelect = useCallback((variant, options) => {
+    setSelectedVariant(variant);
+    setSelectedOptions(options);
+    
+    // If variant has a specific image, show it
+    if (variant?.image && product?.images) {
+      const variantImageIndex = product.images.indexOf(variant.image);
+      if (variantImageIndex >= 0) {
+        setSelectedImage(variantImageIndex);
+      }
+    }
+  }, [product?.images]);
 
   const handleAddToWishlist = async () => {
     if (!isAuthenticated) {
