@@ -206,7 +206,7 @@ const VendorDashboard = () => {
       location_type: serviceForm.location_type,
       location_address: serviceForm.location_address || null,
       category_id: serviceForm.category_id,
-      images: serviceForm.images.split(',').map(s => s.trim()).filter(Boolean),
+      images: serviceForm.images,
       tags: serviceForm.tags.split(',').map(s => s.trim()).filter(Boolean)
     };
     
@@ -233,7 +233,7 @@ const VendorDashboard = () => {
         location_type: 'both',
         location_address: '',
         category_id: '',
-        images: '',
+        images: [],
         tags: ''
       });
     } catch (error) {
@@ -252,7 +252,7 @@ const VendorDashboard = () => {
       location_type: service.location_type,
       location_address: service.location_address || '',
       category_id: service.category_id,
-      images: service.images?.join(', ') || '',
+      images: service.images || [],
       tags: service.tags?.join(', ') || ''
     });
     setServiceDialogOpen(true);
