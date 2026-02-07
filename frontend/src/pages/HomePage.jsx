@@ -71,7 +71,7 @@ const HomePage = () => {
                 asChild
                 variant="outline"
                 size="lg"
-                className="rounded-full px-8 py-6 text-lg font-semibold border-2 border-background text-background hover:bg-background/10"
+                className="rounded-full px-8 py-6 text-lg font-semibold border-2 border-white text-white hover:bg-white/10"
                 data-testid="hero-vendor-btn"
               >
                 <Link to="/register?vendor=true">Become a Vendor</Link>
