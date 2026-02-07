@@ -1623,7 +1623,41 @@ async def add_to_cart(item: CartItemBase, user: dict = Depends(get_current_user)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     
-    existing = await db.cart_items.find_one({"user_id": user["id"], "product_id": item.product_id})
+    # Handle variant selection
+    variant_id = item.variant_id
+    selected_options = item.selected_options
+    
+    if product.get("has_variants") and product.get("variants"):
+        if not variant_id and not selected_options:
+            raise HTTPException(status_code=400, detail="Please select product options")
+        
+        # Find the variant
+        variant = None
+        if variant_id:
+            variant = next((v for v in product["variants"] if v["id"] == variant_id), None)
+        elif selected_options:
+            variant = next(
+                (v for v in product["variants"] if v.get("options") == selected_options),
+                None
+            )
+        
+        if not variant:
+            raise HTTPException(status_code=400, detail="Selected variant not found")
+        
+        if variant.get("stock", 0) < item.quantity:
+            raise HTTPException(status_code=400, detail="Not enough stock for selected variant")
+        
+        variant_id = variant["id"]
+        selected_options = variant.get("options", {})
+    
+    # Check for existing cart item with same product AND variant
+    query = {"user_id": user["id"], "product_id": item.product_id}
+    if variant_id:
+        query["variant_id"] = variant_id
+    else:
+        query["variant_id"] = None
+    
+    existing = await db.cart_items.find_one(query)
     
     if existing:
         new_qty = existing["quantity"] + item.quantity
@@ -1633,7 +1667,9 @@ async def add_to_cart(item: CartItemBase, user: dict = Depends(get_current_user)
             "id": str(uuid.uuid4()),
             "user_id": user["id"],
             "product_id": item.product_id,
-            "quantity": item.quantity
+            "quantity": item.quantity,
+            "variant_id": variant_id,
+            "selected_options": selected_options
         }
         await db.cart_items.insert_one(cart_item)
     
