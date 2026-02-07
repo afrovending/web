@@ -39,7 +39,7 @@ const VendorDashboard = () => {
     compare_price: '',
     category_id: '',
     stock: '',
-    images: '',
+    images: [],
     tags: ''
   });
   
@@ -55,7 +55,7 @@ const VendorDashboard = () => {
     location_type: 'both',
     location_address: '',
     category_id: '',
-    images: '',
+    images: [],
     tags: ''
   });
 
