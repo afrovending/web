@@ -77,6 +77,8 @@ const AppContent = () => {
                     <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
                     <Route path="/bookings/:bookingId" element={<BookingDetailPage />} />
                     <Route path="/bookings/:bookingId/success" element={<BookingSuccessPage />} />
+                    <Route path="/tracking" element={<TrackingPage />} />
+                    <Route path="/tracking/:itemType/:itemId" element={<TrackingDetailPage />} />
                   </Routes>
                 </main>
                 <Footer />
