@@ -1134,7 +1134,7 @@ async def update_booking_status(booking_id: str, status_update: BookingStatusUpd
     return {"message": "Booking status updated"}
 
 @api_router.put("/bookings/{booking_id}/confirm-delivery")
-async def confirm_service_delivery(booking_id: str, user: dict = Depends(get_current_user)):
+async def confirm_service_delivery(booking_id: str, background_tasks: BackgroundTasks, user: dict = Depends(get_current_user)):
     """Customer confirms that the service was delivered - releases payment to vendor"""
     booking = await db.bookings.find_one({"id": booking_id}, {"_id": 0})
     if not booking:
@@ -1165,6 +1165,18 @@ async def confirm_service_delivery(booking_id: str, user: dict = Depends(get_cur
         {"id": booking["vendor_id"]},
         {"$inc": {"pending_payout": booking["price"], "total_sales": booking["price"]}}
     )
+    
+    # Send payment released email to vendor
+    vendor = await db.vendors.find_one({"id": booking["vendor_id"]}, {"_id": 0})
+    if vendor:
+        vendor_user = await db.users.find_one({"id": vendor["user_id"]}, {"_id": 0})
+        if vendor_user:
+            background_tasks.add_task(
+                send_payment_released_email,
+                vendor_user["email"],
+                vendor.get("store_name", "Vendor"),
+                booking
+            )
     
     return {"message": "Delivery confirmed. Payment released to vendor."}
 
