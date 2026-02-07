@@ -323,8 +323,11 @@ const ProductDetailPage = () => {
                   variant="ghost"
                   size="icon"
                   className="rounded-full"
-                  onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                  disabled={quantity >= product.stock}
+                  onClick={() => {
+                    const maxStock = selectedVariant?.stock ?? product.stock;
+                    setQuantity(Math.min(maxStock, quantity + 1));
+                  }}
+                  disabled={quantity >= (selectedVariant?.stock ?? product.stock)}
                   data-testid="qty-increase"
                 >
                   <Plus className="h-4 w-4" />
@@ -335,11 +338,14 @@ const ProductDetailPage = () => {
                 size="lg"
                 className="rounded-full flex-1 sm:flex-initial px-8"
                 onClick={handleAddToCart}
-                disabled={product.stock === 0}
+                disabled={
+                  (product.has_variants && product.variants?.length > 0 && !selectedVariant) ||
+                  (selectedVariant ? selectedVariant.stock === 0 : product.stock === 0)
+                }
                 data-testid="add-to-cart-btn"
               >
                 <ShoppingCart className="h-5 w-5 mr-2" />
-                Add to Cart
+                {product.has_variants && !selectedVariant ? 'Select Options' : 'Add to Cart'}
               </Button>
               
               <Button
