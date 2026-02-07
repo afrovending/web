@@ -2002,7 +2002,7 @@ async def get_vendor_payout_transactions(user: dict = Depends(require_vendor), l
             id=payout["id"],
             type="payout",
             amount=-payout["amount"],
-            description=f"Payout to Stripe account",
+            description="Payout to Stripe account",
             status=payout["status"],
             created_at=payout.get("created_at", datetime.now(timezone.utc).isoformat())
         ))
