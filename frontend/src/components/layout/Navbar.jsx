@@ -207,6 +207,13 @@ const Navbar = () => {
                 All Products
               </Link>
               <Link
+                to="/services"
+                className="px-4 py-2 hover:bg-muted rounded-lg transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Services
+              </Link>
+              <Link
                 to="/vendors"
                 className="px-4 py-2 hover:bg-muted rounded-lg transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
