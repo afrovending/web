@@ -1602,18 +1602,37 @@ async def get_cart(user: dict = Depends(get_current_user)):
         product = await db.products.find_one({"id": item["product_id"]}, {"_id": 0})
         if product:
             vendor = await db.vendors.find_one({"id": product.get("vendor_id")}, {"_id": 0, "store_name": 1})
+            
+            # Determine price based on variant
+            price = product["price"]
+            variant_sku = None
+            product_image = product["images"][0] if product.get("images") else ""
+            
+            if item.get("variant_id") and product.get("variants"):
+                variant = next((v for v in product["variants"] if v["id"] == item["variant_id"]), None)
+                if variant:
+                    if variant.get("price") is not None:
+                        price = variant["price"]
+                    if variant.get("sku"):
+                        variant_sku = variant["sku"]
+                    if variant.get("image"):
+                        product_image = variant["image"]
+            
             item_response = CartItemResponse(
                 id=item["id"],
                 product_id=product["id"],
                 product_name=product["name"],
-                product_image=product["images"][0] if product.get("images") else "",
-                price=product["price"],
+                product_image=product_image,
+                price=price,
                 quantity=item["quantity"],
                 vendor_id=product.get("vendor_id", ""),
-                vendor_name=vendor.get("store_name") if vendor else "Unknown"
+                vendor_name=vendor.get("store_name") if vendor else "Unknown",
+                variant_id=item.get("variant_id"),
+                selected_options=item.get("selected_options"),
+                variant_sku=variant_sku
             )
             items.append(item_response)
-            subtotal += product["price"] * item["quantity"]
+            subtotal += price * item["quantity"]
     
     return CartResponse(items=items, subtotal=round(subtotal, 2), total=round(subtotal, 2))
 
