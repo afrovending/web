@@ -178,7 +178,28 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 ```
 
 ## Next Tasks
-1. Implement PayPal checkout flow
-2. Add cloud storage for images (S3)
-3. Build social login (Google OAuth)
-4. Create coupon/discount system
+1. Implement Google Social Login (Emergent-managed OAuth)
+2. Implement PayPal checkout flow
+3. Add cloud storage for images (S3)
+4. Refactor server.py into modular structure
+
+## Coupon Data Structure
+
+```json
+{
+  "id": "uuid",
+  "code": "SAVE20",
+  "discount_type": "percentage",  // or "fixed"
+  "discount_value": 20,
+  "min_order_amount": 0,
+  "max_discount": null,
+  "max_uses": null,
+  "max_uses_per_user": 1,
+  "used_count": 0,
+  "start_date": "2026-02-08T00:00:00Z",
+  "expiry_date": "2026-12-31T23:59:59Z",
+  "is_active": true,
+  "vendor_id": null,  // null = platform-wide
+  "created_at": "2026-02-08T00:00:00Z"
+}
+```
