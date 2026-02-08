@@ -262,7 +262,7 @@ const UserDashboard = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="orders" className="space-y-6">
-          <TabsList className="bg-muted/50 rounded-full p-1">
+          <TabsList className="bg-muted/50 rounded-full p-1 flex-wrap">
             <TabsTrigger value="orders" className="rounded-full" data-testid="tab-orders">
               <Package className="h-4 w-4 mr-2" />
               Orders
@@ -270,6 +270,10 @@ const UserDashboard = () => {
             <TabsTrigger value="bookings" className="rounded-full" data-testid="tab-bookings">
               <Calendar className="h-4 w-4 mr-2" />
               Bookings
+            </TabsTrigger>
+            <TabsTrigger value="addresses" className="rounded-full" data-testid="tab-addresses">
+              <MapPin className="h-4 w-4 mr-2" />
+              Addresses
             </TabsTrigger>
             <TabsTrigger value="profile" className="rounded-full" data-testid="tab-profile">
               <User className="h-4 w-4 mr-2" />
