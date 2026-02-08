@@ -4,7 +4,7 @@
 Create a full e-commerce platform for Afrovending.com - an online marketplace for African Vendors to sell their products AND SERVICES to global customers.
 
 ## User Choices
-- Payment Integration: Stripe (live key configured) + Stripe Connect for vendor payouts
+- Payment Integration: Stripe + PayPal (both configured) + Stripe Connect for vendor payouts
 - Email Notifications: SendGrid (verified sender: info@afrovending.com)
 - User Features: Full functionality (accounts, order history, wishlist, reviews)
 - Admin Dashboard: Yes
@@ -18,7 +18,7 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - **Frontend**: React 19 + Tailwind CSS + Shadcn UI
 - **Backend**: FastAPI (Python)
 - **Database**: MongoDB
-- **Payment**: Stripe Checkout API + Stripe Connect
+- **Payment**: Stripe Checkout API + Stripe Connect + PayPal REST API
 - **Email**: SendGrid API
 - **File Storage**: Local uploads (/app/backend/uploads/)
 - **Deployment**: Kubernetes container with Nginx proxy
@@ -102,6 +102,24 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
   - Booking Notifications toggle
   - Marketing & Tips toggle
 - **Scheduler Endpoint**: POST /api/analytics/send-all-weekly-reports (requires API key)
+
+### PayPal Payment Integration (NEW - Feb 8, 2026)
+- **Sandbox Mode**: Currently configured for PayPal sandbox testing
+- **Checkout Flow**:
+  - Customer clicks "Pay with PayPal" on cart page
+  - Creates PayPal order via REST API
+  - Redirects to PayPal approval page
+  - On success, redirects to /checkout/paypal/success to capture payment
+  - On cancel, redirects to /checkout/paypal/cancel
+- **API Endpoints**:
+  - POST /api/checkout/paypal - Create PayPal order
+  - POST /api/checkout/paypal/capture - Capture payment after approval
+  - GET /api/checkout/paypal/status/:order_id - Check order status
+- **Frontend Pages**:
+  - CartPage.jsx - "Pay with PayPal" button alongside Stripe
+  - PayPalSuccessPage.jsx - Handles payment capture and success confirmation
+  - PayPalCancelPage.jsx - Shows cancellation message
+- **Database**: Uses payment_transactions collection with sparse unique index on session_id
 
 ### Verified Seller Badge (NEW - Feb 8, 2026)
 - **Eligibility**: Growth, Pro, and Enterprise subscription plans
@@ -223,14 +241,17 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Vendor Analytics: 100% (17/17 backend, all frontend features working)
 - Weekly Email Reports: 100% (15/15 backend, all frontend features working)
 - Verified Seller Badge: 100% (15/15 backend, all frontend displays working)
+- PayPal Integration: 100% (backend endpoints working, frontend UI integrated)
 
 ## Prioritized Backlog
 
+### P0 (Critical)
+- Cloud storage for images (AWS S3) - replace local storage (non-persistent)
+- Refactor server.py into modular APIRouters (4600+ lines)
+
 ### P1 (High Priority)
-- PayPal payment integration (original requirement)
-- Cloud storage for images (AWS S3) - replace local storage
 - Google Social Login integration
-- Refactor server.py into modular APIRouters
+- Admin Analytics Dashboard - platform-wide insights
 
 ### P2 (Nice to Have)
 - Multiple shipping addresses
