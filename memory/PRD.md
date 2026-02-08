@@ -155,12 +155,10 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 
 ## Prioritized Backlog
 
-### P0 (Immediate - Next Session)
-- Google Social Login integration (user requested)
-
 ### P1 (High Priority)
 - PayPal payment integration (original requirement)
 - Cloud storage for images (AWS S3) - replace local storage
+- Google Social Login integration
 
 ### P2 (Nice to Have)
 - Multiple shipping addresses
@@ -168,14 +166,37 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Enhanced review/rating UI for services
 
 ## Technical Debt
-- **server.py refactoring**: File is over 2900 lines and should be split into modular APIRouters
+- **server.py refactoring**: File is over 3400 lines and should be split into modular APIRouters
 - **Image persistence**: Currently uses local /app/backend/uploads/ which is lost on redeployment
 
 ## Next Tasks
-1. Implement Google Social Login (Emergent-managed OAuth)
-2. Implement PayPal checkout flow
-3. Add cloud storage for images (S3)
+1. Implement PayPal checkout flow
+2. Add cloud storage for images (S3)
+3. Implement Google Social Login (Emergent-managed OAuth)
 4. Refactor server.py into modular structure
+
+## Subscription Plans Data Structure
+
+```json
+{
+  "id": "growth",
+  "name": "Growth",
+  "price_monthly": 25,
+  "price_yearly": 250,
+  "commission_rate": 15,
+  "product_limit": 50,
+  "features": [
+    "Up to 50 products",
+    "Boosted category visibility",
+    "Basic sales & traffic analytics",
+    "Priority email support",
+    "Verified Seller badge"
+  ],
+  "stripe_price_id_monthly": null,
+  "stripe_price_id_yearly": null,
+  "is_custom": false
+}
+```
 
 ## Variant Data Structure
 
