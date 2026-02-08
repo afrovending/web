@@ -60,16 +60,26 @@ const VendorsPage = () => {
                 className="group bg-card rounded-xl p-6 border border-border hover:border-primary/30 transition-all hover:shadow-lg text-center"
                 data-testid={`vendor-${vendor.id}`}
               >
-                <div className="w-24 h-24 rounded-full bg-muted overflow-hidden mx-auto mb-4">
+                <div className="relative w-24 h-24 rounded-full bg-muted overflow-hidden mx-auto mb-4">
                   <img
                     src={vendor.logo_url || 'https://images.unsplash.com/photo-1687422808565-929533931584?w=200'}
                     alt={vendor.store_name}
                     className="w-full h-full object-cover"
                   />
+                  {vendor.is_verified_seller && (
+                    <div className="absolute -bottom-1 -right-1 bg-blue-500 text-white p-1.5 rounded-full" title="Verified Seller">
+                      <BadgeCheck className="h-4 w-4" />
+                    </div>
+                  )}
                 </div>
-                <h3 className="font-heading font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
-                  {vendor.store_name}
-                </h3>
+                <div className="flex items-center justify-center gap-1">
+                  <h3 className="font-heading font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+                    {vendor.store_name}
+                  </h3>
+                  {vendor.is_verified_seller && (
+                    <BadgeCheck className="h-4 w-4 text-blue-500" />
+                  )}
+                </div>
                 {(vendor.city || vendor.country) && (
                   <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mt-2">
                     <MapPin className="h-4 w-4" />
