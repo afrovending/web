@@ -380,6 +380,117 @@ const SubscriptionManagement = () => {
           </CardFooter>
         </Card>
       )}
+
+      {/* Email Preferences */}
+      {emailPreferences && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              Email Preferences
+            </CardTitle>
+            <CardDescription>
+              Manage your email notification settings
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Weekly Analytics Report - only show for Growth+ */}
+            {!isFreePlan && (
+              <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <Label htmlFor="weekly-report" className="text-base font-medium">
+                      Weekly Analytics Report
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Receive a detailed performance summary every Friday
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  id="weekly-report"
+                  checked={emailPreferences.weekly_analytics_report}
+                  onCheckedChange={(checked) => updateEmailPreference('weekly_analytics_report', checked)}
+                  disabled={updatingPrefs}
+                  data-testid="weekly-report-toggle"
+                />
+              </div>
+            )}
+
+            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Bell className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <Label htmlFor="order-notifications" className="text-base font-medium">
+                    Order Notifications
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Get notified when you receive new orders
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="order-notifications"
+                checked={emailPreferences.order_notifications}
+                onCheckedChange={(checked) => updateEmailPreference('order_notifications', checked)}
+                disabled={updatingPrefs}
+                data-testid="order-notifications-toggle"
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Calendar className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <Label htmlFor="booking-notifications" className="text-base font-medium">
+                    Booking Notifications
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Get notified when customers book your services
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="booking-notifications"
+                checked={emailPreferences.booking_notifications}
+                onCheckedChange={(checked) => updateEmailPreference('booking_notifications', checked)}
+                disabled={updatingPrefs}
+                data-testid="booking-notifications-toggle"
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Mail className="h-5 w-5 text-purple-600" />
+                </div>
+                <div>
+                  <Label htmlFor="marketing-emails" className="text-base font-medium">
+                    Marketing & Tips
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive tips to grow your business and platform updates
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="marketing-emails"
+                checked={emailPreferences.marketing_emails}
+                onCheckedChange={(checked) => updateEmailPreference('marketing_emails', checked)}
+                disabled={updatingPrefs}
+                data-testid="marketing-emails-toggle"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
