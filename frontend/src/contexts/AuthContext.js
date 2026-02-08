@@ -11,21 +11,36 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Configure axios to send cookies
+    axios.defaults.withCredentials = true;
+    
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      fetchUser();
-    } else {
-      setLoading(false);
+    }
+    
+    // Always try to fetch user (may have session cookie from Google OAuth)
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
   }, [token]);
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get(`${API}/auth/me`);
+      const response = await axios.get(`${API}/auth/me`, { withCredentials: true });
       setUser(response.data);
+      
+      // If we have a user from Google OAuth but no local token, that's fine
+      // The session cookie handles authentication
     } catch (error) {
       console.error('Failed to fetch user:', error);
-      logout();
+      // Only clear token if it exists and is invalid
+      if (token) {
+        logout();
+      }
     } finally {
       setLoading(false);
     }
@@ -44,25 +59,60 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
+  // Google OAuth login - redirect to Emergent Auth
+  const loginWithGoogle = () => {
+    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
+    const redirectUrl = window.location.origin + '/auth/callback';
+    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+  };
+
+  // Process Google OAuth callback
+  const processGoogleCallback = async (sessionId) => {
+    try {
+      const response = await axios.post(`${API}/auth/google/session`, 
+        { session_id: sessionId },
+        { withCredentials: true }
+      );
+      
+      const { access_token, user: userData } = response.data;
+      
+      if (access_token) {
+        localStorage.setItem('afrovending_token', access_token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+        setToken(access_token);
+      }
+      
+      setUser(userData);
+      return userData;
+    } catch (error) {
+      console.error('Google OAuth callback failed:', error);
+      throw error;
+    }
+  };
+
   const register = async (userData) => {
     const response = await axios.post(`${API}/auth/register`, userData);
     const { access_token, user: newUser } = response.data;
     
-    // Set token in localStorage and axios headers synchronously
     localStorage.setItem('afrovending_token', access_token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
     
-    // Update state
     setToken(access_token);
     setUser(newUser);
     
-    // Force a small delay to ensure state is updated before navigation
     await new Promise(resolve => setTimeout(resolve, 100));
     
     return newUser;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      // Try to clear Google session
+      await axios.post(`${API}/auth/google/logout`, {}, { withCredentials: true });
+    } catch (error) {
+      // Ignore errors on logout
+    }
+    
     localStorage.removeItem('afrovending_token');
     delete axios.defaults.headers.common['Authorization'];
     setToken(null);
@@ -78,6 +128,8 @@ export const AuthProvider = ({ children }) => {
       token,
       loading,
       login,
+      loginWithGoogle,
+      processGoogleCallback,
       register,
       logout,
       isVendor,
