@@ -780,38 +780,8 @@ def send_booking_created_email(vendor_email: str, vendor_name: str, booking: dic
 
 def send_booking_status_email(customer_email: str, customer_name: str, booking: dict, new_status: str):
     """Notify customer of booking status change"""
-    status_messages = {
-        "confirmed": "Your booking has been confirmed by the vendor.",
-        "in_progress": "Your service is now in progress.",
-        "completed": "Your service has been marked as completed.",
-        "cancelled": "Your booking has been cancelled."
-    }
-    
     subject = f"Booking Update: {booking['service_name']}"
-    html_content = f"""
-    <html>
-    <body style="font-family: 'Ubuntu', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-            <h1 style="color: white; margin: 0; font-family: 'Montserrat', sans-serif;">Booking Update</h1>
-        </div>
-        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-            <p>Hi {customer_name},</p>
-            <p>{status_messages.get(new_status, f"Your booking status has been updated to: {new_status}")}</p>
-            
-            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #c41e3a;">
-                <h3 style="margin-top: 0; color: #1a1a1a;">{booking['service_name']}</h3>
-                <p><strong>Date:</strong> {booking['booking_date']}</p>
-                <p><strong>Time:</strong> {booking['booking_time']}</p>
-                <p><strong>Status:</strong> <span style="color: #c41e3a; font-weight: bold;">{new_status.upper()}</span></p>
-            </div>
-            
-            {"<p><strong>Next Step:</strong> After your service is completed, please confirm delivery in your dashboard to release the payment to the vendor.</p>" if new_status == "confirmed" else ""}
-            
-            <p style="color: #666; font-size: 12px;">This is an automated message from Afrovending.</p>
-        </div>
-    </body>
-    </html>
-    """
+    html_content = render_booking_status(customer_name, booking, new_status)
     return send_email(customer_email, subject, html_content)
 
 def send_payment_released_email(vendor_email: str, vendor_name: str, booking: dict):
