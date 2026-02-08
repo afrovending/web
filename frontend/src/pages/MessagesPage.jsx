@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   ChevronLeft, Send, MessageCircle, User, Store, 
-  Package, MoreVertical, Trash2, Search, Check, CheckCheck
+  Package, MoreVertical, Trash2, Search, Check, CheckCheck, Wifi, WifiOff
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
 import { useAuth } from '../contexts/AuthContext';
+import { useMessagingWebSocket } from '../hooks/useMessagingWebSocket';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -33,14 +34,100 @@ const MessagesPage = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [typingUsers, setTypingUsers] = useState({}); // {conversationId: {userId: userName}}
+  const [onlineUsers, setOnlineUsers] = useState(new Set());
   
   const messagesEndRef = useRef(null);
-  const pollIntervalRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // Handle incoming WebSocket messages
+  const handleWebSocketMessage = useCallback((data) => {
+    switch (data.type) {
+      case 'new_message':
+        // Add new message to the list if it's for the active conversation
+        if (data.conversation_id === activeConversation?.id) {
+          setMessages(prev => {
+            // Avoid duplicates
+            if (prev.find(m => m.id === data.message.id)) return prev;
+            return [...prev, data.message];
+          });
+          scrollToBottom();
+        }
+        // Update conversation list with new last message
+        setConversations(prev => prev.map(conv => {
+          if (conv.id === data.conversation_id) {
+            return {
+              ...conv,
+              last_message: {
+                content: data.message.content.substring(0, 100),
+                sender_id: data.message.sender_id,
+                sender_name: data.message.sender_name,
+                created_at: data.message.created_at
+              },
+              updated_at: data.message.created_at,
+              unread_count: conv.id === activeConversation?.id ? 0 : (conv.unread_count || 0) + 1
+            };
+          }
+          return conv;
+        }));
+        break;
+
+      case 'typing':
+        // Update typing indicator
+        setTypingUsers(prev => {
+          const newTyping = { ...prev };
+          if (!newTyping[data.conversation_id]) {
+            newTyping[data.conversation_id] = {};
+          }
+          if (data.is_typing) {
+            newTyping[data.conversation_id][data.user_id] = data.user_name;
+          } else {
+            delete newTyping[data.conversation_id][data.user_id];
+          }
+          return newTyping;
+        });
+        break;
+
+      case 'read_receipt':
+        // Update message read status
+        if (data.conversation_id === activeConversation?.id) {
+          setMessages(prev => prev.map(msg => {
+            if (data.message_ids.includes(msg.id)) {
+              return { ...msg, read: true };
+            }
+            return msg;
+          }));
+        }
+        break;
+
+      case 'status':
+        // Update online status
+        setOnlineUsers(prev => {
+          const newSet = new Set(prev);
+          if (data.is_online) {
+            newSet.add(data.user_id);
+          } else {
+            newSet.delete(data.user_id);
+          }
+          return newSet;
+        });
+        break;
+
+      default:
+        console.log('Unknown WebSocket message type:', data.type);
+    }
+  }, [activeConversation?.id]);
+
+  // WebSocket connection
+  const { isConnected, sendTyping, sendReadReceipt } = useMessagingWebSocket(
+    user?.id,
+    handleWebSocketMessage
+  );
 
   // Fetch conversations
   const fetchConversations = async () => {
