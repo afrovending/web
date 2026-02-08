@@ -935,6 +935,10 @@ const VendorDashboard = () => {
           <TabsContent value="payouts">
             <PayoutDashboard />
           </TabsContent>
+
+          <TabsContent value="subscription">
+            <SubscriptionManagement />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
