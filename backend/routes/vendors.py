@@ -3,7 +3,7 @@ Vendor routes for Afrovending API
 """
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pydantic import BaseModel, Field
 import uuid
 
