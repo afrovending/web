@@ -25,6 +25,7 @@ import ServiceDetailPage from './pages/ServiceDetailPage';
 import { BookingDetailPage, BookingSuccessPage } from './pages/BookingPages';
 import { TrackingPage, TrackingDetailPage } from './pages/TrackingPage';
 import PricingPage from './pages/PricingPage';
+import AuthCallback from './pages/AuthCallback';
 
 // Loading component
 const LoadingScreen = () => (
@@ -55,6 +56,7 @@ const AppContent = () => {
           {/* Auth pages without navbar */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           
           {/* Main pages with navbar */}
           <Route
