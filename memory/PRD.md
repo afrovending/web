@@ -224,6 +224,32 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
   - GET /api/messages/vendor/:vendorId/start
   - WS /api/ws/messages/:userId
 
+### Vendor Storefront Customization (NEW - Feb 8, 2026)
+- **Backend**: `/backend/routes/vendors.py` (lines 200-379)
+- **Frontend**: 
+  - `/components/StorefrontEditor.jsx` - Complete editor component
+  - `/pages/VendorsPages.jsx` - VendorPage with storefront support
+  - `/pages/VendorDashboard.jsx` - Storefront tab
+- **Theme Presets**: 6 options
+  - Classic (red #dc2626)
+  - Ocean (blue #0891b2)
+  - Forest (green #16a34a)
+  - Sunset (orange #ea580c)
+  - Royal (purple #7c3aed)
+  - Midnight (dark #6366f1)
+- **Layout Options**: grid, list, masonry
+- **Social Links**: Instagram, Facebook, Twitter, YouTube, Website
+- **Display Toggles**: show_reviews, show_product_count, show_member_since
+- **Max Featured Products**: 6
+- **Editor Tabs**: Branding, Theme, Content, Featured, Social
+- **API Endpoints**:
+  - GET /api/vendors/:id/storefront (public)
+  - PUT /api/vendors/:id/storefront (auth required)
+  - GET /api/vendors/:id/storefront/theme-presets
+  - POST /api/vendors/:id/storefront/apply-preset
+  - PUT /api/vendors/:id/storefront/featured-products
+  - PUT /api/vendors/:id/storefront/sections
+
 ### Coupon/Discount System (Feb 8, 2026)
 - **Coupon Types**: Percentage or fixed amount discounts
 - **Validation Rules**: Min order amount, max discount cap, usage limits
