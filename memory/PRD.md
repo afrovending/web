@@ -122,11 +122,14 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
   - Sizes: S, M, L, XL
   - Colors: Red, Blue, Green, Yellow
   - Different prices per size tier
+- **Product without Variants**: "Raw Unrefined Shea Butter" (ID: 99b24dcb-c76b-4d3c-9c67-9ae4da1ecf9f)
+- **Test Coupon**: SAVE20 (20% discount, active)
 
-## Testing Status (Feb 7, 2026)
+## Testing Status (Feb 8, 2026)
 - Backend: 100% (all tests passed)
 - Frontend: 100% (all features working)
 - Product Variants: 100% (14/14 backend, 11/11 frontend tests)
+- Coupon System: 100% (19/19 backend, 16/16 frontend tests)
 
 ## Prioritized Backlog
 
