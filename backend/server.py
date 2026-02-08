@@ -4865,7 +4865,7 @@ async def startup_db_client():
     await db.cart_items.create_index("user_id")
     await db.wishlists.create_index([("user_id", 1), ("product_id", 1)], unique=True)
     await db.reviews.create_index([("product_id", 1), ("user_id", 1)], unique=True)
-    await db.payment_transactions.create_index("session_id", unique=True)
+    await db.payment_transactions.create_index("session_id", unique=True, sparse=True)
     await db.vendor_payouts.create_index("id", unique=True)
     await db.vendor_payouts.create_index("vendor_id")
     
