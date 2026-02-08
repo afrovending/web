@@ -61,6 +61,30 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - **Vendor Dashboard**: Subscription tab showing current plan, usage, upgrade options
 - **Stripe Integration**: Checkout sessions for paid plans
 
+### Vendor Analytics Dashboard (NEW - Feb 8, 2026)
+- **Access Control**: Only Growth, Pro, and Enterprise subscribers
+- **Starter Plan**: Shows "Analytics Locked" screen with upgrade CTA
+- **Sales Analytics**:
+  - Total revenue, orders, average order value
+  - Revenue & orders trend charts (daily data points)
+- **Traffic Analytics**:
+  - Total views, unique visitors
+  - Views trend over time
+  - Traffic sources breakdown (direct, search, category, homepage)
+- **Conversion Funnel**:
+  - View-to-cart rate
+  - Cart-to-purchase rate
+  - Overall conversion rate
+  - Visual funnel with Views → Cart Adds → Purchases
+- **Customer Insights**:
+  - Total, new, returning customers
+  - Top customer locations
+- **Top Products**:
+  - Ranked by revenue
+  - Shows views, cart adds, purchases, conversion rate per product
+- **Period Selector**: 7d, 30d, 90d, 1y
+- **View Tracking**: Automatic tracking on product detail page visits
+
 ### Coupon/Discount System (Feb 8, 2026)
 - **Coupon Types**: Percentage or fixed amount discounts
 - **Validation Rules**: Min order amount, max discount cap, usage limits
