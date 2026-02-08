@@ -109,16 +109,19 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppContent />
-        <Toaster 
-          position="top-right" 
-          richColors 
-          toastOptions={{
-            style: {
-              fontFamily: 'Manrope, sans-serif'
-            }
-          }}
-        />
+        <CompareProvider>
+          <AppContent />
+          <CompareTray />
+          <Toaster 
+            position="top-right" 
+            richColors 
+            toastOptions={{
+              style: {
+                fontFamily: 'Manrope, sans-serif'
+              }
+            }}
+          />
+        </CompareProvider>
       </AuthProvider>
     </BrowserRouter>
   );
