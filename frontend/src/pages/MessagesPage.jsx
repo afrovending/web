@@ -251,6 +251,12 @@ const MessagesPage = () => {
     e.preventDefault();
     if (!newMessage.trim() || !activeConversation) return;
 
+    // Stop typing indicator
+    sendTyping(activeConversation.id, false);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
     setSending(true);
     try {
       const recipient = activeConversation.participants.find(p => p.id !== user.id);
