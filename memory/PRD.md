@@ -375,10 +375,10 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - **Utils folder**: Created /app/backend/utils/ with database.py, auth.py, email.py, email_templates.py
 
 ## Next Tasks
-1. Add multiple images per product (gallery feature)
-2. Implement product comparison feature
-3. Add vendor messaging/chat system
-4. Implement multi-currency support
+1. Add product quick view modal
+2. Implement order tracking map view
+3. Add vendor storefront customization
+4. Implement product recommendations engine
 
 ## Subscription Plans Data Structure
 
