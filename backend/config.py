@@ -1,5 +1,6 @@
 """
 Configuration and database connections for Afrovending API
+This module centralizes all configuration settings and database connections.
 """
 import os
 import logging
@@ -30,7 +31,7 @@ STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
 
 # Stripe Connect Configuration
 STRIPE_CONNECT_CLIENT_ID = os.environ.get('STRIPE_CONNECT_CLIENT_ID', '')
-PLATFORM_FEE_PERCENT = 10  # Platform takes 10% commission
+PLATFORM_FEE_PERCENT = 10
 
 # PayPal Configuration
 PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID', '')
@@ -62,3 +63,4 @@ if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and S3_BUCKET_NAME:
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
         region_name=AWS_REGION
     )
+    logger.info(f"S3 client initialized for bucket: {S3_BUCKET_NAME}")
