@@ -5,14 +5,15 @@ from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime, timezone
 import uuid
 
-from models import UserCreate, UserLogin, UserResponse, TokenResponse
+from config import db, logger
 from utils.auth import hash_password, verify_password, create_access_token, get_current_user
-from config import db
+from models import UserCreate, UserLogin, UserResponse, TokenResponse
 
-router = APIRouter(prefix="/auth", tags=["Authentication"])
+router = APIRouter(tags=["Authentication"])
 
-@router.post("/register", response_model=TokenResponse)
+@router.post("/auth/register", response_model=TokenResponse)
 async def register(user_data: UserCreate):
+    """Register a new user"""
     existing = await db.users.find_one({"email": user_data.email})
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -30,6 +31,7 @@ async def register(user_data: UserCreate):
     }
     
     await db.users.insert_one(user_doc)
+    logger.info(f"New user registered: {user_data.email}")
     
     token = create_access_token({"sub": user_id})
     user_response = UserResponse(
@@ -44,8 +46,9 @@ async def register(user_data: UserCreate):
     
     return TokenResponse(access_token=token, user=user_response)
 
-@router.post("/login", response_model=TokenResponse)
+@router.post("/auth/login", response_model=TokenResponse)
 async def login(credentials: UserLogin):
+    """Login and get access token"""
     user = await db.users.find_one({"email": credentials.email}, {"_id": 0})
     if not user or not verify_password(credentials.password, user.get("password_hash", "")):
         raise HTTPException(status_code=401, detail="Invalid email or password")
@@ -63,6 +66,7 @@ async def login(credentials: UserLogin):
     
     return TokenResponse(access_token=token, user=user_response)
 
-@router.get("/me", response_model=UserResponse)
+@router.get("/auth/me", response_model=UserResponse)
 async def get_me(user: dict = Depends(get_current_user)):
+    """Get current user profile"""
     return UserResponse(**user)
