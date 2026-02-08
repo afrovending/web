@@ -146,8 +146,12 @@ const AdminDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="vendors" className="space-y-6">
+        <Tabs defaultValue="analytics" className="space-y-6">
           <TabsList className="bg-muted/50 rounded-full p-1">
+            <TabsTrigger value="analytics" className="rounded-full" data-testid="admin-tab-analytics">
+              <BarChart3 className="h-4 w-4 mr-1" />
+              Analytics
+            </TabsTrigger>
             <TabsTrigger value="vendors" className="rounded-full" data-testid="admin-tab-vendors">
               Vendors
             </TabsTrigger>
@@ -162,6 +166,11 @@ const AdminDashboard = () => {
               Coupons
             </TabsTrigger>
           </TabsList>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            <AdminAnalytics />
+          </TabsContent>
 
           {/* Vendors Tab */}
           <TabsContent value="vendors">
