@@ -193,6 +193,11 @@ export const CurrencyProvider = ({ children }) => {
     return SUPPORTED_CURRENCIES[code] || SUPPORTED_CURRENCIES.USD;
   }, [currency]);
 
+  // Reset detection (for testing or allowing re-detection)
+  const resetDetection = useCallback(() => {
+    localStorage.removeItem(DETECTED_KEY);
+  }, []);
+
   return (
     <CurrencyContext.Provider value={{
       currency,
@@ -206,7 +211,9 @@ export const CurrencyProvider = ({ children }) => {
       displayPrice,
       getConvertedPrice,
       getCurrencyInfo,
-      refreshRates: fetchRates
+      refreshRates: fetchRates,
+      detectedCountry,
+      resetDetection
     }}>
       {children}
     </CurrencyContext.Provider>
