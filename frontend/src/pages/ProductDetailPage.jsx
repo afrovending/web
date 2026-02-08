@@ -66,6 +66,18 @@ const ProductDetailPage = () => {
           const relatedRes = await axios.get(`${API}/products?category_id=${productRes.data.category_id}&limit=4`);
           setRelatedProducts(relatedRes.data.filter(p => p.id !== productId));
         }
+        
+        // Track product view for analytics
+        try {
+          const sessionId = sessionStorage.getItem('session_id') || (() => {
+            const id = Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem('session_id', id);
+            return id;
+          })();
+          await axios.post(`${API}/analytics/track-view?product_id=${productId}&source=direct&session_id=${sessionId}`);
+        } catch (e) {
+          // Silently fail - analytics tracking shouldn't break the page
+        }
       } catch (error) {
         console.error('Failed to fetch product:', error);
         toast.error('Product not found');
