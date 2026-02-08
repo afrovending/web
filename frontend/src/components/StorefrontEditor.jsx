@@ -492,6 +492,11 @@ const StorefrontEditor = ({ vendorId, products = [] }) => {
             </div>
           </div>
         </TabsContent>
+
+        {/* Analytics Tab */}
+        <TabsContent value="analytics">
+          <StorefrontAnalytics vendorId={vendorId} />
+        </TabsContent>
       </Tabs>
     </div>
   );
