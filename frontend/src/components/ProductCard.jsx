@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingCart, Star, BadgeCheck } from 'lucide-react';
+import { Heart, ShoppingCart, Star, BadgeCheck, GitCompare } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useCompare } from '../contexts/CompareContext';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -12,6 +13,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const ProductCard = ({ product }) => {
   const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
+  const { addToCompare, isInCompare, removeFromCompare } = useCompare();
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
