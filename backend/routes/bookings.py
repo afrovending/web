@@ -14,7 +14,7 @@ from models import (
 )
 
 # Import Stripe checkout
-from emergentintegrations.llm.stripe import StripeCheckout, CheckoutSessionRequest
+from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
 
 router = APIRouter(tags=["Bookings"])
 
