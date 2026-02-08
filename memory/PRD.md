@@ -175,6 +175,44 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
   - Review images gallery support
   - Empty state for no reviews
 
+### Product Image Gallery (NEW - Feb 8, 2026)
+- **Component**: `/frontend/src/components/ui/image-gallery.jsx`
+- **Features**:
+  - Main image display with thumbnails
+  - Click to zoom indicator
+  - Lightbox modal with zoom controls (1x to 3x)
+  - Navigation arrows for multiple images
+  - Keyboard navigation (arrow keys, +/-, Escape)
+  - Thumbnail strip only shows for 2+ images
+
+### Product Comparison (NEW - Feb 8, 2026)
+- **Context**: `/frontend/src/contexts/CompareContext.js`
+- **Components**:
+  - CompareTray - Sticky bottom bar showing selected items
+  - ComparePage - Side-by-side comparison table at `/compare`
+- **Features**:
+  - Max 4 items for comparison
+  - Compare toggle button on ProductCard
+  - Persists to localStorage
+  - Comparison fields: Price, Rating, Vendor, Category, Stock, Variants, Description
+  - Add to Cart and View Details actions from compare page
+
+### Vendor Messaging/Chat (NEW - Feb 8, 2026)
+- **Backend**: `/backend/routes/messaging.py`
+- **Frontend**: `/frontend/src/pages/MessagesPage.jsx`
+- **Features**:
+  - Customer-vendor conversations
+  - Product-specific inquiries
+  - Polling-based real-time updates (5 sec interval)
+  - Unread message count in navbar
+  - Message Vendor button on product detail pages
+  - Conversation search and management
+- **API Endpoints**:
+  - GET /api/messages/conversations
+  - POST /api/messages/send
+  - GET /api/messages/unread-count
+  - GET /api/messages/vendor/:vendorId/start
+
 ### Coupon/Discount System (Feb 8, 2026)
 - **Coupon Types**: Percentage or fixed amount discounts
 - **Validation Rules**: Min order amount, max discount cap, usage limits
