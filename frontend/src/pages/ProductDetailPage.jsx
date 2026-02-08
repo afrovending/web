@@ -215,32 +215,12 @@ const ProductDetailPage = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
         {/* Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
-          {/* Images */}
-          <div className="space-y-4">
-            <div className="aspect-square rounded-xl overflow-hidden bg-muted">
-              <img
-                src={images[selectedImage]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            {images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-2">
-                {images.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(idx)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-colors ${
-                      selectedImage === idx ? 'border-primary' : 'border-transparent'
-                    }`}
-                    data-testid={`image-thumb-${idx}`}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Images - Using new ImageGallery component */}
+          <ImageGallery 
+            images={images} 
+            alt={product.name}
+            data-testid="product-gallery"
+          />
 
           {/* Details */}
           <div className="space-y-6">
