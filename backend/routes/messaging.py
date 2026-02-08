@@ -358,3 +358,136 @@ async def start_vendor_conversation(
     conversation = await get_or_create_conversation(user["id"], recipient_id, product_id)
     
     return conversation
+
+
+
+# ==================== WEBSOCKET ENDPOINTS ====================
+
+@router.websocket("/ws/messages/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    """
+    WebSocket endpoint for real-time messaging.
+    
+    Message types received from client:
+    - {"type": "typing", "conversation_id": "...", "is_typing": true/false}
+    - {"type": "read", "conversation_id": "...", "message_ids": [...]}
+    - {"type": "ping"} - Keep-alive
+    
+    Message types sent to client:
+    - {"type": "new_message", "message": {...}, "conversation_id": "..."}
+    - {"type": "typing", "conversation_id": "...", "user_id": "...", "user_name": "...", "is_typing": true/false}
+    - {"type": "read_receipt", "conversation_id": "...", "message_ids": [...], "reader_id": "..."}
+    - {"type": "status", "user_id": "...", "is_online": true/false}
+    - {"type": "pong"} - Keep-alive response
+    """
+    await manager.connect(websocket, user_id)
+    
+    # Get user info for broadcasting
+    user = await db.users.find_one({"id": user_id}, {"_id": 0, "id": 1, "first_name": 1, "last_name": 1})
+    user_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip() if user else "User"
+    
+    # Get all conversation partners to notify them user is online
+    conversations = await db.conversations.find(
+        {"participant_ids": user_id}, 
+        {"_id": 0, "participant_ids": 1}
+    ).to_list(length=100)
+    
+    contact_ids = set()
+    for conv in conversations:
+        for pid in conv.get("participant_ids", []):
+            if pid != user_id:
+                contact_ids.add(pid)
+    
+    # Broadcast online status
+    await manager.broadcast_online_status(user_id, True, list(contact_ids))
+    
+    try:
+        while True:
+            # Receive message from client
+            data = await websocket.receive_text()
+            
+            try:
+                message = json.loads(data)
+                msg_type = message.get("type")
+                
+                if msg_type == "ping":
+                    # Keep-alive response
+                    await websocket.send_json({"type": "pong"})
+                
+                elif msg_type == "typing":
+                    # Broadcast typing indicator
+                    conversation_id = message.get("conversation_id")
+                    is_typing = message.get("is_typing", False)
+                    
+                    if conversation_id:
+                        conversation = await db.conversations.find_one(
+                            {"id": conversation_id, "participant_ids": user_id},
+                            {"_id": 0, "participant_ids": 1}
+                        )
+                        if conversation:
+                            await manager.broadcast_typing(
+                                conversation_id,
+                                user_id,
+                                user_name,
+                                conversation["participant_ids"],
+                                is_typing
+                            )
+                
+                elif msg_type == "read":
+                    # Mark messages as read and send read receipt
+                    conversation_id = message.get("conversation_id")
+                    message_ids = message.get("message_ids", [])
+                    
+                    if conversation_id and message_ids:
+                        # Update messages in database
+                        await db.messages.update_many(
+                            {
+                                "id": {"$in": message_ids},
+                                "recipient_id": user_id
+                            },
+                            {"$set": {"read": True}}
+                        )
+                        
+                        # Get conversation to notify sender
+                        conversation = await db.conversations.find_one(
+                            {"id": conversation_id},
+                            {"_id": 0, "participant_ids": 1}
+                        )
+                        if conversation:
+                            # Send read receipt to other participants
+                            read_receipt = {
+                                "type": "read_receipt",
+                                "conversation_id": conversation_id,
+                                "message_ids": message_ids,
+                                "reader_id": user_id
+                            }
+                            for pid in conversation["participant_ids"]:
+                                if pid != user_id:
+                                    await manager.send_personal_message(read_receipt, pid)
+                
+            except json.JSONDecodeError:
+                logger.warning(f"Invalid JSON received from user {user_id}")
+                
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, user_id)
+        # Broadcast offline status
+        await manager.broadcast_online_status(user_id, False, list(contact_ids))
+        logger.info(f"WebSocket disconnected for user {user_id}")
+    except Exception as e:
+        logger.error(f"WebSocket error for user {user_id}: {e}")
+        manager.disconnect(websocket, user_id)
+
+
+@router.get("/messages/online-status")
+async def get_online_status(
+    user_ids: str = Query(..., description="Comma-separated user IDs"),
+    user: dict = Depends(get_current_user)
+):
+    """Get online status for a list of users"""
+    ids = [uid.strip() for uid in user_ids.split(",") if uid.strip()]
+    online_users = manager.get_online_users(ids)
+    
+    return {
+        "online_users": online_users,
+        "statuses": {uid: uid in online_users for uid in ids}
+    }
