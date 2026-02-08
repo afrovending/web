@@ -347,40 +347,154 @@ const ServiceDetailPage = () => {
               
               <TabsContent value="reviews" className="pt-8">
                 {reviews.length > 0 ? (
-                  <div className="space-y-6">
-                    {reviews.map((review) => (
-                      <div key={review.id} className="bg-card rounded-xl p-6 border border-border">
-                        <div className="flex items-start gap-4">
-                          <Avatar>
-                            <AvatarFallback>{review.user_name?.charAt(0) || 'U'}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-semibold">{review.user_name}</h4>
-                              <span className="text-sm text-muted-foreground">
-                                {new Date(review.created_at).toLocaleDateString()}
-                              </span>
+                  <div className="space-y-8">
+                    {/* Rating Summary */}
+                    <div className="bg-card rounded-xl p-6 border border-border">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Overall Rating */}
+                        <div className="text-center md:text-left md:border-r md:border-border md:pr-6">
+                          <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                            <span className="text-5xl font-bold font-heading">
+                              {service.average_rating?.toFixed(1) || '0.0'}
+                            </span>
+                            <div>
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`h-5 w-5 ${
+                                      i < Math.round(service.average_rating || 0) 
+                                        ? 'fill-primary text-primary' 
+                                        : 'text-muted-foreground/30'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {reviews.length} review{reviews.length !== 1 ? 's' : ''}
+                              </p>
                             </div>
-                            <div className="flex items-center gap-1 mb-2">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-4 w-4 ${
-                                    i < review.rating ? 'fill-primary text-primary' : 'text-muted-foreground/30'
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                            {review.title && <h5 className="font-medium mb-1">{review.title}</h5>}
-                            {review.comment && <p className="text-muted-foreground">{review.comment}</p>}
                           </div>
                         </div>
+
+                        {/* Rating Breakdown */}
+                        <div className="space-y-2">
+                          {[5, 4, 3, 2, 1].map((rating) => {
+                            const count = reviews.filter(r => Math.round(r.rating) === rating).length;
+                            const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                            return (
+                              <div key={rating} className="flex items-center gap-3">
+                                <span className="text-sm w-3">{rating}</span>
+                                <Star className="h-4 w-4 fill-primary text-primary" />
+                                <Progress value={percentage} className="flex-1 h-2" />
+                                <span className="text-sm text-muted-foreground w-8">{count}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Review List */}
+                    <div className="space-y-4">
+                      {reviews.map((review) => (
+                        <div 
+                          key={review.id} 
+                          className="bg-card rounded-xl p-6 border border-border hover:shadow-sm transition-shadow"
+                          data-testid={`review-${review.id}`}
+                        >
+                          <div className="flex items-start gap-4">
+                            <Avatar className="h-12 w-12">
+                              <AvatarFallback className="bg-primary/10 text-primary">
+                                {review.user_name?.charAt(0) || 'U'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                <div>
+                                  <h4 className="font-semibold text-foreground">{review.user_name}</h4>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <div className="flex items-center gap-0.5">
+                                      {[...Array(5)].map((_, i) => (
+                                        <Star
+                                          key={i}
+                                          className={`h-4 w-4 ${
+                                            i < review.rating 
+                                              ? 'fill-primary text-primary' 
+                                              : 'text-muted-foreground/20'
+                                          }`}
+                                        />
+                                      ))}
+                                    </div>
+                                    <span className="text-xs text-muted-foreground">
+                                      {new Date(review.created_at).toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric'
+                                      })}
+                                    </span>
+                                  </div>
+                                </div>
+                                {review.verified_purchase && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    Verified Purchase
+                                  </Badge>
+                                )}
+                              </div>
+                              
+                              {review.title && (
+                                <h5 className="font-medium text-foreground mb-2">{review.title}</h5>
+                              )}
+                              
+                              {review.comment && (
+                                <p className="text-muted-foreground leading-relaxed">{review.comment}</p>
+                              )}
+
+                              {/* Review Images */}
+                              {review.images && review.images.length > 0 && (
+                                <div className="flex gap-2 mt-3 flex-wrap">
+                                  {review.images.map((img, idx) => (
+                                    <div 
+                                      key={idx} 
+                                      className="w-20 h-20 rounded-lg overflow-hidden border border-border"
+                                    >
+                                      <img 
+                                        src={img} 
+                                        alt={`Review image ${idx + 1}`} 
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Helpful Button */}
+                              <div className="flex items-center gap-4 mt-4 pt-3 border-t border-border">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="text-muted-foreground hover:text-foreground"
+                                  data-testid={`helpful-${review.id}`}
+                                >
+                                  <ThumbsUp className="h-4 w-4 mr-2" />
+                                  Helpful {review.helpful_count > 0 && `(${review.helpful_count})`}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-muted-foreground">
-                    No reviews yet for this service.
+                  <div className="text-center py-16 bg-card rounded-xl border border-border">
+                    <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Star className="h-8 w-8 text-muted-foreground/50" />
+                    </div>
+                    <h3 className="font-heading font-semibold text-lg mb-2">No Reviews Yet</h3>
+                    <p className="text-muted-foreground max-w-md mx-auto">
+                      Be the first to share your experience with this service. Your feedback helps others make informed decisions.
+                    </p>
                   </div>
                 )}
               </TabsContent>
