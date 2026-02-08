@@ -681,6 +681,10 @@ const VendorDashboard = () => {
               <BarChart3 className="h-4 w-4 mr-1" />
               Analytics
             </TabsTrigger>
+            <TabsTrigger value="storefront" className="rounded-full" data-testid="vendor-tab-storefront">
+              <Palette className="h-4 w-4 mr-1" />
+              Storefront
+            </TabsTrigger>
             <TabsTrigger value="subscription" className="rounded-full" data-testid="vendor-tab-subscription">
               <CreditCard className="h-4 w-4 mr-1" />
               Subscription
