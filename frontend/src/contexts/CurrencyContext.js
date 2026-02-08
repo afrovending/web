@@ -130,14 +130,15 @@ export const CurrencyProvider = ({ children }) => {
     }
   }, [rates]);
 
-  // Fetch rates on mount
+  // Fetch rates on mount and detect currency
   useEffect(() => {
     fetchRates();
+    detectCurrency();
     
     // Refresh rates every hour
     const interval = setInterval(fetchRates, 3600000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchRates, detectCurrency]);
 
   // Set currency preference
   const setCurrency = useCallback(async (newCurrency) => {
