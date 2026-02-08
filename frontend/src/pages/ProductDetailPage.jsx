@@ -243,14 +243,25 @@ const ProductDetailPage = () => {
           <div className="space-y-6">
             {/* Vendor */}
             {vendor && (
-              <Link 
-                to={`/vendors/${vendor.id}`}
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-                data-testid="product-vendor-link"
-              >
-                <Store className="h-4 w-4" />
-                {vendor.store_name}
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link 
+                  to={`/vendors/${vendor.id}`}
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                  data-testid="product-vendor-link"
+                >
+                  <Store className="h-4 w-4" />
+                  {vendor.store_name}
+                </Link>
+                {(product.is_verified_seller || vendor.is_verified_seller) && (
+                  <span 
+                    className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full"
+                    data-testid="vendor-verified-badge"
+                  >
+                    <BadgeCheck className="h-3 w-3" />
+                    Verified Seller
+                  </span>
+                )}
+              </div>
             )}
 
             <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground" data-testid="product-title">
