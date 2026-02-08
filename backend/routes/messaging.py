@@ -1,15 +1,17 @@
 """
 Messaging routes for Afrovending API
-Customer-Vendor chat system
+Customer-Vendor chat system with WebSocket support
 """
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, WebSocket, WebSocketDisconnect
 from typing import List, Optional
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 import uuid
+import json
 
 from config import db, logger
 from utils.auth import get_current_user
+from utils.websocket_manager import manager
 
 router = APIRouter(tags=["Messaging"])
 
