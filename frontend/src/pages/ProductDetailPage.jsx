@@ -276,11 +276,11 @@ const ProductDetailPage = () => {
             {(!product.has_variants || !selectedVariant) && (
               <div className="flex items-center gap-4">
                 <span className="font-accent text-4xl font-bold text-foreground" data-testid="product-price">
-                  ${product.price.toFixed(2)}
+                  {displayPrice(product.price)}
                 </span>
                 {product.compare_price && (
                   <span className="text-xl text-muted-foreground line-through">
-                    ${product.compare_price.toFixed(2)}
+                    {displayPrice(product.compare_price)}
                   </span>
                 )}
                 {product.compare_price && product.compare_price > product.price && (
