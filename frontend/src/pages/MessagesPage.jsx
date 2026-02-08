@@ -227,17 +227,19 @@ const MessagesPage = () => {
     return `${names.length} people are typing...`;
   };
 
-    return () => {
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-      }
-    };
-  }, [activeConversation]);
-
   // Scroll when messages update
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Cleanup typing timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSelectConversation = async (conv) => {
     setActiveConversation(conv);
