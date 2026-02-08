@@ -312,6 +312,127 @@ class CouponValidationResponse(BaseModel):
 
 # ==================== SERVICE MODELS ====================
 
+# ==================== SUBSCRIPTION MODELS ====================
+
+class SubscriptionPlan(BaseModel):
+    """Subscription plan configuration"""
+    id: str
+    name: str  # Starter, Growth, Pro Vendor, Enterprise
+    price_monthly: float
+    price_yearly: float  # With discount
+    commission_rate: float  # Percentage taken from sales
+    product_limit: int  # -1 for unlimited
+    features: List[str]
+    stripe_price_id_monthly: Optional[str] = None
+    stripe_price_id_yearly: Optional[str] = None
+    is_custom: bool = False
+
+class VendorSubscription(BaseModel):
+    """Vendor's active subscription"""
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    vendor_id: str
+    plan_id: str
+    plan_name: str
+    status: str  # active, cancelled, past_due, trialing
+    billing_cycle: str  # monthly, yearly
+    current_period_start: str
+    current_period_end: str
+    stripe_subscription_id: Optional[str] = None
+    stripe_customer_id: Optional[str] = None
+    commission_rate: float
+    product_limit: int
+    created_at: str
+    cancelled_at: Optional[str] = None
+
+class SubscriptionCheckoutRequest(BaseModel):
+    plan_id: str
+    billing_cycle: str = "monthly"  # monthly, yearly
+    origin_url: str
+
+class SubscriptionCheckoutResponse(BaseModel):
+    checkout_url: str
+    session_id: str
+
+class SubscriptionResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    subscription: Optional[VendorSubscription] = None
+    plan: Optional[SubscriptionPlan] = None
+    can_upgrade: bool = True
+    product_count: int = 0
+    products_remaining: int = -1  # -1 for unlimited
+
+# Subscription Plans Configuration
+SUBSCRIPTION_PLANS = {
+    "starter": SubscriptionPlan(
+        id="starter",
+        name="Starter",
+        price_monthly=0,
+        price_yearly=0,
+        commission_rate=20,
+        product_limit=5,
+        features=[
+            "Vendor profile on Afrovending",
+            "Up to 5 products",
+            "Standard category placement",
+            "Search visibility",
+            "Email support"
+        ],
+        is_custom=False
+    ),
+    "growth": SubscriptionPlan(
+        id="growth",
+        name="Growth",
+        price_monthly=25,
+        price_yearly=250,  # ~17% discount
+        commission_rate=15,
+        product_limit=50,
+        features=[
+            "Up to 50 products",
+            "Boosted category visibility",
+            "Basic sales & traffic analytics",
+            "Priority email support",
+            "Verified Seller badge"
+        ],
+        is_custom=False
+    ),
+    "pro": SubscriptionPlan(
+        id="pro",
+        name="Pro Vendor",
+        price_monthly=50,
+        price_yearly=500,  # ~17% discount
+        commission_rate=10,
+        product_limit=-1,  # Unlimited
+        features=[
+            "Unlimited products",
+            "10% commission rates",
+            "Featured category placement",
+            "Homepage promotion eligibility",
+            "Advanced analytics (views, clicks, conversions)",
+            "Priority chat support",
+            "Early access to promotions"
+        ],
+        is_custom=False
+    ),
+    "enterprise": SubscriptionPlan(
+        id="enterprise",
+        name="Enterprise / Partner",
+        price_monthly=0,  # Custom pricing
+        price_yearly=0,
+        commission_rate=0,  # Custom
+        product_limit=-1,  # Unlimited
+        features=[
+            "Dedicated account manager",
+            "Custom storefront page",
+            "Bulk uploads / integrations",
+            "Wholesale & B2B visibility",
+            "Marketing collaborations",
+            "Custom commission rates"
+        ],
+        is_custom=True
+    )
+}
+
 class ServiceBase(BaseModel):
     name: str
     description: str
