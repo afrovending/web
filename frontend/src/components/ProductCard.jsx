@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useCompare } from '../contexts/CompareContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -14,6 +15,7 @@ const ProductCard = ({ product }) => {
   const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
   const { addToCompare, isInCompare, removeFromCompare } = useCompare();
+  const { displayPrice } = useCurrency();
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
