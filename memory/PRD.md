@@ -254,7 +254,10 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 ## Prioritized Backlog
 
 ### P0 (Critical)
-- Refactor server.py into modular APIRouters (4600+ lines) - URGENT
+- Refactor server.py into modular APIRouters (4900+ lines) - IN PROGRESS
+  - ✅ Created: config.py, models/__init__.py, utils/auth.py
+  - 📋 Roadmap: /app/backend/REFACTORING_ROADMAP.md
+  - 🔲 Remaining: Route file migrations (incremental)
 
 ### P1 (High Priority)
 - Google Social Login integration
