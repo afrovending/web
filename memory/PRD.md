@@ -222,6 +222,7 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Coupon System: 100% (19/19 backend, 16/16 frontend tests)
 - Vendor Analytics: 100% (17/17 backend, all frontend features working)
 - Weekly Email Reports: 100% (15/15 backend, all frontend features working)
+- Verified Seller Badge: 100% (15/15 backend, all frontend displays working)
 
 ## Prioritized Backlog
 
@@ -229,21 +230,22 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - PayPal payment integration (original requirement)
 - Cloud storage for images (AWS S3) - replace local storage
 - Google Social Login integration
+- Refactor server.py into modular APIRouters
 
 ### P2 (Nice to Have)
 - Multiple shipping addresses
 - Enhanced review/rating UI for services
-- "Verified Seller" badge display on product cards for Growth+ vendors
 
 ## Technical Debt
-- **server.py refactoring**: File is over 4500 lines and should be split into modular APIRouters
+- **server.py refactoring**: File is over 4600 lines and should be split into modular APIRouters
 - **Image persistence**: Currently uses local /app/backend/uploads/ which is lost on redeployment
+- **Utils folder created**: /app/backend/utils/ with database.py, auth.py, email.py (ready for modular refactoring)
 
 ## Next Tasks
 1. Implement PayPal checkout flow
 2. Add cloud storage for images (S3)
 3. Implement Google Social Login (Emergent-managed OAuth)
-4. Refactor server.py into modular structure
+4. Complete server.py modular refactoring (utils folder already created)
 
 ## Subscription Plans Data Structure
 
