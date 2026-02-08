@@ -200,10 +200,19 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 ### Vendor Messaging/Chat (NEW - Feb 8, 2026)
 - **Backend**: `/backend/routes/messaging.py`
 - **Frontend**: `/frontend/src/pages/MessagesPage.jsx`
+- **WebSocket**: Real-time messaging via WebSocket
+  - Endpoint: `/api/ws/messages/{user_id}`
+  - Features: instant delivery, typing indicators, online status, read receipts
+  - Auto-reconnect on disconnect (3 sec delay)
+  - Ping/pong keepalive (30 sec interval)
 - **Features**:
   - Customer-vendor conversations
   - Product-specific inquiries
-  - Polling-based real-time updates (5 sec interval)
+  - Real-time message delivery via WebSocket
+  - Typing indicator (auto-stops after 2 sec)
+  - Online status indicator (green dot)
+  - Read receipts (✓ sent, ✓✓ read)
+  - Connection status (Live/Connecting)
   - Unread message count in navbar
   - Message Vendor button on product detail pages
   - Conversation search and management
@@ -211,7 +220,9 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
   - GET /api/messages/conversations
   - POST /api/messages/send
   - GET /api/messages/unread-count
+  - GET /api/messages/online-status
   - GET /api/messages/vendor/:vendorId/start
+  - WS /api/ws/messages/:userId
 
 ### Coupon/Discount System (Feb 8, 2026)
 - **Coupon Types**: Percentage or fixed amount discounts
