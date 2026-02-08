@@ -299,3 +299,105 @@ async def format_amount(currency_code: str, amount: float):
         "currency": currency_code,
         "formatted": format_currency(amount, currency_code)
     }
+
+
+
+# ==================== IP GEOLOCATION ====================
+
+async def get_country_from_ip(ip_address: str) -> Optional[str]:
+    """Get country code from IP address using free geolocation API"""
+    # Skip local/private IPs
+    if ip_address in ['127.0.0.1', 'localhost', '::1'] or ip_address.startswith(('10.', '192.168.', '172.')):
+        return None
+    
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            # Using ip-api.com (free, no key required, 45 requests/minute)
+            response = await client.get(f"http://ip-api.com/json/{ip_address}?fields=status,countryCode")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("status") == "success":
+                    return data.get("countryCode")
+    except Exception as e:
+        logger.warning(f"Failed to get country from IP {ip_address}: {e}")
+    
+    return None
+
+
+def get_currency_for_country(country_code: str) -> str:
+    """Get the default currency for a country"""
+    if not country_code:
+        return BASE_CURRENCY
+    
+    return COUNTRY_TO_CURRENCY.get(country_code.upper(), BASE_CURRENCY)
+
+
+@router.get("/currency/detect")
+async def detect_currency(request: Request):
+    """
+    Detect user's preferred currency based on their IP address.
+    Returns the suggested currency and country information.
+    """
+    # Get client IP from request
+    # Check X-Forwarded-For header first (for proxied requests)
+    forwarded_for = request.headers.get("X-Forwarded-For")
+    if forwarded_for:
+        # Take the first IP in the chain (original client)
+        client_ip = forwarded_for.split(",")[0].strip()
+    else:
+        client_ip = request.client.host if request.client else None
+    
+    if not client_ip:
+        return {
+            "detected": False,
+            "currency": BASE_CURRENCY,
+            "country_code": None,
+            "country_name": None,
+            "message": "Could not determine IP address"
+        }
+    
+    # Get country from IP
+    country_code = await get_country_from_ip(client_ip)
+    
+    if not country_code:
+        return {
+            "detected": False,
+            "currency": BASE_CURRENCY,
+            "country_code": None,
+            "country_name": None,
+            "ip": client_ip,
+            "message": "Could not determine location"
+        }
+    
+    # Get currency for country
+    suggested_currency = get_currency_for_country(country_code)
+    currency_info = SUPPORTED_CURRENCIES.get(suggested_currency, SUPPORTED_CURRENCIES[BASE_CURRENCY])
+    
+    # Country names for common countries
+    country_names = {
+        "NG": "Nigeria", "GH": "Ghana", "KE": "Kenya", "ZA": "South Africa",
+        "GB": "United Kingdom", "US": "United States", "CA": "Canada",
+        "AU": "Australia", "IN": "India", "DE": "Germany", "FR": "France",
+        "SN": "Senegal", "CI": "Ivory Coast", "CM": "Cameroon"
+    }
+    
+    return {
+        "detected": True,
+        "currency": suggested_currency,
+        "currency_name": currency_info["name"],
+        "currency_symbol": currency_info["symbol"],
+        "country_code": country_code,
+        "country_name": country_names.get(country_code, country_code),
+        "ip": client_ip,
+        "message": f"Currency set to {currency_info['name']} based on your location"
+    }
+
+
+@router.get("/currency/country-mapping")
+async def get_country_currency_mapping():
+    """Get the full country to currency mapping"""
+    return {
+        "mapping": COUNTRY_TO_CURRENCY,
+        "supported_currencies": list(SUPPORTED_CURRENCIES.keys())
+    }
