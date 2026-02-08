@@ -58,6 +58,24 @@ SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'noreply@afrovending.com')
 UPLOAD_DIR = ROOT_DIR / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 
+# AWS S3 Configuration
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
+AWS_REGION = os.environ.get('AWS_REGION', 'us-east-2')
+S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', '')
+S3_PUBLIC_URL = f"https://{S3_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com" if S3_BUCKET_NAME else ""
+
+# Initialize S3 client
+s3_client = None
+if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and S3_BUCKET_NAME:
+    s3_client = boto3.client(
+        's3',
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        region_name=AWS_REGION
+    )
+    logger.info(f"S3 client initialized for bucket: {S3_BUCKET_NAME}")
+
 # Create the main app
 app = FastAPI(title="Afrovending API", description="E-commerce marketplace for African vendors")
 
