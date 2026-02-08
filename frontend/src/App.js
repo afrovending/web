@@ -22,6 +22,7 @@ import ServicesPage from './pages/ServicesPage';
 import ServiceDetailPage from './pages/ServiceDetailPage';
 import { BookingDetailPage, BookingSuccessPage } from './pages/BookingPages';
 import { TrackingPage, TrackingDetailPage } from './pages/TrackingPage';
+import PricingPage from './pages/PricingPage';
 
 // Loading component
 const LoadingScreen = () => (
