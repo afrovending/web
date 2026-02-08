@@ -194,3 +194,185 @@ async def approve_vendor(vendor_id: str, user: dict = Depends(require_admin)):
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Vendor not found")
     return {"message": "Vendor approved"}
+
+
+
+# ==================== STOREFRONT ROUTES ====================
+
+@router.get("/vendors/{vendor_id}/storefront")
+async def get_storefront(vendor_id: str):
+    """Get vendor storefront settings (public)"""
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    
+    # Get storefront settings, return defaults if not set
+    storefront = vendor.get("storefront", {})
+    
+    # Merge with defaults
+    default_settings = StorefrontSettings().model_dump()
+    for key, value in default_settings.items():
+        if key not in storefront:
+            storefront[key] = value
+    
+    # Include some vendor info
+    storefront["vendor_id"] = vendor_id
+    storefront["store_name"] = vendor.get("store_name", "")
+    storefront["is_verified_seller"] = await check_vendor_verified_status(vendor_id)
+    
+    # Get featured products if any
+    if storefront.get("featured_product_ids"):
+        products = await db.products.find(
+            {"id": {"$in": storefront["featured_product_ids"]}, "is_active": True},
+            {"_id": 0}
+        ).to_list(length=10)
+        storefront["featured_products"] = products
+    else:
+        # Get top selling products as default featured
+        products = await db.products.find(
+            {"vendor_id": vendor_id, "is_active": True},
+            {"_id": 0}
+        ).sort("total_sold", -1).limit(6).to_list(length=6)
+        storefront["featured_products"] = products
+    
+    return storefront
+
+
+@router.put("/vendors/{vendor_id}/storefront")
+async def update_storefront(
+    vendor_id: str,
+    update: StorefrontUpdate,
+    user: dict = Depends(get_current_user)
+):
+    """Update vendor storefront settings"""
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    
+    if user["role"] != "admin" and vendor["user_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Get current storefront settings
+    current = vendor.get("storefront", {})
+    
+    # Update only provided fields
+    update_data = update.model_dump(exclude_none=True)
+    
+    # Handle nested objects properly
+    if "theme" in update_data and update_data["theme"]:
+        current_theme = current.get("theme", {})
+        current_theme.update(update_data["theme"])
+        update_data["theme"] = current_theme
+    
+    if "social_links" in update_data and update_data["social_links"]:
+        current_social = current.get("social_links", {})
+        current_social.update(update_data["social_links"])
+        update_data["social_links"] = current_social
+    
+    current.update(update_data)
+    
+    await db.vendors.update_one(
+        {"id": vendor_id},
+        {"$set": {"storefront": current}}
+    )
+    
+    logger.info(f"Storefront updated for vendor {vendor_id}")
+    return {"message": "Storefront updated", "storefront": current}
+
+
+@router.get("/vendors/{vendor_id}/storefront/theme-presets")
+async def get_theme_presets(vendor_id: str):
+    """Get available theme presets"""
+    return {"presets": THEME_PRESETS}
+
+
+@router.post("/vendors/{vendor_id}/storefront/apply-preset")
+async def apply_theme_preset(
+    vendor_id: str,
+    preset_name: str,
+    user: dict = Depends(get_current_user)
+):
+    """Apply a theme preset to the storefront"""
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    
+    if user["role"] != "admin" and vendor["user_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    if preset_name not in THEME_PRESETS:
+        raise HTTPException(status_code=400, detail="Invalid preset name")
+    
+    preset = THEME_PRESETS[preset_name]
+    
+    # Get current storefront and update theme
+    current = vendor.get("storefront", {})
+    current_theme = current.get("theme", {})
+    current_theme.update(preset)
+    current_theme["preset"] = preset_name
+    current["theme"] = current_theme
+    
+    await db.vendors.update_one(
+        {"id": vendor_id},
+        {"$set": {"storefront": current}}
+    )
+    
+    return {"message": f"Applied {preset_name} theme", "theme": current_theme}
+
+
+@router.put("/vendors/{vendor_id}/storefront/featured-products")
+async def update_featured_products(
+    vendor_id: str,
+    product_ids: List[str],
+    user: dict = Depends(get_current_user)
+):
+    """Update featured products for storefront"""
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    
+    if user["role"] != "admin" and vendor["user_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Validate that products belong to this vendor
+    valid_products = await db.products.find(
+        {"id": {"$in": product_ids}, "vendor_id": vendor_id},
+        {"_id": 0, "id": 1}
+    ).to_list(length=10)
+    
+    valid_ids = [p["id"] for p in valid_products]
+    
+    # Limit to 6 featured products
+    valid_ids = valid_ids[:6]
+    
+    # Update storefront
+    await db.vendors.update_one(
+        {"id": vendor_id},
+        {"$set": {"storefront.featured_product_ids": valid_ids}}
+    )
+    
+    return {"message": "Featured products updated", "featured_product_ids": valid_ids}
+
+
+@router.put("/vendors/{vendor_id}/storefront/sections")
+async def update_storefront_sections(
+    vendor_id: str,
+    sections: List[StorefrontSection],
+    user: dict = Depends(get_current_user)
+):
+    """Update storefront section order and visibility"""
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    
+    if user["role"] != "admin" and vendor["user_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    sections_data = [s.model_dump() for s in sections]
+    
+    await db.vendors.update_one(
+        {"id": vendor_id},
+        {"$set": {"storefront.sections": sections_data}}
+    )
+    
+    return {"message": "Sections updated", "sections": sections_data}
