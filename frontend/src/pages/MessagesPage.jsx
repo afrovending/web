@@ -500,12 +500,22 @@ const MessagesPage = () => {
                   <div ref={messagesEndRef} />
                 </div>
 
+                {/* Typing Indicator */}
+                {getTypingText(activeConversation.id) && (
+                  <div className="px-4 py-2 bg-muted/50 text-sm text-muted-foreground italic">
+                    {getTypingText(activeConversation.id)}
+                  </div>
+                )}
+
                 {/* Message Input */}
                 <form onSubmit={handleSendMessage} className="p-4 border-t border-border bg-card">
                   <div className="flex items-center gap-2">
                     <Input
                       value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
+                      onChange={(e) => {
+                        setNewMessage(e.target.value);
+                        handleTyping();
+                      }}
                       placeholder="Type a message..."
                       className="flex-1"
                       disabled={sending}
