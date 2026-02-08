@@ -430,7 +430,6 @@ const MessagesPage = () => {
                           <span className="text-xs text-green-500">Online</span>
                         )}
                       </div>
-                      </h3>
                       {activeConversation.product_name && (
                         <Link 
                           to={`/products/${activeConversation.product_id}`}
