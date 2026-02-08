@@ -23,28 +23,29 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - **File Storage**: Local uploads (/app/backend/uploads/)
 - **Deployment**: Kubernetes container with Nginx proxy
 
-## What's Been Implemented (Feb 7, 2026)
+## What's Been Implemented (Feb 8, 2026)
 
 ### Core Features
 1. **User Authentication** - Register, Login, JWT tokens
 2. **Product Management** - CRUD with advanced filtering
 3. **Service Marketplace** - Booking system with calendar
-4. **Shopping Cart** - With variant support
+4. **Shopping Cart** - With variant support and coupon discounts
 5. **Wishlist** - Save favorite products
 6. **Order Management** - With tracking timeline
 7. **Reviews & Ratings** - For products and services
 8. **Vendor Dashboard** - Manage products, services, orders, bookings, payouts
-9. **Admin Dashboard** - Manage vendors, users, orders
+9. **Admin Dashboard** - Manage vendors, users, orders, coupons
 
 ### Advanced Features
 1. **Advanced Search & Filtering** - Multi-category, price range, rating, sort options
 2. **Unified Search API** - Search products and services together
 3. **Search Suggestions** - Autocomplete functionality
-4. **Product Variants** (NEW) - Size, color options with individual pricing/stock
+4. **Product Variants** - Size, color options with individual pricing/stock
 5. **Stripe Connect** - Vendor payout system
 6. **Email Notifications** - SendGrid integration
 7. **Image Upload** - Local file storage
 8. **Order/Booking Tracking** - Timeline view with status updates
+9. **Coupon/Discount System** (NEW) - Full promo code management
 
 ### Product Variants Feature (NEW)
 - **Variant Options**: Products can have Size, Color, or custom options
