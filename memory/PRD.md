@@ -103,6 +103,18 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
   - Marketing & Tips toggle
 - **Scheduler Endpoint**: POST /api/analytics/send-all-weekly-reports (requires API key)
 
+### Verified Seller Badge (NEW - Feb 8, 2026)
+- **Eligibility**: Growth, Pro, and Enterprise subscription plans
+- **Display Locations**:
+  - Product cards (blue badge with checkmark, top-left)
+  - Product detail page (next to vendor name)
+  - Vendors listing (checkmark on avatar + next to name)
+  - Vendor profile page (badge in header + avatar checkmark)
+- **API Fields**:
+  - ProductResponse: is_verified_seller (boolean)
+  - VendorResponse: is_verified_seller (boolean), subscription_plan (string)
+- **Visual Design**: Blue color (#3b82f6) with BadgeCheck icon
+
 ### Coupon/Discount System (Feb 8, 2026)
 - **Coupon Types**: Percentage or fixed amount discounts
 - **Validation Rules**: Min order amount, max discount cap, usage limits
