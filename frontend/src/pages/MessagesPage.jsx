@@ -268,8 +268,7 @@ const MessagesPage = () => {
       });
       
       setNewMessage('');
-      await fetchMessages(activeConversation.id);
-      await fetchConversations();
+      // No need to fetch - WebSocket will deliver the message
     } catch (error) {
       toast.error('Failed to send message');
     } finally {
