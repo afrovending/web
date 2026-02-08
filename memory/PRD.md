@@ -118,6 +118,15 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - POST /api/vendor/stripe/connect
 - POST /api/vendor/payout/request
 
+#### Vendor Subscriptions
+- GET /api/subscriptions/plans - Get all subscription plans
+- GET /api/subscriptions/current - Get vendor's current subscription
+- POST /api/subscriptions/checkout - Create Stripe checkout for subscription
+- GET /api/subscriptions/success - Handle successful subscription
+- POST /api/subscriptions/cancel - Cancel subscription
+- POST /api/subscriptions/reactivate - Reactivate cancelled subscription
+- GET /api/subscriptions/portal - Get Stripe customer portal URL
+
 #### Tracking
 - GET /api/tracking
 - GET /api/tracking/:type/:id
