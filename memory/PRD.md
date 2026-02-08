@@ -33,7 +33,7 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 5. **Wishlist** - Save favorite products
 6. **Order Management** - With tracking timeline
 7. **Reviews & Ratings** - For products and services
-8. **Vendor Dashboard** - Manage products, services, orders, bookings, payouts
+8. **Vendor Dashboard** - Manage products, services, orders, bookings, payouts, subscription
 9. **Admin Dashboard** - Manage vendors, users, orders, coupons
 
 ### Advanced Features
@@ -45,9 +45,22 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 6. **Email Notifications** - SendGrid integration
 7. **Image Upload** - Local file storage
 8. **Order/Booking Tracking** - Timeline view with status updates
-9. **Coupon/Discount System** (NEW) - Full promo code management
+9. **Coupon/Discount System** - Full promo code management
+10. **Vendor Subscription System** (NEW) - Tiered pricing plans for vendors
 
-### Coupon/Discount System (NEW - Feb 8, 2026)
+### Vendor Subscription System (NEW - Feb 8, 2026)
+- **4 Subscription Tiers:**
+  - **Starter** (Free): 5 products, 20% commission, basic features
+  - **Growth** ($25/mo or $250/yr): 50 products, 15% commission, analytics, verified badge
+  - **Pro Vendor** ($50/mo or $500/yr): Unlimited products, 10% commission, featured placement, advanced analytics
+  - **Enterprise** (Custom): Dedicated manager, custom storefront, bulk uploads, B2B visibility
+- **Billing Cycles**: Monthly and Yearly (with ~17% discount)
+- **Product Limit Enforcement**: Vendors limited to plan's product count
+- **Pricing Page**: /pricing with all plans displayed
+- **Vendor Dashboard**: Subscription tab showing current plan, usage, upgrade options
+- **Stripe Integration**: Checkout sessions for paid plans
+
+### Coupon/Discount System (Feb 8, 2026)
 - **Coupon Types**: Percentage or fixed amount discounts
 - **Validation Rules**: Min order amount, max discount cap, usage limits
 - **Date Constraints**: Start and expiry dates
