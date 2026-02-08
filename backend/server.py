@@ -4456,7 +4456,6 @@ async def preview_weekly_report(user: dict = Depends(get_current_user)):
     
     html_content = await generate_weekly_report_html(report_data)
     
-    from fastapi.responses import HTMLResponse
     return HTMLResponse(content=html_content)
 
 # ==================== HEALTH CHECK ====================
