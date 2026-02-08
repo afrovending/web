@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -24,6 +25,7 @@ const SUPPORTED_CURRENCIES = {
 const BASE_CURRENCY = 'USD';
 const STORAGE_KEY = 'afrovending_currency';
 const RATES_CACHE_KEY = 'afrovending_rates';
+const DETECTED_KEY = 'afrovending_currency_detected';
 
 export const CurrencyProvider = ({ children }) => {
   const [currency, setCurrencyState] = useState(() => {
@@ -46,6 +48,60 @@ export const CurrencyProvider = ({ children }) => {
   });
   
   const [loading, setLoading] = useState(!rates);
+  const [detectedCountry, setDetectedCountry] = useState(null);
+
+  // Auto-detect currency based on IP location (only on first visit)
+  const detectCurrency = useCallback(async () => {
+    // Skip if user has already set a preference or we've already detected
+    const hasStoredCurrency = localStorage.getItem(STORAGE_KEY);
+    const alreadyDetected = localStorage.getItem(DETECTED_KEY);
+    
+    if (hasStoredCurrency || alreadyDetected) {
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${API}/currency/detect`);
+      const data = response.data;
+      
+      if (data.detected && data.currency && SUPPORTED_CURRENCIES[data.currency]) {
+        // Mark as detected to avoid repeated detection
+        localStorage.setItem(DETECTED_KEY, 'true');
+        
+        // Only update if different from current (USD default)
+        if (data.currency !== BASE_CURRENCY) {
+          setCurrencyState(data.currency);
+          localStorage.setItem(STORAGE_KEY, data.currency);
+          setDetectedCountry(data.country_name);
+          
+          // Show toast notification
+          toast.success(
+            `Currency set to ${data.currency_name} (${data.currency_symbol}) based on your location in ${data.country_name}`,
+            {
+              duration: 5000,
+              action: {
+                label: 'Change',
+                onClick: () => {
+                  // This will open the currency selector - user can click it manually
+                  document.querySelector('[data-testid="currency-selector"]')?.click();
+                }
+              }
+            }
+          );
+        } else {
+          // Still mark as detected even if USD
+          localStorage.setItem(DETECTED_KEY, 'true');
+        }
+      } else {
+        // Mark as attempted even if detection failed
+        localStorage.setItem(DETECTED_KEY, 'true');
+      }
+    } catch (error) {
+      console.log('Currency detection failed:', error);
+      // Mark as attempted to avoid retrying
+      localStorage.setItem(DETECTED_KEY, 'true');
+    }
+  }, []);
 
   // Fetch exchange rates
   const fetchRates = useCallback(async () => {
