@@ -491,6 +491,40 @@ class VendorAnalyticsResponse(BaseModel):
     period: str
     has_access: bool = True
 
+# ==================== EMAIL REPORT MODELS ====================
+
+class VendorEmailPreferences(BaseModel):
+    weekly_analytics_report: bool = True
+    order_notifications: bool = True
+    booking_notifications: bool = True
+    marketing_emails: bool = True
+
+class UpdateEmailPreferencesRequest(BaseModel):
+    weekly_analytics_report: Optional[bool] = None
+    order_notifications: Optional[bool] = None
+    booking_notifications: Optional[bool] = None
+    marketing_emails: Optional[bool] = None
+
+class WeeklyReportData(BaseModel):
+    vendor_name: str
+    period_start: str
+    period_end: str
+    total_revenue: float
+    total_orders: int
+    average_order_value: float
+    revenue_change: float  # Percentage change vs previous week
+    orders_change: float
+    total_views: int
+    unique_visitors: int
+    views_change: float
+    view_to_cart_rate: float
+    cart_to_purchase_rate: float
+    overall_conversion_rate: float
+    top_products: List[Dict[str, Any]]
+    new_customers: int
+    returning_customers: int
+    top_locations: List[Dict[str, Any]]
+
 class ServiceBase(BaseModel):
     name: str
     description: str
