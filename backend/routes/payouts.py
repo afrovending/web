@@ -205,19 +205,19 @@ async def stripe_connect_return(account_id: str, request: Request):
                 {"$set": {"stripe_payouts_enabled": True}}
             )
         
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://afro-paypal-test.preview.emergentagent.com')
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://social-login-test.preview.emergentagent.com')
         return RedirectResponse(url=f"{frontend_url}/vendor/dashboard?stripe=connected")
         
     except stripe.error.StripeError as e:
         logger.error(f"Stripe return error: {str(e)}")
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://afro-paypal-test.preview.emergentagent.com')
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://social-login-test.preview.emergentagent.com')
         return RedirectResponse(url=f"{frontend_url}/vendor/dashboard?stripe=error")
 
 
 @router.get("/vendor/stripe/refresh")
 async def stripe_connect_refresh(request: Request):
     """Handle refresh from Stripe Connect"""
-    frontend_url = os.environ.get('FRONTEND_URL', 'https://afro-paypal-test.preview.emergentagent.com')
+    frontend_url = os.environ.get('FRONTEND_URL', 'https://social-login-test.preview.emergentagent.com')
     return RedirectResponse(url=f"{frontend_url}/vendor/dashboard?stripe=refresh")
 
 
