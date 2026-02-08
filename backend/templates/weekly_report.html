@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); padding: 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Weekly Analytics Report</h1>
+            <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">
+                {{ period_start }} - {{ period_end }}
+            </p>
+        </div>
+        
+        <!-- Greeting -->
+        <div style="padding: 30px 30px 20px;">
+            <h2 style="color: #1f2937; margin: 0 0 10px 0;">Hi {{ vendor_name }}!</h2>
+            <p style="color: #6b7280; margin: 0;">Here's your weekly performance summary on Afrovending.</p>
+        </div>
+        
+        <!-- Key Metrics -->
+        <div style="padding: 0 30px 30px;">
+            <h3 style="color: #1f2937; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">Sales Overview</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                <div style="flex: 1; min-width: 150px; background: #f9fafb; padding: 20px; border-radius: 10px; text-align: center;">
+                    <p style="color: #6b7280; margin: 0 0 5px 0; font-size: 14px;">Total Revenue</p>
+                    <p style="color: #1f2937; margin: 0; font-size: 28px; font-weight: bold;">${{ total_revenue }}</p>
+                    <p style="color: {{ rev_change_color }}; margin: 5px 0 0 0; font-size: 14px;">
+                        {{ rev_change_icon }} {{ revenue_change_abs }}% vs last week
+                    </p>
+                </div>
+                <div style="flex: 1; min-width: 150px; background: #f9fafb; padding: 20px; border-radius: 10px; text-align: center;">
+                    <p style="color: #6b7280; margin: 0 0 5px 0; font-size: 14px;">Total Orders</p>
+                    <p style="color: #1f2937; margin: 0; font-size: 28px; font-weight: bold;">{{ total_orders }}</p>
+                    <p style="color: {{ orders_change_color }}; margin: 5px 0 0 0; font-size: 14px;">
+                        {{ orders_change_icon }} {{ orders_change_abs }}% vs last week
+                    </p>
+                </div>
+                <div style="flex: 1; min-width: 150px; background: #f9fafb; padding: 20px; border-radius: 10px; text-align: center;">
+                    <p style="color: #6b7280; margin: 0 0 5px 0; font-size: 14px;">Avg. Order Value</p>
+                    <p style="color: #1f2937; margin: 0; font-size: 28px; font-weight: bold;">${{ average_order_value }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Traffic Stats -->
+        <div style="padding: 0 30px 30px;">
+            <h3 style="color: #1f2937; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">Traffic & Engagement</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                <div style="flex: 1; min-width: 120px; background: #eff6ff; padding: 15px; border-radius: 10px; text-align: center;">
+                    <p style="color: #3b82f6; margin: 0 0 5px 0; font-size: 13px;">Total Views</p>
+                    <p style="color: #1f2937; margin: 0; font-size: 22px; font-weight: bold;">{{ total_views }}</p>
+                    <p style="color: {{ views_change_color }}; margin: 5px 0 0 0; font-size: 12px;">
+                        {{ views_change_icon }} {{ views_change_abs }}%
+                    </p>
+                </div>
+                <div style="flex: 1; min-width: 120px; background: #f0fdf4; padding: 15px; border-radius: 10px; text-align: center;">
+                    <p style="color: #16a34a; margin: 0 0 5px 0; font-size: 13px;">Unique Visitors</p>
+                    <p style="color: #1f2937; margin: 0; font-size: 22px; font-weight: bold;">{{ unique_visitors }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Conversion Funnel -->
+        <div style="padding: 0 30px 30px;">
+            <h3 style="color: #1f2937; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">Conversion Rates</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 10px; background: #fef2f2; border-radius: 8px 0 0 8px;">
+                        <p style="margin: 0; font-size: 13px; color: #6b7280;">View to Cart</p>
+                        <p style="margin: 5px 0 0 0; font-size: 20px; font-weight: bold; color: #dc2626;">{{ view_to_cart_rate }}%</p>
+                    </td>
+                    <td style="padding: 10px; background: #fef9c3;">
+                        <p style="margin: 0; font-size: 13px; color: #6b7280;">Cart to Purchase</p>
+                        <p style="margin: 5px 0 0 0; font-size: 20px; font-weight: bold; color: #ca8a04;">{{ cart_to_purchase_rate }}%</p>
+                    </td>
+                    <td style="padding: 10px; background: #dcfce7; border-radius: 0 8px 8px 0;">
+                        <p style="margin: 0; font-size: 13px; color: #6b7280;">Overall</p>
+                        <p style="margin: 5px 0 0 0; font-size: 20px; font-weight: bold; color: #16a34a;">{{ overall_conversion_rate }}%</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- Top Products -->
+        <div style="padding: 0 30px 30px;">
+            <h3 style="color: #1f2937; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">Top Products</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <thead>
+                    <tr style="background: #f9fafb;">
+                        <th style="padding: 12px; text-align: left;">#</th>
+                        <th style="padding: 12px; text-align: left;">Product</th>
+                        <th style="padding: 12px; text-align: right;">Views</th>
+                        <th style="padding: 12px; text-align: right;">Sales</th>
+                        <th style="padding: 12px; text-align: right;">Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if top_products %}
+                    {% for product in top_products %}
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 12px;">{{ loop.index }}</td>
+                        <td style="padding: 12px;">{{ product.product_name }}</td>
+                        <td style="padding: 12px; text-align: right;">{{ product.views }}</td>
+                        <td style="padding: 12px; text-align: right;">{{ product.purchases }}</td>
+                        <td style="padding: 12px; text-align: right; font-weight: bold;">${{ product.revenue }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="padding: 20px; text-align: center; color: #6b7280;">No product data this week</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Customer Insights -->
+        <div style="padding: 0 30px 30px;">
+            <h3 style="color: #1f2937; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">Customer Insights</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                <div style="flex: 1; min-width: 130px; background: #f0fdf4; padding: 15px; border-radius: 10px; text-align: center;">
+                    <p style="color: #16a34a; margin: 0; font-size: 13px;">New Customers</p>
+                    <p style="color: #1f2937; margin: 5px 0 0 0; font-size: 24px; font-weight: bold;">{{ new_customers }}</p>
+                </div>
+                <div style="flex: 1; min-width: 130px; background: #eff6ff; padding: 15px; border-radius: 10px; text-align: center;">
+                    <p style="color: #3b82f6; margin: 0; font-size: 13px;">Returning</p>
+                    <p style="color: #1f2937; margin: 5px 0 0 0; font-size: 24px; font-weight: bold;">{{ returning_customers }}</p>
+                </div>
+            </div>
+            {% if top_locations %}
+            <div style="margin-top: 15px;">
+                <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px;">Top Locations:</p>
+                <ul style="margin: 0; padding-left: 20px; color: #1f2937;">
+                    {% for location in top_locations %}
+                    <li>{{ location }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- CTA -->
+        <div style="padding: 0 30px 30px; text-align: center;">
+            <a href="https://afrovending.com/vendor/dashboard" style="display: inline-block; background: #dc2626; color: #ffffff; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                View Full Dashboard
+            </a>
+        </div>
+        
+        <!-- Footer -->
+        <div style="background: #f9fafb; padding: 20px 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+            <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 13px;">
+                You're receiving this because you're a Growth+ subscriber on Afrovending.
+            </p>
+            <p style="color: #9ca3af; margin: 0; font-size: 12px;">
+                <a href="https://afrovending.com/vendor/dashboard" style="color: #6b7280;">Manage email preferences</a> | 
+                <a href="https://afrovending.com" style="color: #6b7280;">Afrovending.com</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
