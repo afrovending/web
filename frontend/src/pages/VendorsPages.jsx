@@ -174,12 +174,17 @@ const VendorPage = () => {
         {/* Vendor Info */}
         <div className="relative -mt-16 mb-8">
           <div className="flex flex-col md:flex-row items-start gap-6">
-            <div className="w-32 h-32 rounded-2xl bg-card border-4 border-background overflow-hidden shadow-lg">
+            <div className="relative w-32 h-32 rounded-2xl bg-card border-4 border-background overflow-hidden shadow-lg">
               <img
                 src={vendor.logo_url || 'https://images.unsplash.com/photo-1687422808565-929533931584?w=300'}
                 alt={vendor.store_name}
                 className="w-full h-full object-cover"
               />
+              {vendor.is_verified_seller && (
+                <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white p-2 rounded-full shadow-lg" title="Verified Seller">
+                  <BadgeCheck className="h-5 w-5" />
+                </div>
+              )}
             </div>
             <div className="flex-1 pt-4">
               <Button variant="ghost" size="sm" asChild className="mb-2 -ml-2">
@@ -188,9 +193,17 @@ const VendorPage = () => {
                   All Vendors
                 </Link>
               </Button>
-              <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground" data-testid="vendor-name">
-                {vendor.store_name}
-              </h1>
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground" data-testid="vendor-name">
+                  {vendor.store_name}
+                </h1>
+                {vendor.is_verified_seller && (
+                  <span className="inline-flex items-center gap-1.5 bg-blue-100 text-blue-700 text-sm font-medium px-3 py-1 rounded-full" data-testid="vendor-verified-badge">
+                    <BadgeCheck className="h-4 w-4" />
+                    Verified Seller
+                  </span>
+                )}
+              </div>
               {(vendor.city || vendor.country) && (
                 <p className="text-muted-foreground flex items-center gap-1 mt-2">
                   <MapPin className="h-4 w-4" />
