@@ -69,6 +69,8 @@ const AppContent = () => {
                     <Route path="/products/:productId" element={<ProductDetailPage />} />
                     <Route path="/cart" element={<CartPage />} />
                     <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+                    <Route path="/checkout/paypal/success" element={<PayPalSuccessPage />} />
+                    <Route path="/checkout/paypal/cancel" element={<PayPalCancelPage />} />
                     <Route path="/wishlist" element={<WishlistPage />} />
                     <Route path="/dashboard" element={<UserDashboard />} />
                     <Route path="/vendor/dashboard" element={<VendorDashboard />} />
