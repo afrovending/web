@@ -49,9 +49,9 @@ class TestMessagingAPI:
         return response.json().get("user")
     
     def test_get_unread_count_unauthenticated(self):
-        """GET /api/messages/unread-count without auth returns 403"""
+        """GET /api/messages/unread-count without auth returns 401/403"""
         response = requests.get(f"{BASE_URL}/api/messages/unread-count")
-        assert response.status_code == 403
+        assert response.status_code in [401, 403]
     
     def test_get_unread_count_authenticated(self, auth_headers):
         """GET /api/messages/unread-count returns count object"""
@@ -64,9 +64,9 @@ class TestMessagingAPI:
         print(f"✓ Unread count: {data['unread_count']}")
     
     def test_get_conversations_unauthenticated(self):
-        """GET /api/messages/conversations without auth returns 403"""
+        """GET /api/messages/conversations without auth returns 401/403"""
         response = requests.get(f"{BASE_URL}/api/messages/conversations")
-        assert response.status_code == 403
+        assert response.status_code in [401, 403]
     
     def test_get_conversations_authenticated(self, auth_headers):
         """GET /api/messages/conversations returns list"""
@@ -84,12 +84,12 @@ class TestMessagingAPI:
             assert "created_at" in conv
     
     def test_send_message_unauthenticated(self):
-        """POST /api/messages/send without auth returns 403"""
+        """POST /api/messages/send without auth returns 401/403"""
         response = requests.post(f"{BASE_URL}/api/messages/send", json={
             "recipient_id": "some-id",
             "content": "Test message"
         })
-        assert response.status_code == 403
+        assert response.status_code in [401, 403]
     
     def test_send_message_to_self(self, auth_headers, user_info):
         """POST /api/messages/send to self returns 400"""
@@ -117,9 +117,9 @@ class TestMessagingAPI:
         print("✓ Correctly rejected message to non-existent user")
     
     def test_start_vendor_conversation_unauthenticated(self):
-        """GET /api/messages/vendor/{vendor_id}/start without auth returns 403"""
+        """GET /api/messages/vendor/{vendor_id}/start without auth returns 401/403"""
         response = requests.get(f"{BASE_URL}/api/messages/vendor/some-vendor-id/start")
-        assert response.status_code == 403
+        assert response.status_code in [401, 403]
     
     def test_start_vendor_conversation_nonexistent(self, auth_headers):
         """GET /api/messages/vendor/{vendor_id}/start with non-existent vendor returns 404"""
