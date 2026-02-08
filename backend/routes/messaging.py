@@ -272,6 +272,14 @@ async def send_message(
         }
     )
     
+    # Broadcast message via WebSocket to all conversation participants
+    ws_message = {
+        "type": "new_message",
+        "message": new_message,
+        "conversation_id": conversation["id"]
+    }
+    await manager.send_to_conversation(ws_message, conversation["participant_ids"])
+    
     logger.info(f"Message sent from {user['id']} to {message.recipient_id}")
     return new_message
 
