@@ -8,6 +8,8 @@ from .vendors import router as vendors_router
 from .services import router as services_router
 from .bookings import router as bookings_router
 from .cart import router as cart_router
+from .coupons import router as coupons_router
+from .orders import router as orders_router
 
 __all__ = [
     'auth_router',
@@ -17,4 +19,6 @@ __all__ = [
     'services_router',
     'bookings_router',
     'cart_router',
+    'coupons_router',
+    'orders_router',
 ]
