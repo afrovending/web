@@ -1166,6 +1166,7 @@ async def get_product(product_id: str):
     
     vendor = await db.vendors.find_one({"id": product.get("vendor_id")}, {"_id": 0, "store_name": 1})
     product["vendor_name"] = vendor.get("store_name") if vendor else "Unknown Vendor"
+    product["is_verified_seller"] = await check_vendor_verified_status(product.get("vendor_id"))
     
     return product
 
