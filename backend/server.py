@@ -3396,6 +3396,11 @@ async def startup_db_client():
     await db.bookings.create_index([("service_id", 1), ("booking_date", 1), ("booking_time", 1)])
     await db.service_reviews.create_index([("service_id", 1), ("user_id", 1)], unique=True)
     
+    # Subscription indexes
+    await db.vendor_subscriptions.create_index("id", unique=True)
+    await db.vendor_subscriptions.create_index("vendor_id")
+    await db.vendor_subscriptions.create_index("stripe_subscription_id")
+    
     # Seed categories if empty
     cat_count = await db.categories.count_documents({})
     if cat_count == 0:
