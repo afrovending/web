@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingCart, Star } from 'lucide-react';
+import { Heart, ShoppingCart, Star, BadgeCheck } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -72,6 +72,19 @@ const ProductCard = ({ product }) => {
           </span>
         )}
         
+        {/* Verified Seller Badge */}
+        {product.is_verified_seller && (
+          <span 
+            className="absolute top-3 left-3 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1"
+            style={{ left: discountPercentage > 0 ? '70px' : '12px' }}
+            title="Verified Seller"
+            data-testid={`verified-badge-${product.id}`}
+          >
+            <BadgeCheck className="h-3 w-3" />
+            Verified
+          </span>
+        )}
+        
         {/* Quick Actions */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <Button
@@ -96,7 +109,12 @@ const ProductCard = ({ product }) => {
 
       {/* Content */}
       <div className="p-4">
-        <p className="text-xs text-muted-foreground mb-1 font-body">{product.vendor_name}</p>
+        <div className="flex items-center gap-1 mb-1">
+          <p className="text-xs text-muted-foreground font-body">{product.vendor_name}</p>
+          {product.is_verified_seller && (
+            <BadgeCheck className="h-3 w-3 text-blue-500" title="Verified Seller" />
+          )}
+        </div>
         <h3 className="font-heading font-semibold text-foreground line-clamp-2 mb-2 group-hover:text-primary transition-colors">
           {product.name}
         </h3>
