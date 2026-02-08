@@ -81,6 +81,16 @@ app = FastAPI(title="Afrovending API", description="E-commerce marketplace for A
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Import modular routes
+from routes.auth import router as auth_router
+from routes.categories import router as categories_router
+from routes.products import router as products_router
+
+# Register modular routers (these will take precedence over inline routes)
+api_router.include_router(auth_router)
+api_router.include_router(categories_router)
+api_router.include_router(products_router)
+
 security = HTTPBearer()
 
 # Configure logging
