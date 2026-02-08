@@ -1070,6 +1070,28 @@ async def create_product(product: ProductCreate, user: dict = Depends(require_ve
     if not vendor and user["role"] != "admin":
         raise HTTPException(status_code=400, detail="You must be a vendor to create products")
     
+    # Check subscription product limit
+    if vendor:
+        current_product_count = await db.products.count_documents({"vendor_id": vendor["id"]})
+        
+        # Get vendor's subscription or default to starter
+        subscription = await db.vendor_subscriptions.find_one(
+            {"vendor_id": vendor["id"], "status": {"$in": ["active", "trialing"]}},
+            {"_id": 0}
+        )
+        
+        if subscription:
+            product_limit = subscription.get("product_limit", 5)
+        else:
+            # Default to starter plan limit
+            product_limit = SUBSCRIPTION_PLANS["starter"].product_limit
+        
+        if product_limit != -1 and current_product_count >= product_limit:
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Product limit reached ({product_limit} products). Upgrade your subscription to add more products."
+            )
+    
     product_id = str(uuid.uuid4())
     vendor_id = vendor["id"] if vendor else user["id"]
     
