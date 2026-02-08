@@ -13,6 +13,7 @@ import VariantSelector from '../components/VariantSelector';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useCompare } from '../contexts/CompareContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -23,6 +24,7 @@ const ProductDetailPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const { addToCart } = useCart();
+  const { displayPrice, currency } = useCurrency();
   const { addToCompare, isInCompare, removeFromCompare } = useCompare();
   
   const [product, setProduct] = useState(null);
