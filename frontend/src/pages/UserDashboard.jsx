@@ -86,6 +86,88 @@ const UserDashboard = () => {
     }
   };
 
+  // Address management functions
+  const resetAddressForm = () => {
+    setAddressForm({
+      label: '',
+      recipient_name: '',
+      street_address: '',
+      apartment: '',
+      city: '',
+      state: '',
+      postal_code: '',
+      country: '',
+      phone: '',
+      is_default: false
+    });
+    setEditingAddress(null);
+  };
+
+  const handleOpenAddressDialog = (address = null) => {
+    if (address) {
+      setEditingAddress(address);
+      setAddressForm({
+        label: address.label || '',
+        recipient_name: address.recipient_name || '',
+        street_address: address.street_address || '',
+        apartment: address.apartment || '',
+        city: address.city || '',
+        state: address.state || '',
+        postal_code: address.postal_code || '',
+        country: address.country || '',
+        phone: address.phone || '',
+        is_default: address.is_default || false
+      });
+    } else {
+      resetAddressForm();
+    }
+    setAddressDialogOpen(true);
+  };
+
+  const handleSaveAddress = async (e) => {
+    e.preventDefault();
+    setSavingAddress(true);
+    try {
+      if (editingAddress) {
+        await axios.put(`${API}/user/addresses/${editingAddress.id}`, addressForm);
+        toast.success('Address updated successfully');
+      } else {
+        await axios.post(`${API}/user/addresses`, addressForm);
+        toast.success('Address added successfully');
+      }
+      const response = await axios.get(`${API}/user/addresses`);
+      setAddresses(response.data);
+      setAddressDialogOpen(false);
+      resetAddressForm();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to save address');
+    } finally {
+      setSavingAddress(false);
+    }
+  };
+
+  const handleDeleteAddress = async (addressId) => {
+    if (!window.confirm('Are you sure you want to delete this address?')) return;
+    try {
+      await axios.delete(`${API}/user/addresses/${addressId}`);
+      toast.success('Address deleted');
+      setAddresses(addresses.filter(a => a.id !== addressId));
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to delete address');
+    }
+  };
+
+  const handleSetDefaultAddress = async (addressId) => {
+    try {
+      await axios.put(`${API}/user/addresses/${addressId}/default`);
+      toast.success('Default address updated');
+      const response = await axios.get(`${API}/user/addresses`);
+      setAddresses(response.data);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to set default address');
+    }
+  };
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
