@@ -327,6 +327,9 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Email Templates Refactoring: 100% (Jinja2 templates, 5 template files, full testing)
 - Multiple Shipping Addresses: 100% (28/28 backend tests, full CRUD + UI)
 - Enhanced Review/Rating UI: 100% (Rating breakdown, helpful votes, verified badges)
+- Product Image Gallery: 100% (lightbox, zoom, keyboard nav all working)
+- Product Comparison: 100% (compare tray, page, max 4 limit, localStorage persistence)
+- Vendor Messaging: 100% (20/20 backend tests, full chat UI working)
 
 ## Prioritized Backlog
 
