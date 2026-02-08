@@ -74,7 +74,6 @@ if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and S3_BUCKET_NAME:
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
         region_name=AWS_REGION
     )
-    logger.info(f"S3 client initialized for bucket: {S3_BUCKET_NAME}")
 
 # Create the main app
 app = FastAPI(title="Afrovending API", description="E-commerce marketplace for African vendors")
