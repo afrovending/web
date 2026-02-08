@@ -15,6 +15,8 @@ from .upload import router as upload_router
 from .tracking import router as tracking_router
 from .payouts import router as payouts_router
 from .subscriptions import router as subscriptions_router
+from .analytics import router as analytics_router
+from .email_reports import router as email_reports_router
 
 __all__ = [
     'auth_router',
@@ -31,4 +33,6 @@ __all__ = [
     'tracking_router',
     'payouts_router',
     'subscriptions_router',
+    'analytics_router',
+    'email_reports_router',
 ]
