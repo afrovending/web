@@ -1078,6 +1078,15 @@ async def search_suggestions(q: str, limit: int = 10):
     
     return {"suggestions": list(suggestions)[:limit]}
 
+# Helper function to check if vendor has verified seller status (Growth+ subscription)
+async def check_vendor_verified_status(vendor_id: str) -> bool:
+    """Check if vendor has Growth+ subscription for verified seller badge"""
+    subscription = await db.vendor_subscriptions.find_one(
+        {"vendor_id": vendor_id, "status": {"$in": ["active", "trialing"]}, "plan_id": {"$in": ["growth", "pro", "enterprise"]}},
+        {"_id": 0}
+    )
+    return subscription is not None
+
 @api_router.get("/products", response_model=List[ProductResponse])
 async def get_products(
     category_id: Optional[str] = None,
