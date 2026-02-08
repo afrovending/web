@@ -20,7 +20,7 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - **Database**: MongoDB
 - **Payment**: Stripe Checkout API + Stripe Connect + PayPal REST API
 - **Email**: SendGrid API
-- **File Storage**: Local uploads (/app/backend/uploads/)
+- **File Storage**: AWS S3 (afrovending-uploads bucket, us-east-2)
 - **Deployment**: Kubernetes container with Nginx proxy
 
 ## What's Been Implemented (Feb 8, 2026)
@@ -102,6 +102,13 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
   - Booking Notifications toggle
   - Marketing & Tips toggle
 - **Scheduler Endpoint**: POST /api/analytics/send-all-weekly-reports (requires API key)
+
+### AWS S3 Image Storage (NEW - Feb 8, 2026)
+- **Bucket**: afrovending-uploads (us-east-2)
+- **Public Access**: Images uploaded with `public-read` ACL
+- **URL Format**: `https://afrovending-uploads.s3.us-east-2.amazonaws.com/products/{uuid}.{ext}`
+- **Fallback**: Local storage if S3 credentials not configured
+- **Validation**: 5MB max size, JPEG/PNG/WebP/GIF only
 
 ### PayPal Payment Integration (NEW - Feb 8, 2026)
 - **Sandbox Mode**: Currently configured for PayPal sandbox testing
@@ -242,12 +249,12 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Weekly Email Reports: 100% (15/15 backend, all frontend features working)
 - Verified Seller Badge: 100% (15/15 backend, all frontend displays working)
 - PayPal Integration: 100% (backend endpoints working, frontend UI integrated)
+- AWS S3 Image Storage: 100% (uploads working, images publicly accessible)
 
 ## Prioritized Backlog
 
 ### P0 (Critical)
-- Cloud storage for images (AWS S3) - replace local storage (non-persistent)
-- Refactor server.py into modular APIRouters (4600+ lines)
+- Refactor server.py into modular APIRouters (4600+ lines) - URGENT
 
 ### P1 (High Priority)
 - Google Social Login integration
