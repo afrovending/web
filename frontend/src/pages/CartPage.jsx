@@ -4,6 +4,7 @@ import { Trash2, Minus, Plus, ShoppingBag, ArrowRight, Tag, CreditCard, Loader2 
 import { Button } from '../components/ui/button';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { toast } from 'sonner';
 import axios from 'axios';
 import CouponInput from '../components/CouponInput';
@@ -21,6 +22,7 @@ const CartPage = () => {
   const navigate = useNavigate();
   const { cart, updateQuantity, removeFromCart, loading, fetchCart } = useCart();
   const { isAuthenticated } = useAuth();
+  const { displayPrice, currency } = useCurrency();
   const [checkoutLoading, setCheckoutLoading] = useState(null); // 'stripe' | 'paypal' | null
 
   const handleCouponApplied = () => {
