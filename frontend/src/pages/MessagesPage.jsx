@@ -410,14 +410,26 @@ const MessagesPage = () => {
                     >
                       <ChevronLeft className="h-5 w-5" />
                     </Button>
-                    <Avatar>
-                      <AvatarFallback>
-                        {getOtherParticipant(activeConversation)?.name?.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar>
+                        <AvatarFallback>
+                          {getOtherParticipant(activeConversation)?.name?.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      {/* Online indicator */}
+                      {onlineUsers.has(getOtherParticipant(activeConversation)?.id) && (
+                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
+                      )}
+                    </div>
                     <div>
-                      <h3 className="font-semibold">
-                        {getOtherParticipant(activeConversation)?.name}
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold">
+                          {getOtherParticipant(activeConversation)?.name}
+                        </h3>
+                        {onlineUsers.has(getOtherParticipant(activeConversation)?.id) && (
+                          <span className="text-xs text-green-500">Online</span>
+                        )}
+                      </div>
                       </h3>
                       {activeConversation.product_name && (
                         <Link 
