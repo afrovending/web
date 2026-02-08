@@ -251,6 +251,9 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - PayPal Integration: 100% (backend endpoints working, frontend UI integrated)
 - AWS S3 Image Storage: 100% (uploads working, images publicly accessible)
 - Google Social Login: 100% (12/12 backend tests, all frontend flows working)
+- Email Templates Refactoring: 100% (Jinja2 templates, 5 template files, full testing)
+- Multiple Shipping Addresses: 100% (28/28 backend tests, full CRUD + UI)
+- Enhanced Review/Rating UI: 100% (Rating breakdown, helpful votes, verified badges)
 
 ## Prioritized Backlog
 
@@ -274,20 +277,32 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
   - Backend session management with cookies + JWT
   - User auto-registration from Google profile
 
-### P2 (Nice to Have)
+### P2 (Nice to Have) - COMPLETED ✅ (Feb 8, 2026)
 - Multiple shipping addresses
+  - Full CRUD API: /api/user/addresses/*
+  - Max 10 addresses per user
+  - Default address management
+  - Address Book tab in User Dashboard
 - Enhanced review/rating UI for services
+  - Rating breakdown with progress bars
+  - Helpful voting buttons
+  - Verified purchase badges
+  - Review images support
+- Email templates refactoring
+  - Jinja2 templates in /backend/templates/
+  - 5 template files extracted from inline HTML
+  - Centralized rendering via email_templates.py
 
 ## Technical Debt
-- **server.py refactoring**: File is over 4600 lines and should be split into modular APIRouters
-- **Image persistence**: Currently uses local /app/backend/uploads/ which is lost on redeployment
-- **Utils folder created**: /app/backend/utils/ with database.py, auth.py, email.py (ready for modular refactoring)
+- **Email reports HTML**: ✅ RESOLVED - Extracted to Jinja2 templates
+- **Image persistence**: ✅ RESOLVED - Now uses AWS S3 for cloud storage
+- **Utils folder**: Created /app/backend/utils/ with database.py, auth.py, email.py, email_templates.py
 
 ## Next Tasks
-1. Implement PayPal checkout flow
-2. Add cloud storage for images (S3)
-3. Implement Google Social Login (Emergent-managed OAuth)
-4. Complete server.py modular refactoring (utils folder already created)
+1. Add multiple images per product (gallery feature)
+2. Implement product comparison feature
+3. Add vendor messaging/chat system
+4. Implement multi-currency support
 
 ## Subscription Plans Data Structure
 
