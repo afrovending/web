@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Star, Heart, ShoppingCart, Minus, Plus, ChevronLeft, Store, Truck, Shield, RotateCcw, BadgeCheck } from 'lucide-react';
+import { Star, Heart, ShoppingCart, Minus, Plus, ChevronLeft, Store, Truck, Shield, RotateCcw, BadgeCheck, MessageCircle, GitCompare } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Textarea } from '../components/ui/textarea';
 import { Input } from '../components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Badge } from '../components/ui/badge';
+import { ImageGallery } from '../components/ui/image-gallery';
 import ProductCard from '../components/ProductCard';
 import VariantSelector from '../components/VariantSelector';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useCompare } from '../contexts/CompareContext';
 import { toast } from 'sonner';
 import axios from 'axios';
 
