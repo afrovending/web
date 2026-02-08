@@ -1,6 +1,6 @@
 """
-Configuration and database connections for Afrovending API
-This module centralizes all configuration settings and database connections.
+Shared database and configuration for Afrovending API
+All routes import from here to access db, logger, and config values.
 """
 import os
 import logging
@@ -8,6 +8,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 import boto3
+import stripe
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -28,6 +29,7 @@ JWT_EXPIRATION_HOURS = 24
 
 # Stripe Configuration
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
+stripe.api_key = STRIPE_API_KEY
 
 # Stripe Connect Configuration
 STRIPE_CONNECT_CLIENT_ID = os.environ.get('STRIPE_CONNECT_CLIENT_ID', '')
@@ -63,4 +65,3 @@ if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and S3_BUCKET_NAME:
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
         region_name=AWS_REGION
     )
-    logger.info(f"S3 client initialized for bucket: {S3_BUCKET_NAME}")
