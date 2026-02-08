@@ -250,6 +250,25 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
   - PUT /api/vendors/:id/storefront/featured-products
   - PUT /api/vendors/:id/storefront/sections
 
+### Storefront Analytics (NEW - Feb 8, 2026)
+- **Backend**: `/backend/routes/vendors.py` (lines 380-646)
+- **Frontend**: `/components/StorefrontAnalytics.jsx`
+- **Metrics Tracked**:
+  - Total page views
+  - Unique visitors (by session)
+  - Views today/this week/this month
+  - Views by day (chart data)
+  - Top referrers with counts
+  - Device breakdown (mobile/desktop/tablet)
+  - Peak hours by time of day
+  - Product click-through tracking
+- **API Endpoints**:
+  - POST /api/vendors/:id/storefront/track-view (public)
+  - GET /api/vendors/:id/storefront/analytics (auth required)
+  - GET /api/vendors/:id/storefront/analytics/summary
+- **MongoDB Collections**: storefront_views, storefront_product_clicks
+- **Charts**: Line chart (views over time), Pie chart (devices), Bar chart (peak hours)
+
 ### Coupon/Discount System (Feb 8, 2026)
 - **Coupon Types**: Percentage or fixed amount discounts
 - **Validation Rules**: Min order amount, max discount cap, usage limits
