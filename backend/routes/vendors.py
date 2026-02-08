@@ -4,6 +4,7 @@ Vendor routes for Afrovending API
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional
 from datetime import datetime, timezone
+from pydantic import BaseModel, Field
 import uuid
 
 from config import db, logger
@@ -11,6 +12,73 @@ from utils.auth import get_current_user, require_admin
 from models import VendorCreate, VendorResponse
 
 router = APIRouter(tags=["Vendors"])
+
+
+# ==================== STOREFRONT MODELS ====================
+
+class SocialLinks(BaseModel):
+    instagram: Optional[str] = None
+    facebook: Optional[str] = None
+    twitter: Optional[str] = None
+    tiktok: Optional[str] = None
+    youtube: Optional[str] = None
+    website: Optional[str] = None
+
+class StorefrontTheme(BaseModel):
+    primary_color: str = "#dc2626"  # Default red
+    accent_color: str = "#1a1a1a"   # Default dark
+    background_style: str = "light"  # light, dark, gradient
+    layout_style: str = "grid"       # grid, list, masonry
+    preset: Optional[str] = None     # preset theme name if using preset
+
+class StorefrontSection(BaseModel):
+    id: str
+    type: str  # featured_products, about, categories, testimonials, gallery
+    title: str
+    enabled: bool = True
+    order: int = 0
+    settings: dict = {}
+
+class StorefrontSettings(BaseModel):
+    banner_url: Optional[str] = None
+    logo_url: Optional[str] = None
+    tagline: Optional[str] = None
+    about_text: Optional[str] = None
+    about_html: Optional[str] = None  # Rich text HTML
+    theme: StorefrontTheme = StorefrontTheme()
+    social_links: SocialLinks = SocialLinks()
+    featured_product_ids: List[str] = []
+    sections: List[StorefrontSection] = []
+    show_reviews: bool = True
+    show_product_count: bool = True
+    show_member_since: bool = True
+    custom_css: Optional[str] = None  # Advanced: custom CSS
+
+class StorefrontUpdate(BaseModel):
+    banner_url: Optional[str] = None
+    logo_url: Optional[str] = None
+    tagline: Optional[str] = None
+    about_text: Optional[str] = None
+    about_html: Optional[str] = None
+    theme: Optional[StorefrontTheme] = None
+    social_links: Optional[SocialLinks] = None
+    featured_product_ids: Optional[List[str]] = None
+    sections: Optional[List[StorefrontSection]] = None
+    show_reviews: Optional[bool] = None
+    show_product_count: Optional[bool] = None
+    show_member_since: Optional[bool] = None
+    custom_css: Optional[str] = None
+
+
+# Theme presets
+THEME_PRESETS = {
+    "classic": {"primary_color": "#dc2626", "accent_color": "#1a1a1a", "background_style": "light"},
+    "ocean": {"primary_color": "#0891b2", "accent_color": "#164e63", "background_style": "light"},
+    "forest": {"primary_color": "#16a34a", "accent_color": "#14532d", "background_style": "light"},
+    "sunset": {"primary_color": "#ea580c", "accent_color": "#7c2d12", "background_style": "light"},
+    "royal": {"primary_color": "#7c3aed", "accent_color": "#4c1d95", "background_style": "light"},
+    "midnight": {"primary_color": "#6366f1", "accent_color": "#312e81", "background_style": "dark"},
+}
 
 
 async def check_vendor_verified_status(vendor_id: str) -> bool:
