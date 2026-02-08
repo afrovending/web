@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { MapPin, Package, ArrowLeft } from 'lucide-react';
+import { MapPin, Package, ArrowLeft, BadgeCheck } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import ProductCard from '../components/ProductCard';
 import axios from 'axios';
