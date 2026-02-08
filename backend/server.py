@@ -105,6 +105,7 @@ from routes.subscriptions import router as subscriptions_router
 from routes.analytics import router as analytics_router
 from routes.email_reports import router as email_reports_router
 from routes.users import router as users_router
+from routes.messaging import router as messaging_router
 
 # Register modular routers (these will take precedence over inline routes)
 api_router.include_router(auth_router)
