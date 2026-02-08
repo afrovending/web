@@ -3873,6 +3873,592 @@ async def get_product_analytics(
         "purchases_trend": purchases_trend[-30:]
     }
 
+# ==================== EMAIL REPORTS ENDPOINTS ====================
+
+@api_router.get("/vendor/email-preferences", response_model=VendorEmailPreferences)
+async def get_email_preferences(user: dict = Depends(get_current_user)):
+    """Get vendor's email notification preferences"""
+    if user["role"] not in ["vendor", "admin"]:
+        raise HTTPException(status_code=403, detail="Only vendors can access email preferences")
+    
+    vendor = await db.vendors.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor profile not found")
+    
+    # Return preferences or defaults
+    preferences = vendor.get("email_preferences", {})
+    return VendorEmailPreferences(
+        weekly_analytics_report=preferences.get("weekly_analytics_report", True),
+        order_notifications=preferences.get("order_notifications", True),
+        booking_notifications=preferences.get("booking_notifications", True),
+        marketing_emails=preferences.get("marketing_emails", True)
+    )
+
+@api_router.put("/vendor/email-preferences", response_model=VendorEmailPreferences)
+async def update_email_preferences(
+    request: UpdateEmailPreferencesRequest,
+    user: dict = Depends(get_current_user)
+):
+    """Update vendor's email notification preferences"""
+    if user["role"] not in ["vendor", "admin"]:
+        raise HTTPException(status_code=403, detail="Only vendors can update email preferences")
+    
+    vendor = await db.vendors.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor profile not found")
+    
+    # Get current preferences
+    current = vendor.get("email_preferences", {
+        "weekly_analytics_report": True,
+        "order_notifications": True,
+        "booking_notifications": True,
+        "marketing_emails": True
+    })
+    
+    # Update only provided fields
+    update_data = request.model_dump(exclude_none=True)
+    current.update(update_data)
+    
+    await db.vendors.update_one(
+        {"id": vendor["id"]},
+        {"$set": {"email_preferences": current}}
+    )
+    
+    return VendorEmailPreferences(**current)
+
+async def generate_weekly_report_html(report: WeeklyReportData) -> str:
+    """Generate HTML email for weekly analytics report"""
+    
+    # Format top products
+    top_products_html = ""
+    for i, product in enumerate(report.top_products[:5], 1):
+        top_products_html += f"""
+        <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #eee;">{i}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #eee;">{product['product_name'][:30]}...</td>
+            <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">{product['views']}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">{product['purchases']}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a;">${product['revenue']:.2f}</td>
+        </tr>
+        """
+    
+    # Format top locations
+    locations_html = ""
+    for loc in report.top_locations[:3]:
+        locations_html += f"<li>{loc['location']}: {loc['count']} customers</li>"
+    
+    # Revenue change indicator
+    rev_change_color = "#16a34a" if report.revenue_change >= 0 else "#dc2626"
+    rev_change_icon = "↑" if report.revenue_change >= 0 else "↓"
+    
+    orders_change_color = "#16a34a" if report.orders_change >= 0 else "#dc2626"
+    orders_change_icon = "↑" if report.orders_change >= 0 else "↓"
+    
+    views_change_color = "#16a34a" if report.views_change >= 0 else "#dc2626"
+    views_change_icon = "↑" if report.views_change >= 0 else "↓"
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); padding: 30px; text-align: center;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 24px;">📊 Weekly Analytics Report</h1>
+                <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">
+                    {report.period_start} - {report.period_end}
+                </p>
+            </div>
+            
+            <!-- Greeting -->
+            <div style="padding: 30px 30px 20px;">
+                <h2 style="color: #1f2937; margin: 0 0 10px 0;">Hi {report.vendor_name}! 👋</h2>
+                <p style="color: #6b7280; margin: 0;">Here's your weekly performance summary on Afrovending.</p>
+            </div>
+            
+            <!-- Key Metrics -->
+            <div style="padding: 0 30px 30px;">
+                <h3 style="color: #1f2937; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">💰 Sales Overview</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div style="flex: 1; min-width: 150px; background: #f9fafb; padding: 20px; border-radius: 10px; text-align: center;">
+                        <p style="color: #6b7280; margin: 0 0 5px 0; font-size: 14px;">Total Revenue</p>
+                        <p style="color: #1f2937; margin: 0; font-size: 28px; font-weight: bold;">${report.total_revenue:.2f}</p>
+                        <p style="color: {rev_change_color}; margin: 5px 0 0 0; font-size: 14px;">
+                            {rev_change_icon} {abs(report.revenue_change):.1f}% vs last week
+                        </p>
+                    </div>
+                    <div style="flex: 1; min-width: 150px; background: #f9fafb; padding: 20px; border-radius: 10px; text-align: center;">
+                        <p style="color: #6b7280; margin: 0 0 5px 0; font-size: 14px;">Total Orders</p>
+                        <p style="color: #1f2937; margin: 0; font-size: 28px; font-weight: bold;">{report.total_orders}</p>
+                        <p style="color: {orders_change_color}; margin: 5px 0 0 0; font-size: 14px;">
+                            {orders_change_icon} {abs(report.orders_change):.1f}% vs last week
+                        </p>
+                    </div>
+                    <div style="flex: 1; min-width: 150px; background: #f9fafb; padding: 20px; border-radius: 10px; text-align: center;">
+                        <p style="color: #6b7280; margin: 0 0 5px 0; font-size: 14px;">Avg. Order Value</p>
+                        <p style="color: #1f2937; margin: 0; font-size: 28px; font-weight: bold;">${report.average_order_value:.2f}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Traffic Stats -->
+            <div style="padding: 0 30px 30px;">
+                <h3 style="color: #1f2937; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">👁️ Traffic & Engagement</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div style="flex: 1; min-width: 120px; background: #eff6ff; padding: 15px; border-radius: 10px; text-align: center;">
+                        <p style="color: #3b82f6; margin: 0 0 5px 0; font-size: 13px;">Total Views</p>
+                        <p style="color: #1f2937; margin: 0; font-size: 22px; font-weight: bold;">{report.total_views}</p>
+                        <p style="color: {views_change_color}; margin: 5px 0 0 0; font-size: 12px;">
+                            {views_change_icon} {abs(report.views_change):.1f}%
+                        </p>
+                    </div>
+                    <div style="flex: 1; min-width: 120px; background: #f0fdf4; padding: 15px; border-radius: 10px; text-align: center;">
+                        <p style="color: #16a34a; margin: 0 0 5px 0; font-size: 13px;">Unique Visitors</p>
+                        <p style="color: #1f2937; margin: 0; font-size: 22px; font-weight: bold;">{report.unique_visitors}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Conversion Funnel -->
+            <div style="padding: 0 30px 30px;">
+                <h3 style="color: #1f2937; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">📈 Conversion Rates</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 10px; background: #fef2f2; border-radius: 8px 0 0 8px;">
+                            <p style="margin: 0; font-size: 13px; color: #6b7280;">View → Cart</p>
+                            <p style="margin: 5px 0 0 0; font-size: 20px; font-weight: bold; color: #dc2626;">{report.view_to_cart_rate}%</p>
+                        </td>
+                        <td style="padding: 10px; background: #fef9c3;">
+                            <p style="margin: 0; font-size: 13px; color: #6b7280;">Cart → Purchase</p>
+                            <p style="margin: 5px 0 0 0; font-size: 20px; font-weight: bold; color: #ca8a04;">{report.cart_to_purchase_rate}%</p>
+                        </td>
+                        <td style="padding: 10px; background: #dcfce7; border-radius: 0 8px 8px 0;">
+                            <p style="margin: 0; font-size: 13px; color: #6b7280;">Overall</p>
+                            <p style="margin: 5px 0 0 0; font-size: 20px; font-weight: bold; color: #16a34a;">{report.overall_conversion_rate}%</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Top Products -->
+            <div style="padding: 0 30px 30px;">
+                <h3 style="color: #1f2937; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">🏆 Top Products</h3>
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                    <thead>
+                        <tr style="background: #f9fafb;">
+                            <th style="padding: 12px; text-align: left;">#</th>
+                            <th style="padding: 12px; text-align: left;">Product</th>
+                            <th style="padding: 12px; text-align: right;">Views</th>
+                            <th style="padding: 12px; text-align: right;">Sales</th>
+                            <th style="padding: 12px; text-align: right;">Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {top_products_html if top_products_html else '<tr><td colspan="5" style="padding: 20px; text-align: center; color: #6b7280;">No product data this week</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Customer Insights -->
+            <div style="padding: 0 30px 30px;">
+                <h3 style="color: #1f2937; border-bottom: 2px solid #dc2626; padding-bottom: 10px;">👥 Customer Insights</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div style="flex: 1; min-width: 130px; background: #f0fdf4; padding: 15px; border-radius: 10px; text-align: center;">
+                        <p style="color: #16a34a; margin: 0; font-size: 13px;">New Customers</p>
+                        <p style="color: #1f2937; margin: 5px 0 0 0; font-size: 24px; font-weight: bold;">{report.new_customers}</p>
+                    </div>
+                    <div style="flex: 1; min-width: 130px; background: #eff6ff; padding: 15px; border-radius: 10px; text-align: center;">
+                        <p style="color: #3b82f6; margin: 0; font-size: 13px;">Returning</p>
+                        <p style="color: #1f2937; margin: 5px 0 0 0; font-size: 24px; font-weight: bold;">{report.returning_customers}</p>
+                    </div>
+                </div>
+                {f'<div style="margin-top: 15px;"><p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px;">Top Locations:</p><ul style="margin: 0; padding-left: 20px; color: #1f2937;">{locations_html}</ul></div>' if locations_html else ''}
+            </div>
+            
+            <!-- CTA -->
+            <div style="padding: 0 30px 30px; text-align: center;">
+                <a href="https://afrovending.com/vendor/dashboard" style="display: inline-block; background: #dc2626; color: #ffffff; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                    View Full Dashboard →
+                </a>
+            </div>
+            
+            <!-- Footer -->
+            <div style="background: #f9fafb; padding: 20px 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+                <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 13px;">
+                    You're receiving this because you're a Growth+ subscriber on Afrovending.
+                </p>
+                <p style="color: #9ca3af; margin: 0; font-size: 12px;">
+                    <a href="https://afrovending.com/vendor/dashboard" style="color: #6b7280;">Manage email preferences</a> | 
+                    <a href="https://afrovending.com" style="color: #6b7280;">Afrovending.com</a>
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return html
+
+async def get_vendor_weekly_analytics(vendor_id: str) -> Optional[WeeklyReportData]:
+    """Generate weekly analytics data for a vendor"""
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0})
+    if not vendor:
+        return None
+    
+    now = datetime.now(timezone.utc)
+    week_start = now - timedelta(days=7)
+    prev_week_start = now - timedelta(days=14)
+    
+    week_start_iso = week_start.isoformat()
+    prev_week_start_iso = prev_week_start.isoformat()
+    
+    # Current week orders
+    current_orders = await db.orders.find({
+        "created_at": {"$gte": week_start_iso},
+        "items.vendor_id": vendor_id,
+        "payment_status": "paid"
+    }, {"_id": 0}).to_list(1000)
+    
+    # Previous week orders
+    prev_orders = await db.orders.find({
+        "created_at": {"$gte": prev_week_start_iso, "$lt": week_start_iso},
+        "items.vendor_id": vendor_id,
+        "payment_status": "paid"
+    }, {"_id": 0}).to_list(1000)
+    
+    # Calculate current week revenue
+    current_revenue = 0.0
+    current_order_count = 0
+    for order in current_orders:
+        vendor_items = [item for item in order.get("items", []) if item.get("vendor_id") == vendor_id]
+        if vendor_items:
+            current_revenue += sum(item.get("price", 0) * item.get("quantity", 1) for item in vendor_items)
+            current_order_count += 1
+    
+    # Calculate previous week revenue
+    prev_revenue = 0.0
+    prev_order_count = 0
+    for order in prev_orders:
+        vendor_items = [item for item in order.get("items", []) if item.get("vendor_id") == vendor_id]
+        if vendor_items:
+            prev_revenue += sum(item.get("price", 0) * item.get("quantity", 1) for item in vendor_items)
+            prev_order_count += 1
+    
+    # Calculate changes
+    revenue_change = ((current_revenue - prev_revenue) / prev_revenue * 100) if prev_revenue > 0 else 0
+    orders_change = ((current_order_count - prev_order_count) / prev_order_count * 100) if prev_order_count > 0 else 0
+    
+    avg_order_value = current_revenue / current_order_count if current_order_count > 0 else 0
+    
+    # Traffic data
+    current_views = await db.analytics_events.count_documents({
+        "vendor_id": vendor_id,
+        "event_type": "view",
+        "timestamp": {"$gte": week_start_iso}
+    })
+    
+    prev_views = await db.analytics_events.count_documents({
+        "vendor_id": vendor_id,
+        "event_type": "view",
+        "timestamp": {"$gte": prev_week_start_iso, "$lt": week_start_iso}
+    })
+    
+    views_change = ((current_views - prev_views) / prev_views * 100) if prev_views > 0 else 0
+    
+    unique_sessions = await db.analytics_events.distinct(
+        "session_id",
+        {"vendor_id": vendor_id, "event_type": "view", "timestamp": {"$gte": week_start_iso}}
+    )
+    
+    # Conversion data
+    cart_adds = await db.analytics_events.count_documents({
+        "vendor_id": vendor_id,
+        "event_type": "cart_add",
+        "timestamp": {"$gte": week_start_iso}
+    })
+    
+    total_purchases = sum(
+        sum(item.get("quantity", 1) for item in order.get("items", []) if item.get("vendor_id") == vendor_id)
+        for order in current_orders
+    )
+    
+    view_to_cart = (cart_adds / current_views * 100) if current_views > 0 else 0
+    cart_to_purchase = (total_purchases / cart_adds * 100) if cart_adds > 0 else 0
+    overall_conversion = (total_purchases / current_views * 100) if current_views > 0 else 0
+    
+    # Top products
+    products = await db.products.find({"vendor_id": vendor_id}, {"_id": 0}).to_list(100)
+    product_analytics = []
+    
+    for product in products:
+        views = await db.analytics_events.count_documents({
+            "product_id": product["id"],
+            "event_type": "view",
+            "timestamp": {"$gte": week_start_iso}
+        })
+        
+        purchases = 0
+        product_revenue = 0.0
+        for order in current_orders:
+            for item in order.get("items", []):
+                if item.get("product_id") == product["id"]:
+                    purchases += item.get("quantity", 1)
+                    product_revenue += item.get("price", 0) * item.get("quantity", 1)
+        
+        if views > 0 or purchases > 0:
+            product_analytics.append({
+                "product_id": product["id"],
+                "product_name": product["name"],
+                "views": views,
+                "purchases": purchases,
+                "revenue": round(product_revenue, 2)
+            })
+    
+    top_products = sorted(product_analytics, key=lambda x: x["revenue"], reverse=True)[:5]
+    
+    # Customer data
+    customer_ids = set()
+    for order in current_orders:
+        customer_id = order.get("user_id")
+        if customer_id:
+            customer_ids.add(customer_id)
+    
+    # Check which are new (first order this week)
+    new_customers = 0
+    for customer_id in customer_ids:
+        first_order = await db.orders.find_one({
+            "user_id": customer_id,
+            "items.vendor_id": vendor_id,
+            "payment_status": "paid"
+        }, {"_id": 0}, sort=[("created_at", 1)])
+        
+        if first_order and first_order.get("created_at", "") >= week_start_iso:
+            new_customers += 1
+    
+    returning_customers = len(customer_ids) - new_customers
+    
+    # Top locations
+    from collections import defaultdict
+    location_counts = defaultdict(int)
+    for customer_id in customer_ids:
+        user_doc = await db.users.find_one({"id": customer_id}, {"_id": 0, "country": 1, "city": 1})
+        if user_doc:
+            location = user_doc.get("country") or user_doc.get("city") or "Unknown"
+            location_counts[location] += 1
+    
+    top_locations = [{"location": k, "count": v} for k, v in sorted(location_counts.items(), key=lambda x: x[1], reverse=True)[:5]]
+    
+    return WeeklyReportData(
+        vendor_name=vendor.get("store_name", "Vendor"),
+        period_start=week_start.strftime("%b %d"),
+        period_end=now.strftime("%b %d, %Y"),
+        total_revenue=round(current_revenue, 2),
+        total_orders=current_order_count,
+        average_order_value=round(avg_order_value, 2),
+        revenue_change=round(revenue_change, 1),
+        orders_change=round(orders_change, 1),
+        total_views=current_views,
+        unique_visitors=len(unique_sessions),
+        views_change=round(views_change, 1),
+        view_to_cart_rate=round(view_to_cart, 2),
+        cart_to_purchase_rate=round(cart_to_purchase, 2),
+        overall_conversion_rate=round(overall_conversion, 2),
+        top_products=top_products,
+        new_customers=new_customers,
+        returning_customers=max(0, returning_customers),
+        top_locations=top_locations
+    )
+
+@api_router.post("/analytics/send-weekly-report/{vendor_id}")
+async def send_weekly_report_to_vendor(
+    vendor_id: str,
+    background_tasks: BackgroundTasks,
+    user: dict = Depends(get_current_user)
+):
+    """Send weekly analytics report to a specific vendor (admin only or self)"""
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    
+    # Check authorization
+    if user["role"] != "admin" and vendor.get("user_id") != user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Check if vendor has Growth+ subscription
+    has_access = await check_analytics_access(vendor_id)
+    if not has_access:
+        raise HTTPException(status_code=403, detail="Weekly reports are only available for Growth+ subscribers")
+    
+    # Check if opted out
+    preferences = vendor.get("email_preferences", {})
+    if not preferences.get("weekly_analytics_report", True):
+        raise HTTPException(status_code=400, detail="Vendor has opted out of weekly reports")
+    
+    # Get vendor's email
+    vendor_user = await db.users.find_one({"id": vendor["user_id"]}, {"_id": 0, "email": 1, "first_name": 1})
+    if not vendor_user:
+        raise HTTPException(status_code=404, detail="Vendor user not found")
+    
+    # Generate report data
+    report_data = await get_vendor_weekly_analytics(vendor_id)
+    if not report_data:
+        raise HTTPException(status_code=500, detail="Failed to generate report")
+    
+    # Generate HTML
+    html_content = await generate_weekly_report_html(report_data)
+    
+    # Send email
+    if SENDGRID_API_KEY:
+        try:
+            from sendgrid import SendGridAPIClient
+            from sendgrid.helpers.mail import Mail, Email, To, Content
+            
+            message = Mail(
+                from_email=Email(SENDER_EMAIL, "Afrovending"),
+                to_emails=To(vendor_user["email"]),
+                subject=f"📊 Your Weekly Analytics Report - {report_data.period_start} to {report_data.period_end}",
+                html_content=Content("text/html", html_content)
+            )
+            
+            sg = SendGridAPIClient(SENDGRID_API_KEY)
+            response = sg.send(message)
+            
+            # Log the send
+            await db.email_logs.insert_one({
+                "id": str(uuid.uuid4()),
+                "type": "weekly_analytics_report",
+                "vendor_id": vendor_id,
+                "recipient": vendor_user["email"],
+                "status": "sent",
+                "sent_at": datetime.now(timezone.utc).isoformat()
+            })
+            
+            return {"message": "Weekly report sent successfully", "recipient": vendor_user["email"]}
+            
+        except Exception as e:
+            logger.error(f"Failed to send weekly report: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
+    else:
+        raise HTTPException(status_code=500, detail="Email service not configured")
+
+@api_router.post("/analytics/send-all-weekly-reports")
+async def send_all_weekly_reports(
+    background_tasks: BackgroundTasks,
+    api_key: str = Query(..., description="Admin API key for scheduled tasks")
+):
+    """Send weekly reports to all eligible vendors (called by scheduler/cron)"""
+    # Simple API key check for scheduled tasks
+    expected_key = os.environ.get("SCHEDULER_API_KEY", "afrovending-scheduler-key")
+    if api_key != expected_key:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    
+    # Find all vendors with Growth+ subscription who haven't opted out
+    vendors_sent = []
+    vendors_skipped = []
+    vendors_failed = []
+    
+    # Get all active subscriptions for Growth+
+    subscriptions = await db.vendor_subscriptions.find({
+        "status": {"$in": ["active", "trialing"]},
+        "plan_id": {"$in": ["growth", "pro", "enterprise"]}
+    }, {"_id": 0}).to_list(1000)
+    
+    for sub in subscriptions:
+        vendor_id = sub["vendor_id"]
+        vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0})
+        
+        if not vendor:
+            continue
+        
+        # Check opt-out
+        preferences = vendor.get("email_preferences", {})
+        if not preferences.get("weekly_analytics_report", True):
+            vendors_skipped.append(vendor_id)
+            continue
+        
+        # Get vendor email
+        vendor_user = await db.users.find_one({"id": vendor["user_id"]}, {"_id": 0, "email": 1})
+        if not vendor_user:
+            continue
+        
+        try:
+            # Generate and send report
+            report_data = await get_vendor_weekly_analytics(vendor_id)
+            if not report_data:
+                vendors_failed.append(vendor_id)
+                continue
+            
+            html_content = await generate_weekly_report_html(report_data)
+            
+            if SENDGRID_API_KEY:
+                from sendgrid import SendGridAPIClient
+                from sendgrid.helpers.mail import Mail, Email, To, Content
+                
+                message = Mail(
+                    from_email=Email(SENDER_EMAIL, "Afrovending"),
+                    to_emails=To(vendor_user["email"]),
+                    subject=f"📊 Your Weekly Analytics Report - {report_data.period_start} to {report_data.period_end}",
+                    html_content=Content("text/html", html_content)
+                )
+                
+                sg = SendGridAPIClient(SENDGRID_API_KEY)
+                sg.send(message)
+                
+                # Log
+                await db.email_logs.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "type": "weekly_analytics_report",
+                    "vendor_id": vendor_id,
+                    "recipient": vendor_user["email"],
+                    "status": "sent",
+                    "sent_at": datetime.now(timezone.utc).isoformat()
+                })
+                
+                vendors_sent.append(vendor_id)
+        
+        except Exception as e:
+            logger.error(f"Failed to send report to {vendor_id}: {e}")
+            vendors_failed.append(vendor_id)
+    
+    return {
+        "message": "Weekly reports batch completed",
+        "sent": len(vendors_sent),
+        "skipped": len(vendors_skipped),
+        "failed": len(vendors_failed),
+        "details": {
+            "sent_to": vendors_sent,
+            "skipped_opted_out": vendors_skipped,
+            "failed": vendors_failed
+        }
+    }
+
+@api_router.get("/analytics/preview-weekly-report")
+async def preview_weekly_report(user: dict = Depends(get_current_user)):
+    """Preview weekly report HTML (for testing)"""
+    if user["role"] not in ["vendor", "admin"]:
+        raise HTTPException(status_code=403, detail="Only vendors can preview reports")
+    
+    vendor = await db.vendors.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor profile not found")
+    
+    has_access = await check_analytics_access(vendor["id"])
+    if not has_access and user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Weekly reports are only available for Growth+ subscribers")
+    
+    report_data = await get_vendor_weekly_analytics(vendor["id"])
+    if not report_data:
+        raise HTTPException(status_code=500, detail="Failed to generate report")
+    
+    html_content = await generate_weekly_report_html(report_data)
+    
+    from fastapi.responses import HTMLResponse
+    return HTMLResponse(content=html_content)
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/health")
