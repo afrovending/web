@@ -203,7 +203,7 @@ class OrderResponse(BaseModel):
     id: str
     user_id: str
     items: List[Dict[str, Any]]
-    shipping_address: Dict[str, str]
+    shipping_address: Optional[Dict[str, str]] = None
     subtotal: float
     shipping_cost: float = 0.0
     total: float
