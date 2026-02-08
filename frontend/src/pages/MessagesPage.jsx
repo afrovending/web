@@ -200,14 +200,32 @@ const MessagesPage = () => {
     init();
   }, [isAuthenticated, conversationId, searchParams]);
 
-  // Poll for new messages every 5 seconds when conversation is active
-  useEffect(() => {
-    if (activeConversation) {
-      pollIntervalRef.current = setInterval(async () => {
-        await fetchMessages(activeConversation.id);
-        await fetchConversations();
-      }, 5000);
+  // Handle typing indicator - send typing status when user is typing
+  const handleTyping = () => {
+    if (!activeConversation) return;
+    
+    // Send typing indicator
+    sendTyping(activeConversation.id, true);
+    
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
     }
+    
+    // Stop typing after 2 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      sendTyping(activeConversation.id, false);
+    }, 2000);
+  };
+
+  // Get typing indicator text for a conversation
+  const getTypingText = (convId) => {
+    const typing = typingUsers[convId];
+    if (!typing || Object.keys(typing).length === 0) return null;
+    const names = Object.values(typing);
+    if (names.length === 1) return `${names[0]} is typing...`;
+    return `${names.length} people are typing...`;
+  };
 
     return () => {
       if (pollIntervalRef.current) {
