@@ -460,7 +460,7 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 1. Product quick view modal
 2. Order tracking map view
 3. Product recommendations engine
-4. Multi-currency support
+4. Advanced search filters with autocomplete
 
 ## Subscription Plans Data Structure
 
