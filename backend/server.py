@@ -3898,6 +3898,13 @@ async def startup_db_client():
     await db.vendor_subscriptions.create_index("vendor_id")
     await db.vendor_subscriptions.create_index("stripe_subscription_id")
     
+    # Analytics indexes
+    await db.analytics_events.create_index("id", unique=True)
+    await db.analytics_events.create_index("vendor_id")
+    await db.analytics_events.create_index("product_id")
+    await db.analytics_events.create_index([("vendor_id", 1), ("event_type", 1), ("timestamp", -1)])
+    await db.analytics_events.create_index([("product_id", 1), ("event_type", 1), ("timestamp", -1)])
+    
     # Seed categories if empty
     cat_count = await db.categories.count_documents({})
     if cat_count == 0:
