@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Trash2, Minus, Plus, ShoppingBag, ArrowRight, Tag } from 'lucide-react';
+import { Trash2, Minus, Plus, ShoppingBag, ArrowRight, Tag, CreditCard, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,10 +10,18 @@ import CouponInput from '../components/CouponInput';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// PayPal icon component
+const PayPalIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.77.77 0 0 1 .757-.647h6.847c2.28 0 3.912.752 4.713 2.177.77 1.372.853 3.23-.054 5.17-.907 1.94-2.655 3.396-4.896 4.093l.002.002c-.095.03-.192.053-.288.08a.762.762 0 0 0-.526.716l-.663 4.937a.77.77 0 0 1-.76.65zm-.757-1.502h.758l.663-4.937c.08-.594.454-1.1.988-1.356.026-.012.052-.025.079-.035l.002-.001c1.859-.564 3.315-1.712 4.06-3.26.604-1.255.644-2.514.113-3.457-.43-.765-1.31-1.286-2.534-1.286H5.701L2.96 19.835z"/>
+  </svg>
+);
+
 const CartPage = () => {
   const navigate = useNavigate();
   const { cart, updateQuantity, removeFromCart, loading, fetchCart } = useCart();
   const { isAuthenticated } = useAuth();
+  const [checkoutLoading, setCheckoutLoading] = useState(null); // 'stripe' | 'paypal' | null
 
   const handleCouponApplied = () => {
     fetchCart();
@@ -40,13 +48,14 @@ const CartPage = () => {
     }
   };
 
-  const handleCheckout = async () => {
+  const handleStripeCheckout = async () => {
     if (!isAuthenticated) {
       toast.error('Please login to checkout');
       navigate('/login');
       return;
     }
     
+    setCheckoutLoading('stripe');
     try {
       const response = await axios.post(`${API}/checkout/stripe`, {
         payment_method: 'stripe',
@@ -57,6 +66,28 @@ const CartPage = () => {
       window.location.href = response.data.checkout_url;
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to start checkout');
+      setCheckoutLoading(null);
+    }
+  };
+
+  const handlePayPalCheckout = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please login to checkout');
+      navigate('/login');
+      return;
+    }
+    
+    setCheckoutLoading('paypal');
+    try {
+      const response = await axios.post(`${API}/checkout/paypal`, {
+        payment_method: 'paypal'
+      });
+      
+      // Redirect to PayPal approval
+      window.location.href = response.data.approval_url;
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to start PayPal checkout');
+      setCheckoutLoading(null);
     }
   };
 
