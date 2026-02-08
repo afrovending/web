@@ -152,6 +152,12 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - POST /api/subscriptions/reactivate - Reactivate cancelled subscription
 - GET /api/subscriptions/portal - Get Stripe customer portal URL
 
+#### Vendor Analytics (Growth+ Only)
+- GET /api/analytics/vendor - Get comprehensive vendor analytics
+- GET /api/analytics/product/:id - Get detailed product analytics
+- POST /api/analytics/track-view - Track product view event
+- POST /api/analytics/track-cart-add - Track cart add event
+
 #### Tracking
 - GET /api/tracking
 - GET /api/tracking/:type/:id
