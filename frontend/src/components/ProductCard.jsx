@@ -49,6 +49,23 @@ const ProductCard = ({ product }) => {
     }
   };
 
+  const handleToggleCompare = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isInCompare(product.id)) {
+      removeFromCompare(product.id);
+      toast.success('Removed from comparison');
+    } else {
+      const result = addToCompare(product);
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    }
+  };
+
   const discountPercentage = product.compare_price 
     ? Math.round((1 - product.price / product.compare_price) * 100)
     : 0;
