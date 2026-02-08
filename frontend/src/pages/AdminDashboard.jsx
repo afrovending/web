@@ -325,6 +325,11 @@ const AdminDashboard = () => {
               </div>
             </div>
           </TabsContent>
+
+          {/* Coupons Tab */}
+          <TabsContent value="coupons">
+            <CouponManagement />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
