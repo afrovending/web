@@ -250,6 +250,7 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Verified Seller Badge: 100% (15/15 backend, all frontend displays working)
 - PayPal Integration: 100% (backend endpoints working, frontend UI integrated)
 - AWS S3 Image Storage: 100% (uploads working, images publicly accessible)
+- Google Social Login: 100% (12/12 backend tests, all frontend flows working)
 
 ## Prioritized Backlog
 
@@ -265,9 +266,13 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
   - Frontend: Interactive dashboard with charts (recharts)
   - Features: Revenue trends, user growth, top vendors/products, category breakdown
 
-### P1 (High Priority)
-- Google Social Login integration
-- Admin Analytics Dashboard - platform-wide insights
+### P1 (High Priority) - COMPLETED ✅
+- Google Social Login integration (Feb 8, 2026)
+  - Emergent-managed Google OAuth
+  - Login button with Google branding on /login page
+  - OAuth callback handler at /auth/callback
+  - Backend session management with cookies + JWT
+  - User auto-registration from Google profile
 
 ### P2 (Nice to Have)
 - Multiple shipping addresses
@@ -330,10 +335,21 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 ```
 
 ## Next Tasks
-1. Implement Google Social Login (Emergent-managed OAuth)
-2. Implement PayPal checkout flow
-3. Add cloud storage for images (S3)
-4. Refactor server.py into modular structure
+1. Extract inline HTML from email_reports.py into template files
+2. Add multiple shipping addresses feature
+3. Enhanced review/rating UI for services
+
+### Google Social Login (COMPLETED - Feb 8, 2026)
+- **Auth Flow**: Click "Sign in with Google" → Emergent Auth → /auth/callback → Session created
+- **Backend Endpoints**:
+  - POST /api/auth/google/session - Exchange session_id for user data
+  - POST /api/auth/google/logout - Clear Google session
+  - GET /api/auth/me - Supports both JWT and session cookie
+- **Frontend Components**:
+  - AuthPages.jsx - Google Sign-in button
+  - AuthCallback.jsx - OAuth callback handler
+  - AuthContext.js - loginWithGoogle(), processGoogleCallback()
+- **Database Collections**: google_sessions (stores session tokens)
 
 ## Coupon Data Structure
 
