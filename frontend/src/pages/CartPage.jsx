@@ -209,7 +209,7 @@ const CartPage = () => {
                     )}
                     
                     <p className="font-accent font-semibold text-lg mt-1">
-                      ${item.price.toFixed(2)}
+                      {displayPrice(item.price)}
                     </p>
                     
                     <div className="flex items-center justify-between mt-3">
