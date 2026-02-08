@@ -458,6 +458,11 @@ const MessagesPage = () => {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
+                  {/* Connection Status */}
+                  <div className={`flex items-center gap-1 text-xs ${isConnected ? 'text-green-500' : 'text-muted-foreground'}`}>
+                    {isConnected ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
+                    {isConnected ? 'Live' : 'Connecting...'}
+                  </div>
                 </div>
 
                 {/* Messages */}
