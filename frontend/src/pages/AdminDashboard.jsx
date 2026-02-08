@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Users, Store, Package, DollarSign, ShoppingBag, Clock, Check, X } from 'lucide-react';
+import { Users, Store, Package, DollarSign, ShoppingBag, Clock, Check, X, Tag } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import axios from 'axios';
+import CouponManagement from '../components/admin/CouponManagement';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
