@@ -85,6 +85,23 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - **Period Selector**: 7d, 30d, 90d, 1y
 - **View Tracking**: Automatic tracking on product detail page visits
 
+### Weekly Analytics Email Reports (NEW - Feb 8, 2026)
+- **Delivery**: Automated every Friday (via scheduler/cron)
+- **Audience**: Growth, Pro, and Enterprise subscribers only
+- **Opt-Out**: Toggle in Subscription > Email Preferences
+- **Report Contents**:
+  - Sales overview (revenue, orders, avg order value) with week-over-week comparison
+  - Traffic stats (views, unique visitors) with change indicators
+  - Conversion funnel rates (view→cart, cart→purchase, overall)
+  - Top 5 products by revenue
+  - Customer insights (new vs returning, top locations)
+- **Email Preferences UI**:
+  - Weekly Analytics Report toggle (Growth+ only)
+  - Order Notifications toggle
+  - Booking Notifications toggle
+  - Marketing & Tips toggle
+- **Scheduler Endpoint**: POST /api/analytics/send-all-weekly-reports (requires API key)
+
 ### Coupon/Discount System (Feb 8, 2026)
 - **Coupon Types**: Percentage or fixed amount discounts
 - **Validation Rules**: Min order amount, max discount cap, usage limits
