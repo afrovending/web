@@ -87,10 +87,17 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - PUT /api/bookings/:id/status
 - PUT /api/bookings/:id/confirm-delivery
 
-#### Cart
+#### Cart & Coupons
 - GET /api/cart
 - POST /api/cart/items (supports variant_id, selected_options)
 - PUT/DELETE /api/cart/items/:id
+- POST /api/cart/apply-coupon
+- DELETE /api/cart/coupon
+
+#### Coupons (Admin)
+- GET/POST /api/coupons
+- GET/PUT/DELETE /api/coupons/:id
+- POST /api/coupons/validate
 
 #### Vendor Payouts
 - GET /api/vendor/payout/summary
