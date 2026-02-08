@@ -135,6 +135,9 @@ async def process_google_session(request: Request, response: Response):
         
         return json_response
         
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is (don't wrap them)
+        raise
     except httpx.HTTPError as e:
         logger.error(f"HTTP error during Google auth: {e}")
         raise HTTPException(status_code=500, detail="Authentication service unavailable")
