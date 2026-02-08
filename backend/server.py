@@ -106,6 +106,7 @@ from routes.analytics import router as analytics_router
 from routes.email_reports import router as email_reports_router
 from routes.users import router as users_router
 from routes.messaging import router as messaging_router
+from routes.currency import router as currency_router
 
 # Register modular routers (these will take precedence over inline routes)
 api_router.include_router(auth_router)
@@ -126,6 +127,7 @@ api_router.include_router(analytics_router)
 api_router.include_router(email_reports_router)
 api_router.include_router(users_router)
 api_router.include_router(messaging_router)
+api_router.include_router(currency_router)
 
 security = HTTPBearer()
 
