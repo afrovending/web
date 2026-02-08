@@ -3421,6 +3421,424 @@ async def get_customer_portal(origin_url: str, user: dict = Depends(get_current_
     except stripe.error.StripeError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+# ==================== ANALYTICS ENDPOINTS ====================
+
+async def check_analytics_access(vendor_id: str) -> bool:
+    """Check if vendor has Growth+ subscription for analytics access"""
+    subscription = await db.vendor_subscriptions.find_one(
+        {"vendor_id": vendor_id, "status": {"$in": ["active", "trialing"]}},
+        {"_id": 0}
+    )
+    if subscription and subscription.get("plan_id") in ["growth", "pro", "enterprise"]:
+        return True
+    return False
+
+@api_router.post("/analytics/track-view")
+async def track_product_view(
+    product_id: str,
+    source: str = "direct",
+    session_id: Optional[str] = None,
+    user: Optional[dict] = None
+):
+    """Track a product view event"""
+    product = await db.products.find_one({"id": product_id}, {"_id": 0, "vendor_id": 1})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    view_event = {
+        "id": str(uuid.uuid4()),
+        "product_id": product_id,
+        "vendor_id": product["vendor_id"],
+        "user_id": user["id"] if user else None,
+        "session_id": session_id or str(uuid.uuid4()),
+        "source": source,
+        "event_type": "view",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.analytics_events.insert_one(view_event)
+    
+    # Increment view count on product
+    await db.products.update_one(
+        {"id": product_id},
+        {"$inc": {"view_count": 1}}
+    )
+    
+    return {"success": True}
+
+@api_router.post("/analytics/track-cart-add")
+async def track_cart_add(
+    product_id: str,
+    session_id: Optional[str] = None,
+    user: dict = Depends(get_current_user)
+):
+    """Track a cart add event"""
+    product = await db.products.find_one({"id": product_id}, {"_id": 0, "vendor_id": 1})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    event = {
+        "id": str(uuid.uuid4()),
+        "product_id": product_id,
+        "vendor_id": product["vendor_id"],
+        "user_id": user["id"],
+        "session_id": session_id or str(uuid.uuid4()),
+        "event_type": "cart_add",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.analytics_events.insert_one(event)
+    return {"success": True}
+
+@api_router.get("/analytics/vendor", response_model=VendorAnalyticsResponse)
+async def get_vendor_analytics(
+    period: str = "30d",  # 7d, 30d, 90d, 1y
+    user: dict = Depends(get_current_user)
+):
+    """Get comprehensive analytics for vendor (Growth+ only)"""
+    if user["role"] not in ["vendor", "admin"]:
+        raise HTTPException(status_code=403, detail="Only vendors can access analytics")
+    
+    vendor = await db.vendors.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor profile not found")
+    
+    # Check subscription access
+    has_access = await check_analytics_access(vendor["id"])
+    if not has_access and user["role"] != "admin":
+        # Return limited response for non-Growth+ vendors
+        return VendorAnalyticsResponse(
+            sales=SalesAnalytics(
+                total_revenue=0, total_orders=0, average_order_value=0,
+                revenue_trend=[], orders_trend=[]
+            ),
+            top_products=[],
+            traffic=TrafficAnalytics(
+                total_views=0, unique_visitors=0, views_trend=[], top_sources=[]
+            ),
+            conversions=ConversionAnalytics(
+                view_to_cart_rate=0, cart_to_purchase_rate=0,
+                overall_conversion_rate=0, funnel_data=[]
+            ),
+            customers=CustomerAnalytics(
+                total_customers=0, new_customers=0, returning_customers=0, top_locations=[]
+            ),
+            period=period,
+            has_access=False
+        )
+    
+    # Calculate date range
+    now = datetime.now(timezone.utc)
+    if period == "7d":
+        start_date = now - timedelta(days=7)
+    elif period == "30d":
+        start_date = now - timedelta(days=30)
+    elif period == "90d":
+        start_date = now - timedelta(days=90)
+    elif period == "1y":
+        start_date = now - timedelta(days=365)
+    else:
+        start_date = now - timedelta(days=30)
+    
+    start_iso = start_date.isoformat()
+    
+    # ===== SALES ANALYTICS =====
+    orders = await db.orders.find({
+        "created_at": {"$gte": start_iso},
+        "items.vendor_id": vendor["id"],
+        "payment_status": "paid"
+    }, {"_id": 0}).to_list(1000)
+    
+    total_revenue = 0.0
+    vendor_orders = []
+    for order in orders:
+        vendor_items = [item for item in order.get("items", []) if item.get("vendor_id") == vendor["id"]]
+        if vendor_items:
+            order_revenue = sum(item.get("price", 0) * item.get("quantity", 1) for item in vendor_items)
+            total_revenue += order_revenue
+            vendor_orders.append({
+                "date": order.get("created_at", "")[:10],
+                "revenue": order_revenue,
+                "items": len(vendor_items)
+            })
+    
+    total_orders = len(vendor_orders)
+    avg_order_value = total_revenue / total_orders if total_orders > 0 else 0
+    
+    # Group by date for trends
+    from collections import defaultdict
+    revenue_by_date = defaultdict(float)
+    orders_by_date = defaultdict(int)
+    for order in vendor_orders:
+        date = order["date"]
+        revenue_by_date[date] += order["revenue"]
+        orders_by_date[date] += 1
+    
+    # Generate all dates in range
+    date_range = []
+    current = start_date
+    while current <= now:
+        date_range.append(current.strftime("%Y-%m-%d"))
+        current += timedelta(days=1)
+    
+    revenue_trend = [{"date": d, "value": round(revenue_by_date.get(d, 0), 2)} for d in date_range]
+    orders_trend = [{"date": d, "value": orders_by_date.get(d, 0)} for d in date_range]
+    
+    sales_analytics = SalesAnalytics(
+        total_revenue=round(total_revenue, 2),
+        total_orders=total_orders,
+        average_order_value=round(avg_order_value, 2),
+        revenue_trend=revenue_trend[-30:],  # Last 30 data points
+        orders_trend=orders_trend[-30:]
+    )
+    
+    # ===== TOP PRODUCTS =====
+    products = await db.products.find({"vendor_id": vendor["id"]}, {"_id": 0}).to_list(100)
+    product_analytics = []
+    
+    for product in products:
+        # Get views
+        views = await db.analytics_events.count_documents({
+            "product_id": product["id"],
+            "event_type": "view",
+            "timestamp": {"$gte": start_iso}
+        })
+        
+        # Get cart adds
+        cart_adds = await db.analytics_events.count_documents({
+            "product_id": product["id"],
+            "event_type": "cart_add",
+            "timestamp": {"$gte": start_iso}
+        })
+        
+        # Get purchases from orders
+        purchases = 0
+        product_revenue = 0.0
+        for order in orders:
+            for item in order.get("items", []):
+                if item.get("product_id") == product["id"]:
+                    purchases += item.get("quantity", 1)
+                    product_revenue += item.get("price", 0) * item.get("quantity", 1)
+        
+        conversion_rate = (purchases / views * 100) if views > 0 else 0
+        
+        product_analytics.append(ProductAnalytics(
+            product_id=product["id"],
+            product_name=product["name"],
+            views=views or product.get("view_count", 0),
+            cart_adds=cart_adds,
+            purchases=purchases,
+            revenue=round(product_revenue, 2),
+            conversion_rate=round(conversion_rate, 2)
+        ))
+    
+    # Sort by revenue
+    top_products = sorted(product_analytics, key=lambda x: x.revenue, reverse=True)[:10]
+    
+    # ===== TRAFFIC ANALYTICS =====
+    total_views = await db.analytics_events.count_documents({
+        "vendor_id": vendor["id"],
+        "event_type": "view",
+        "timestamp": {"$gte": start_iso}
+    })
+    
+    # Unique visitors (by session_id)
+    unique_sessions = await db.analytics_events.distinct(
+        "session_id",
+        {"vendor_id": vendor["id"], "event_type": "view", "timestamp": {"$gte": start_iso}}
+    )
+    unique_visitors = len(unique_sessions)
+    
+    # Views by date
+    views_by_date = defaultdict(int)
+    view_events = await db.analytics_events.find({
+        "vendor_id": vendor["id"],
+        "event_type": "view",
+        "timestamp": {"$gte": start_iso}
+    }, {"_id": 0, "timestamp": 1}).to_list(10000)
+    
+    for event in view_events:
+        date = event.get("timestamp", "")[:10]
+        views_by_date[date] += 1
+    
+    views_trend = [{"date": d, "value": views_by_date.get(d, 0)} for d in date_range]
+    
+    # Traffic sources
+    source_counts = defaultdict(int)
+    source_events = await db.analytics_events.find({
+        "vendor_id": vendor["id"],
+        "event_type": "view",
+        "timestamp": {"$gte": start_iso}
+    }, {"_id": 0, "source": 1}).to_list(10000)
+    
+    for event in source_events:
+        source_counts[event.get("source", "direct")] += 1
+    
+    top_sources = [{"source": k, "count": v} for k, v in sorted(source_counts.items(), key=lambda x: x[1], reverse=True)]
+    
+    traffic_analytics = TrafficAnalytics(
+        total_views=total_views or sum(p.get("view_count", 0) for p in products),
+        unique_visitors=unique_visitors,
+        views_trend=views_trend[-30:],
+        top_sources=top_sources[:5]
+    )
+    
+    # ===== CONVERSION ANALYTICS =====
+    total_cart_adds = await db.analytics_events.count_documents({
+        "vendor_id": vendor["id"],
+        "event_type": "cart_add",
+        "timestamp": {"$gte": start_iso}
+    })
+    
+    total_purchases = sum(p.purchases for p in product_analytics)
+    
+    view_to_cart = (total_cart_adds / traffic_analytics.total_views * 100) if traffic_analytics.total_views > 0 else 0
+    cart_to_purchase = (total_purchases / total_cart_adds * 100) if total_cart_adds > 0 else 0
+    overall_conversion = (total_purchases / traffic_analytics.total_views * 100) if traffic_analytics.total_views > 0 else 0
+    
+    funnel_data = [
+        {"stage": "Views", "count": traffic_analytics.total_views},
+        {"stage": "Cart Adds", "count": total_cart_adds},
+        {"stage": "Purchases", "count": total_purchases}
+    ]
+    
+    conversion_analytics = ConversionAnalytics(
+        view_to_cart_rate=round(view_to_cart, 2),
+        cart_to_purchase_rate=round(cart_to_purchase, 2),
+        overall_conversion_rate=round(overall_conversion, 2),
+        funnel_data=funnel_data
+    )
+    
+    # ===== CUSTOMER ANALYTICS =====
+    customer_ids = set()
+    customer_first_order = {}
+    
+    for order in orders:
+        customer_id = order.get("user_id")
+        if customer_id:
+            customer_ids.add(customer_id)
+            order_date = order.get("created_at", "")
+            if customer_id not in customer_first_order or order_date < customer_first_order[customer_id]:
+                customer_first_order[customer_id] = order_date
+    
+    new_customers = sum(1 for cid, first_date in customer_first_order.items() if first_date >= start_iso)
+    returning_customers = len(customer_ids) - new_customers
+    
+    # Top locations (from user data)
+    location_counts = defaultdict(int)
+    for customer_id in customer_ids:
+        user_doc = await db.users.find_one({"id": customer_id}, {"_id": 0, "country": 1, "city": 1})
+        if user_doc:
+            location = user_doc.get("country") or user_doc.get("city") or "Unknown"
+            location_counts[location] += 1
+    
+    top_locations = [{"location": k, "count": v} for k, v in sorted(location_counts.items(), key=lambda x: x[1], reverse=True)]
+    
+    customer_analytics = CustomerAnalytics(
+        total_customers=len(customer_ids),
+        new_customers=new_customers,
+        returning_customers=max(0, returning_customers),
+        top_locations=top_locations[:5]
+    )
+    
+    return VendorAnalyticsResponse(
+        sales=sales_analytics,
+        top_products=top_products,
+        traffic=traffic_analytics,
+        conversions=conversion_analytics,
+        customers=customer_analytics,
+        period=period,
+        has_access=True
+    )
+
+@api_router.get("/analytics/product/{product_id}")
+async def get_product_analytics(
+    product_id: str,
+    period: str = "30d",
+    user: dict = Depends(get_current_user)
+):
+    """Get detailed analytics for a specific product"""
+    product = await db.products.find_one({"id": product_id}, {"_id": 0})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    vendor = await db.vendors.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not vendor or (vendor["id"] != product["vendor_id"] and user["role"] != "admin"):
+        raise HTTPException(status_code=403, detail="Not authorized to view this product's analytics")
+    
+    has_access = await check_analytics_access(vendor["id"])
+    if not has_access and user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Upgrade to Growth or higher to access analytics")
+    
+    # Calculate date range
+    now = datetime.now(timezone.utc)
+    days = {"7d": 7, "30d": 30, "90d": 90, "1y": 365}.get(period, 30)
+    start_date = now - timedelta(days=days)
+    start_iso = start_date.isoformat()
+    
+    # Get view events by date
+    from collections import defaultdict
+    views_by_date = defaultdict(int)
+    cart_by_date = defaultdict(int)
+    
+    events = await db.analytics_events.find({
+        "product_id": product_id,
+        "timestamp": {"$gte": start_iso}
+    }, {"_id": 0}).to_list(10000)
+    
+    for event in events:
+        date = event.get("timestamp", "")[:10]
+        if event.get("event_type") == "view":
+            views_by_date[date] += 1
+        elif event.get("event_type") == "cart_add":
+            cart_by_date[date] += 1
+    
+    # Generate date range
+    date_range = []
+    current = start_date
+    while current <= now:
+        date_range.append(current.strftime("%Y-%m-%d"))
+        current += timedelta(days=1)
+    
+    views_trend = [{"date": d, "value": views_by_date.get(d, 0)} for d in date_range]
+    cart_trend = [{"date": d, "value": cart_by_date.get(d, 0)} for d in date_range]
+    
+    # Get purchase data from orders
+    orders = await db.orders.find({
+        "created_at": {"$gte": start_iso},
+        "items.product_id": product_id,
+        "payment_status": "paid"
+    }, {"_id": 0}).to_list(1000)
+    
+    purchases_by_date = defaultdict(int)
+    total_revenue = 0.0
+    total_purchases = 0
+    
+    for order in orders:
+        date = order.get("created_at", "")[:10]
+        for item in order.get("items", []):
+            if item.get("product_id") == product_id:
+                qty = item.get("quantity", 1)
+                purchases_by_date[date] += qty
+                total_purchases += qty
+                total_revenue += item.get("price", 0) * qty
+    
+    purchases_trend = [{"date": d, "value": purchases_by_date.get(d, 0)} for d in date_range]
+    
+    return {
+        "product_id": product_id,
+        "product_name": product["name"],
+        "period": period,
+        "total_views": sum(views_by_date.values()) or product.get("view_count", 0),
+        "total_cart_adds": sum(cart_by_date.values()),
+        "total_purchases": total_purchases,
+        "total_revenue": round(total_revenue, 2),
+        "conversion_rate": round((total_purchases / max(1, sum(views_by_date.values()))) * 100, 2),
+        "views_trend": views_trend[-30:],
+        "cart_trend": cart_trend[-30:],
+        "purchases_trend": purchases_trend[-30:]
+    }
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/health")
