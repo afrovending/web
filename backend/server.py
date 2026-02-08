@@ -500,6 +500,19 @@ class VendorAnalyticsResponse(BaseModel):
     period: str
     has_access: bool = True
 
+# ==================== PAYPAL MODELS ====================
+
+class PayPalOrderCreate(BaseModel):
+    payment_method: str = "paypal"
+
+class PayPalOrderResponse(BaseModel):
+    order_id: str
+    approval_url: str
+    status: str
+
+class PayPalCaptureRequest(BaseModel):
+    paypal_order_id: str
+
 # ==================== EMAIL REPORT MODELS ====================
 
 class VendorEmailPreferences(BaseModel):
