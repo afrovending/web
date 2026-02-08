@@ -792,37 +792,8 @@ def send_payment_released_email(vendor_email: str, vendor_name: str, booking: di
 
 def send_order_status_email(customer_email: str, customer_name: str, order: dict, new_status: str):
     """Notify customer of order status change"""
-    status_messages = {
-        "processing": "Your order is being processed.",
-        "shipped": "Your order has been shipped!",
-        "delivered": "Your order has been delivered.",
-        "cancelled": "Your order has been cancelled."
-    }
-    
     subject = f"Order Update: #{order['id'][:8]}"
-    html_content = f"""
-    <html>
-    <body style="font-family: 'Ubuntu', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-            <h1 style="color: white; margin: 0; font-family: 'Montserrat', sans-serif;">Order Update</h1>
-        </div>
-        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-            <p>Hi {customer_name},</p>
-            <p>{status_messages.get(new_status, f"Your order status has been updated to: {new_status}")}</p>
-            
-            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #c41e3a;">
-                <h3 style="margin-top: 0; color: #1a1a1a;">Order #{order['id'][:8]}</h3>
-                <p><strong>Items:</strong> {len(order.get('items', []))} item(s)</p>
-                <p><strong>Total:</strong> ${order['total']:.2f}</p>
-                <p><strong>Status:</strong> <span style="color: #c41e3a; font-weight: bold;">{new_status.upper()}</span></p>
-            </div>
-            
-            <p>Log in to your dashboard to view full order details.</p>
-            <p style="color: #666; font-size: 12px;">This is an automated message from Afrovending.</p>
-        </div>
-    </body>
-    </html>
-    """
+    html_content = render_order_status(customer_name, order, new_status)
     return send_email(customer_email, subject, html_content)
 
 # ==================== AUTH ROUTES (MIGRATED TO routes/auth.py) ====================
