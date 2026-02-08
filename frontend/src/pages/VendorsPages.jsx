@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { MapPin, Package, ArrowLeft, BadgeCheck } from 'lucide-react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { MapPin, Package, ArrowLeft, BadgeCheck, Star, Instagram, Facebook, Twitter, Youtube, Globe, MessageCircle } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import ProductCard from '../components/ProductCard';
+import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
