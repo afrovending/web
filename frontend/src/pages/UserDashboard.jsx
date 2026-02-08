@@ -47,12 +47,14 @@ const UserDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [ordersRes, bookingsRes] = await Promise.all([
+        const [ordersRes, bookingsRes, addressesRes] = await Promise.all([
           axios.get(`${API}/orders`),
-          axios.get(`${API}/bookings`)
+          axios.get(`${API}/bookings`),
+          axios.get(`${API}/user/addresses`)
         ]);
         setOrders(ordersRes.data);
         setBookings(bookingsRes.data);
+        setAddresses(addressesRes.data);
       } catch (error) {
         console.error('Failed to fetch data:', error);
       } finally {
