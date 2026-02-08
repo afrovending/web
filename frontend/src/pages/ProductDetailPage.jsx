@@ -23,6 +23,7 @@ const ProductDetailPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const { addToCart } = useCart();
+  const { addToCompare, isInCompare, removeFromCompare } = useCompare();
   
   const [product, setProduct] = useState(null);
   const [vendor, setVendor] = useState(null);
