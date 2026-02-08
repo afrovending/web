@@ -6,6 +6,7 @@ from .categories import router as categories_router
 from .products import router as products_router
 from .vendors import router as vendors_router
 from .services import router as services_router
+from .bookings import router as bookings_router
 
 __all__ = [
     'auth_router',
@@ -13,4 +14,5 @@ __all__ = [
     'products_router',
     'vendors_router',
     'services_router',
+    'bookings_router',
 ]
