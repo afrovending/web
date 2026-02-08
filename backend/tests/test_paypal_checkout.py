@@ -50,12 +50,12 @@ class TestPayPalCheckout:
     
     def test_paypal_checkout_empty_cart(self):
         """Test PayPal checkout with empty cart returns error"""
-        # First clear the cart
+        # First clear the cart using the correct endpoint
         cart_response = self.session.get(f"{BASE_URL}/api/cart")
         if cart_response.status_code == 200:
             cart_data = cart_response.json()
             for item in cart_data.get("items", []):
-                self.session.delete(f"{BASE_URL}/api/cart/{item['id']}")
+                self.session.delete(f"{BASE_URL}/api/cart/items/{item['id']}")
         
         # Try PayPal checkout with empty cart
         response = self.session.post(
@@ -80,9 +80,9 @@ class TestPayPalCheckout:
         
         product = products[0]
         
-        # Add to cart
+        # Add to cart - endpoint is /api/cart/items
         add_response = self.session.post(
-            f"{BASE_URL}/api/cart",
+            f"{BASE_URL}/api/cart/items",
             json={"product_id": product["id"], "quantity": 1}
         )
         
@@ -266,19 +266,19 @@ class TestCartWithPayPal:
     
     def test_cart_total_matches_paypal_order(self):
         """Test that cart total matches PayPal order total"""
-        # Clear cart first
+        # Clear cart first using correct endpoint
         cart_response = self.session.get(f"{BASE_URL}/api/cart")
         if cart_response.status_code == 200:
             for item in cart_response.json().get("items", []):
-                self.session.delete(f"{BASE_URL}/api/cart/{item['id']}")
+                self.session.delete(f"{BASE_URL}/api/cart/items/{item['id']}")
         
-        # Add specific item
+        # Add specific item using correct endpoint
         products_response = self.session.get(f"{BASE_URL}/api/products?limit=1")
         assert products_response.status_code == 200
         product = products_response.json()[0]
         
         self.session.post(
-            f"{BASE_URL}/api/cart",
+            f"{BASE_URL}/api/cart/items",
             json={"product_id": product["id"], "quantity": 2}
         )
         
