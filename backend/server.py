@@ -1289,11 +1289,32 @@ async def get_vendors(
         query["is_approved"] = is_approved
     
     vendors = await db.vendors.find(query, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
+    
+    # Add verified seller status
+    for vendor in vendors:
+        vendor["is_verified_seller"] = await check_vendor_verified_status(vendor["id"])
+        # Get subscription plan
+        sub = await db.vendor_subscriptions.find_one(
+            {"vendor_id": vendor["id"], "status": {"$in": ["active", "trialing"]}},
+            {"_id": 0, "plan_id": 1}
+        )
+        vendor["subscription_plan"] = sub.get("plan_id") if sub else "starter"
+    
     return vendors
 
 @api_router.get("/vendors/featured", response_model=List[VendorResponse])
 async def get_featured_vendors(limit: int = 4):
     vendors = await db.vendors.find({"is_approved": True}, {"_id": 0}).sort("total_sales", -1).limit(limit).to_list(limit)
+    
+    # Add verified seller status
+    for vendor in vendors:
+        vendor["is_verified_seller"] = await check_vendor_verified_status(vendor["id"])
+        sub = await db.vendor_subscriptions.find_one(
+            {"vendor_id": vendor["id"], "status": {"$in": ["active", "trialing"]}},
+            {"_id": 0, "plan_id": 1}
+        )
+        vendor["subscription_plan"] = sub.get("plan_id") if sub else "starter"
+    
     return vendors
 
 @api_router.get("/vendors/{vendor_id}", response_model=VendorResponse)
@@ -1301,6 +1322,15 @@ async def get_vendor(vendor_id: str):
     vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0})
     if not vendor:
         raise HTTPException(status_code=404, detail="Vendor not found")
+    
+    # Add verified seller status
+    vendor["is_verified_seller"] = await check_vendor_verified_status(vendor_id)
+    sub = await db.vendor_subscriptions.find_one(
+        {"vendor_id": vendor_id, "status": {"$in": ["active", "trialing"]}},
+        {"_id": 0, "plan_id": 1}
+    )
+    vendor["subscription_plan"] = sub.get("plan_id") if sub else "starter"
+    
     return vendor
 
 @api_router.post("/vendors", response_model=VendorResponse)
