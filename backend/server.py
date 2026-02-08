@@ -86,12 +86,14 @@ from routes.auth import router as auth_router
 from routes.categories import router as categories_router
 from routes.products import router as products_router
 from routes.vendors import router as vendors_router
+from routes.services import router as services_router
 
 # Register modular routers (these will take precedence over inline routes)
 api_router.include_router(auth_router)
 api_router.include_router(categories_router)
 api_router.include_router(products_router)
 api_router.include_router(vendors_router)
+api_router.include_router(services_router)
 
 security = HTTPBearer()
 
