@@ -156,6 +156,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="orders" className="rounded-full" data-testid="admin-tab-orders">
               Orders
             </TabsTrigger>
+            <TabsTrigger value="coupons" className="rounded-full" data-testid="admin-tab-coupons">
+              <Tag className="h-4 w-4 mr-1" />
+              Coupons
+            </TabsTrigger>
           </TabsList>
 
           {/* Vendors Tab */}
