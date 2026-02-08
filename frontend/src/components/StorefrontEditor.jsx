@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Palette, Image, Type, Link2, Eye, Grid3X3, List, LayoutGrid,
   Instagram, Facebook, Twitter, Youtube, Globe, Save, RefreshCw,
-  ChevronUp, ChevronDown, Trash2, Plus, Check
+  ChevronUp, ChevronDown, Trash2, Plus, Check, BarChart3
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
+import StorefrontAnalytics from './StorefrontAnalytics';
 import { toast } from 'sonner';
 import axios from 'axios';
 
