@@ -997,10 +997,11 @@ async def unified_search(
         results["total_products"] = await db.products.count_documents(product_query)
         products = await db.products.find(product_query, {"_id": 0}).sort(sort_by, sort_dir).skip(skip).limit(limit).to_list(limit)
         
-        # Enrich with vendor names
+        # Enrich with vendor names and verified status
         for product in products:
             vendor = await db.vendors.find_one({"id": product.get("vendor_id")}, {"_id": 0, "store_name": 1})
             product["vendor_name"] = vendor.get("store_name") if vendor else "Unknown"
+            product["is_verified_seller"] = await check_vendor_verified_status(product.get("vendor_id"))
         
         results["products"] = products
     
