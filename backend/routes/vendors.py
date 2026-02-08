@@ -422,7 +422,7 @@ def extract_referrer_domain(referrer: str) -> str:
         parsed = urlparse(referrer)
         domain = parsed.netloc or parsed.path.split('/')[0]
         return domain if domain else "direct"
-    except:
+    except Exception:
         return "direct"
 
 
