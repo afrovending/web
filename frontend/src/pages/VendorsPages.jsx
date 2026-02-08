@@ -125,6 +125,22 @@ const VendorPage = () => {
         setVendor(vendorRes.data);
         setProducts(productsRes.data);
         setStorefront(storefrontRes.data);
+
+        // Track storefront view
+        const sessionId = sessionStorage.getItem('storefront_session') || null;
+        try {
+          const trackRes = await axios.post(`${API}/vendors/${vendorId}/storefront/track-view`, {
+            referrer: document.referrer,
+            user_agent: navigator.userAgent,
+            session_id: sessionId
+          });
+          if (!sessionId && trackRes.data.session_id) {
+            sessionStorage.setItem('storefront_session', trackRes.data.session_id);
+          }
+        } catch (trackError) {
+          // Silently fail - analytics shouldn't break the page
+          console.log('Failed to track view:', trackError);
+        }
       } catch (error) {
         console.error('Failed to fetch vendor:', error);
       } finally {
