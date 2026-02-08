@@ -2616,6 +2616,315 @@ async def stripe_webhook(request: Request):
         logger.error(f"Webhook error: {e}")
         return {"status": "error", "message": str(e)}
 
+# ==================== PAYPAL CHECKOUT ENDPOINTS ====================
+
+import httpx
+
+async def get_paypal_access_token() -> str:
+    """Get PayPal OAuth access token"""
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{PAYPAL_API_BASE}/v1/oauth2/token",
+            auth=(PAYPAL_CLIENT_ID, PAYPAL_SECRET),
+            data={"grant_type": "client_credentials"},
+            headers={"Content-Type": "application/x-www-form-urlencoded"}
+        )
+        response.raise_for_status()
+        return response.json()["access_token"]
+
+@api_router.post("/checkout/paypal", response_model=PayPalOrderResponse)
+async def create_paypal_checkout(
+    request: Request,
+    user: dict = Depends(get_current_user)
+):
+    """Create a PayPal order for checkout"""
+    if not PAYPAL_CLIENT_ID or not PAYPAL_SECRET:
+        raise HTTPException(status_code=500, detail="PayPal not configured")
+    
+    # Get cart items
+    cart_items = await db.cart_items.find({"user_id": user["id"]}, {"_id": 0}).to_list(100)
+    if not cart_items:
+        raise HTTPException(status_code=400, detail="Cart is empty")
+    
+    # Calculate total
+    subtotal = 0.0
+    items_data = []
+    order_items = []
+    
+    for item in cart_items:
+        product = await db.products.find_one({"id": item["product_id"]}, {"_id": 0})
+        if not product:
+            continue
+        
+        # Check for variant pricing
+        price = product["price"]
+        if item.get("selected_options") and product.get("variants"):
+            for variant in product.get("variants", []):
+                if variant.get("options") == item.get("selected_options"):
+                    price = variant.get("price", price)
+                    break
+        
+        quantity = item.get("quantity", 1)
+        item_total = price * quantity
+        subtotal += item_total
+        
+        items_data.append({
+            "name": product["name"][:127],  # PayPal limit
+            "unit_amount": {
+                "currency_code": "USD",
+                "value": f"{price:.2f}"
+            },
+            "quantity": str(quantity)
+        })
+        
+        order_items.append({
+            "product_id": product["id"],
+            "product_name": product["name"],
+            "product_image": product.get("images", [None])[0],
+            "price": price,
+            "quantity": quantity,
+            "selected_options": item.get("selected_options"),
+            "vendor_id": product.get("vendor_id")
+        })
+    
+    # Apply coupon if exists
+    discount = 0.0
+    discount_code = None
+    applied_coupon = await db.cart_coupons.find_one({"user_id": user["id"]}, {"_id": 0})
+    if applied_coupon:
+        coupon = await db.coupons.find_one({"code": applied_coupon["coupon_code"]}, {"_id": 0})
+        if coupon and coupon.get("is_active"):
+            if coupon["discount_type"] == "percentage":
+                discount = subtotal * (coupon["discount_value"] / 100)
+                if coupon.get("max_discount"):
+                    discount = min(discount, coupon["max_discount"])
+            else:
+                discount = coupon["discount_value"]
+            discount_code = coupon["code"]
+    
+    total = max(0, subtotal - discount)
+    
+    # Get origin URL for redirects
+    origin_url = request.headers.get("origin", str(request.base_url).rstrip('/'))
+    
+    # Create order in database first
+    order_id = str(uuid.uuid4())
+    order_doc = {
+        "id": order_id,
+        "user_id": user["id"],
+        "items": order_items,
+        "subtotal": round(subtotal, 2),
+        "discount": round(discount, 2),
+        "discount_code": discount_code,
+        "total": round(total, 2),
+        "status": "pending",
+        "payment_status": "pending",
+        "payment_method": "paypal",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.orders.insert_one(order_doc)
+    
+    # Create PayPal order
+    try:
+        access_token = await get_paypal_access_token()
+        
+        paypal_order_data = {
+            "intent": "CAPTURE",
+            "purchase_units": [{
+                "reference_id": order_id,
+                "amount": {
+                    "currency_code": "USD",
+                    "value": f"{total:.2f}",
+                    "breakdown": {
+                        "item_total": {
+                            "currency_code": "USD",
+                            "value": f"{subtotal:.2f}"
+                        },
+                        "discount": {
+                            "currency_code": "USD",
+                            "value": f"{discount:.2f}"
+                        }
+                    }
+                },
+                "items": items_data
+            }],
+            "application_context": {
+                "brand_name": "Afrovending",
+                "landing_page": "LOGIN",
+                "user_action": "PAY_NOW",
+                "return_url": f"{origin_url}/checkout/paypal/success?order_id={order_id}",
+                "cancel_url": f"{origin_url}/checkout/paypal/cancel?order_id={order_id}"
+            }
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{PAYPAL_API_BASE}/v2/checkout/orders",
+                json=paypal_order_data,
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-Type": "application/json"
+                }
+            )
+            response.raise_for_status()
+            paypal_order = response.json()
+        
+        # Find approval URL
+        approval_url = None
+        for link in paypal_order.get("links", []):
+            if link["rel"] == "approve":
+                approval_url = link["href"]
+                break
+        
+        if not approval_url:
+            raise HTTPException(status_code=500, detail="PayPal approval URL not found")
+        
+        # Store PayPal order ID
+        await db.orders.update_one(
+            {"id": order_id},
+            {"$set": {"paypal_order_id": paypal_order["id"]}}
+        )
+        
+        # Create payment transaction record
+        transaction_doc = {
+            "id": str(uuid.uuid4()),
+            "order_id": order_id,
+            "user_id": user["id"],
+            "paypal_order_id": paypal_order["id"],
+            "amount": round(total, 2),
+            "currency": "USD",
+            "payment_method": "paypal",
+            "payment_status": "pending",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.payment_transactions.insert_one(transaction_doc)
+        
+        return PayPalOrderResponse(
+            order_id=order_id,
+            approval_url=approval_url,
+            status=paypal_order["status"]
+        )
+        
+    except httpx.HTTPStatusError as e:
+        logger.error(f"PayPal API error: {e.response.text}")
+        # Clean up the order
+        await db.orders.delete_one({"id": order_id})
+        raise HTTPException(status_code=500, detail="Failed to create PayPal order")
+    except Exception as e:
+        logger.error(f"PayPal error: {e}")
+        await db.orders.delete_one({"id": order_id})
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/checkout/paypal/capture")
+async def capture_paypal_payment(
+    paypal_order_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """Capture PayPal payment after approval"""
+    if not PAYPAL_CLIENT_ID or not PAYPAL_SECRET:
+        raise HTTPException(status_code=500, detail="PayPal not configured")
+    
+    # Find the order
+    order = await db.orders.find_one({"paypal_order_id": paypal_order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    if order["user_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    try:
+        access_token = await get_paypal_access_token()
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{PAYPAL_API_BASE}/v2/checkout/orders/{paypal_order_id}/capture",
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-Type": "application/json"
+                }
+            )
+            response.raise_for_status()
+            capture_result = response.json()
+        
+        if capture_result["status"] == "COMPLETED":
+            # Update order status
+            await db.orders.update_one(
+                {"id": order["id"]},
+                {"$set": {
+                    "payment_status": "paid",
+                    "status": "processing",
+                    "paypal_capture_id": capture_result.get("purchase_units", [{}])[0].get("payments", {}).get("captures", [{}])[0].get("id")
+                }}
+            )
+            
+            # Update payment transaction
+            await db.payment_transactions.update_one(
+                {"paypal_order_id": paypal_order_id},
+                {"$set": {"payment_status": "paid"}}
+            )
+            
+            # Clear cart
+            await db.cart_items.delete_many({"user_id": user["id"]})
+            await db.cart_coupons.delete_many({"user_id": user["id"]})
+            
+            # Update coupon usage if applicable
+            if order.get("discount_code"):
+                await db.coupons.update_one(
+                    {"code": order["discount_code"]},
+                    {"$inc": {"used_count": 1}}
+                )
+            
+            # Add tracking event
+            tracking_event = {
+                "id": str(uuid.uuid4()),
+                "entity_id": order["id"],
+                "entity_type": "order",
+                "status": "confirmed",
+                "message": "Payment confirmed via PayPal",
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+            await db.tracking_events.insert_one(tracking_event)
+            
+            return {
+                "status": "success",
+                "message": "Payment captured successfully",
+                "order_id": order["id"]
+            }
+        else:
+            return {
+                "status": "pending",
+                "message": f"Payment status: {capture_result['status']}",
+                "order_id": order["id"]
+            }
+            
+    except httpx.HTTPStatusError as e:
+        logger.error(f"PayPal capture error: {e.response.text}")
+        raise HTTPException(status_code=500, detail="Failed to capture payment")
+    except Exception as e:
+        logger.error(f"PayPal capture error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/checkout/paypal/status/{order_id}")
+async def get_paypal_order_status(
+    order_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """Get PayPal order status"""
+    order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    if order["user_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    return {
+        "order_id": order["id"],
+        "payment_status": order.get("payment_status", "pending"),
+        "status": order.get("status", "pending"),
+        "total": order.get("total", 0),
+        "payment_method": order.get("payment_method", "unknown")
+    }
+
 # ==================== ADMIN ROUTES ====================
 
 @api_router.get("/admin/stats")
