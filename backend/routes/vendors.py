@@ -376,3 +376,271 @@ async def update_storefront_sections(
     )
     
     return {"message": "Sections updated", "sections": sections_data}
+
+
+
+# ==================== STOREFRONT ANALYTICS ====================
+
+class StorefrontViewTrack(BaseModel):
+    referrer: Optional[str] = None
+    user_agent: Optional[str] = None
+    product_id: Optional[str] = None  # If viewing from product click
+    session_id: Optional[str] = None
+
+class StorefrontAnalyticsResponse(BaseModel):
+    total_views: int = 0
+    unique_visitors: int = 0
+    views_today: int = 0
+    views_this_week: int = 0
+    views_this_month: int = 0
+    views_by_day: List[dict] = []  # [{date, views, unique}]
+    top_referrers: List[dict] = []  # [{referrer, count}]
+    device_breakdown: dict = {}  # {mobile, desktop, tablet}
+    peak_hours: List[dict] = []  # [{hour, views}]
+    product_clicks: List[dict] = []  # [{product_id, product_name, clicks}]
+
+
+def parse_user_agent(user_agent: str) -> str:
+    """Determine device type from user agent"""
+    if not user_agent:
+        return "unknown"
+    ua_lower = user_agent.lower()
+    if any(x in ua_lower for x in ['mobile', 'android', 'iphone', 'ipod']):
+        return "mobile"
+    elif any(x in ua_lower for x in ['ipad', 'tablet']):
+        return "tablet"
+    else:
+        return "desktop"
+
+
+def extract_referrer_domain(referrer: str) -> str:
+    """Extract domain from referrer URL"""
+    if not referrer:
+        return "direct"
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(referrer)
+        domain = parsed.netloc or parsed.path.split('/')[0]
+        return domain if domain else "direct"
+    except:
+        return "direct"
+
+
+@router.post("/vendors/{vendor_id}/storefront/track-view")
+async def track_storefront_view(
+    vendor_id: str,
+    track_data: StorefrontViewTrack
+):
+    """Track a storefront page view (public endpoint)"""
+    # Verify vendor exists
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0, "id": 1})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    
+    now = datetime.now(timezone.utc)
+    
+    # Create view record
+    view_record = {
+        "id": str(uuid.uuid4()),
+        "vendor_id": vendor_id,
+        "timestamp": now.isoformat(),
+        "date": now.strftime("%Y-%m-%d"),
+        "hour": now.hour,
+        "referrer": extract_referrer_domain(track_data.referrer),
+        "referrer_full": track_data.referrer,
+        "device": parse_user_agent(track_data.user_agent),
+        "session_id": track_data.session_id or str(uuid.uuid4()),
+        "product_id": track_data.product_id
+    }
+    
+    await db.storefront_views.insert_one(view_record)
+    
+    # Track product click if applicable
+    if track_data.product_id:
+        await db.storefront_product_clicks.insert_one({
+            "vendor_id": vendor_id,
+            "product_id": track_data.product_id,
+            "timestamp": now.isoformat(),
+            "session_id": view_record["session_id"]
+        })
+    
+    return {"message": "View tracked", "session_id": view_record["session_id"]}
+
+
+@router.get("/vendors/{vendor_id}/storefront/analytics")
+async def get_storefront_analytics(
+    vendor_id: str,
+    days: int = 30,
+    user: dict = Depends(get_current_user)
+):
+    """Get storefront analytics for a vendor"""
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    
+    if user["role"] != "admin" and vendor["user_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    now = datetime.now(timezone.utc)
+    today = now.strftime("%Y-%m-%d")
+    
+    # Calculate date ranges
+    week_ago = (now - timedelta(days=7)).strftime("%Y-%m-%d")
+    month_ago = (now - timedelta(days=30)).strftime("%Y-%m-%d")
+    start_date = (now - timedelta(days=days)).strftime("%Y-%m-%d")
+    
+    # Get all views within the date range
+    views_cursor = db.storefront_views.find(
+        {"vendor_id": vendor_id, "date": {"$gte": start_date}},
+        {"_id": 0}
+    )
+    all_views = await views_cursor.to_list(length=10000)
+    
+    # Calculate totals
+    total_views = len(all_views)
+    unique_sessions = len(set(v.get("session_id") for v in all_views))
+    
+    views_today = len([v for v in all_views if v.get("date") == today])
+    views_this_week = len([v for v in all_views if v.get("date") >= week_ago])
+    views_this_month = len([v for v in all_views if v.get("date") >= month_ago])
+    
+    # Views by day
+    views_by_day = {}
+    unique_by_day = {}
+    for view in all_views:
+        date = view.get("date")
+        if date:
+            views_by_day[date] = views_by_day.get(date, 0) + 1
+            if date not in unique_by_day:
+                unique_by_day[date] = set()
+            unique_by_day[date].add(view.get("session_id"))
+    
+    views_by_day_list = [
+        {"date": date, "views": count, "unique": len(unique_by_day.get(date, set()))}
+        for date, count in sorted(views_by_day.items())
+    ]
+    
+    # Top referrers
+    referrer_counts = {}
+    for view in all_views:
+        ref = view.get("referrer", "direct")
+        referrer_counts[ref] = referrer_counts.get(ref, 0) + 1
+    
+    top_referrers = sorted(
+        [{"referrer": ref, "count": count} for ref, count in referrer_counts.items()],
+        key=lambda x: x["count"],
+        reverse=True
+    )[:10]
+    
+    # Device breakdown
+    device_counts = {"mobile": 0, "desktop": 0, "tablet": 0, "unknown": 0}
+    for view in all_views:
+        device = view.get("device", "unknown")
+        device_counts[device] = device_counts.get(device, 0) + 1
+    
+    # Peak hours
+    hour_counts = {}
+    for view in all_views:
+        hour = view.get("hour", 0)
+        hour_counts[hour] = hour_counts.get(hour, 0) + 1
+    
+    peak_hours = [
+        {"hour": hour, "views": count}
+        for hour, count in sorted(hour_counts.items())
+    ]
+    
+    # Product clicks
+    product_clicks_cursor = db.storefront_product_clicks.find(
+        {"vendor_id": vendor_id},
+        {"_id": 0}
+    )
+    product_clicks_raw = await product_clicks_cursor.to_list(length=1000)
+    
+    product_click_counts = {}
+    for click in product_clicks_raw:
+        pid = click.get("product_id")
+        if pid:
+            product_click_counts[pid] = product_click_counts.get(pid, 0) + 1
+    
+    # Get product names
+    product_ids = list(product_click_counts.keys())
+    if product_ids:
+        products = await db.products.find(
+            {"id": {"$in": product_ids}},
+            {"_id": 0, "id": 1, "name": 1}
+        ).to_list(length=100)
+        product_names = {p["id"]: p["name"] for p in products}
+    else:
+        product_names = {}
+    
+    product_clicks = sorted(
+        [
+            {
+                "product_id": pid,
+                "product_name": product_names.get(pid, "Unknown"),
+                "clicks": count
+            }
+            for pid, count in product_click_counts.items()
+        ],
+        key=lambda x: x["clicks"],
+        reverse=True
+    )[:10]
+    
+    return {
+        "total_views": total_views,
+        "unique_visitors": unique_sessions,
+        "views_today": views_today,
+        "views_this_week": views_this_week,
+        "views_this_month": views_this_month,
+        "views_by_day": views_by_day_list,
+        "top_referrers": top_referrers,
+        "device_breakdown": device_counts,
+        "peak_hours": peak_hours,
+        "product_clicks": product_clicks
+    }
+
+
+@router.get("/vendors/{vendor_id}/storefront/analytics/summary")
+async def get_storefront_analytics_summary(
+    vendor_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """Get quick summary of storefront analytics"""
+    vendor = await db.vendors.find_one({"id": vendor_id}, {"_id": 0})
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    
+    if user["role"] != "admin" and vendor["user_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    now = datetime.now(timezone.utc)
+    today = now.strftime("%Y-%m-%d")
+    week_ago = (now - timedelta(days=7)).strftime("%Y-%m-%d")
+    month_ago = (now - timedelta(days=30)).strftime("%Y-%m-%d")
+    
+    # Count views
+    views_today = await db.storefront_views.count_documents({
+        "vendor_id": vendor_id, "date": today
+    })
+    views_this_week = await db.storefront_views.count_documents({
+        "vendor_id": vendor_id, "date": {"$gte": week_ago}
+    })
+    views_this_month = await db.storefront_views.count_documents({
+        "vendor_id": vendor_id, "date": {"$gte": month_ago}
+    })
+    
+    # Get unique visitors this month
+    pipeline = [
+        {"$match": {"vendor_id": vendor_id, "date": {"$gte": month_ago}}},
+        {"$group": {"_id": "$session_id"}},
+        {"$count": "unique"}
+    ]
+    unique_result = await db.storefront_views.aggregate(pipeline).to_list(length=1)
+    unique_visitors = unique_result[0]["unique"] if unique_result else 0
+    
+    return {
+        "views_today": views_today,
+        "views_this_week": views_this_week,
+        "views_this_month": views_this_month,
+        "unique_visitors_this_month": unique_visitors
+    }
