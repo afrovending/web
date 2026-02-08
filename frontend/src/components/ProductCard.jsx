@@ -117,6 +117,19 @@ const ProductCard = ({ product }) => {
           </Button>
           <Button
             size="icon"
+            variant="secondary"
+            className={`rounded-full shadow-md h-9 w-9 ${
+              isInCompare(product.id) 
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                : 'bg-card/90 hover:bg-card'
+            }`}
+            onClick={handleToggleCompare}
+            data-testid={`compare-btn-${product.id}`}
+          >
+            <GitCompare className="h-4 w-4" />
+          </Button>
+          <Button
+            size="icon"
             className="rounded-full bg-primary hover:bg-primary/90 shadow-md h-9 w-9"
             onClick={handleAddToCart}
             data-testid={`cart-btn-${product.id}`}
