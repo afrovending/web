@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   CreditCard, Package, TrendingUp, Calendar, AlertCircle, 
-  Check, ExternalLink, Loader2, RefreshCw, ArrowUpRight 
+  Check, ExternalLink, Loader2, RefreshCw, ArrowUpRight, Mail, Bell 
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
+import { Switch } from './ui/switch';
+import { Label } from './ui/label';
 import {
   Card,
   CardContent,
@@ -33,9 +35,12 @@ const SubscriptionManagement = () => {
   const [cancelling, setCancelling] = useState(false);
   const [reactivating, setReactivating] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [emailPreferences, setEmailPreferences] = useState(null);
+  const [updatingPrefs, setUpdatingPrefs] = useState(false);
 
   useEffect(() => {
     fetchSubscription();
+    fetchEmailPreferences();
     
     // Check for success callback
     const sessionId = searchParams.get('session_id');
@@ -43,6 +48,30 @@ const SubscriptionManagement = () => {
       handleSubscriptionSuccess(sessionId);
     }
   }, [searchParams]);
+
+  const fetchEmailPreferences = async () => {
+    try {
+      const response = await axios.get(`${API}/vendor/email-preferences`);
+      setEmailPreferences(response.data);
+    } catch (error) {
+      console.error('Failed to fetch email preferences:', error);
+    }
+  };
+
+  const updateEmailPreference = async (key, value) => {
+    setUpdatingPrefs(true);
+    try {
+      const response = await axios.put(`${API}/vendor/email-preferences`, {
+        [key]: value
+      });
+      setEmailPreferences(response.data);
+      toast.success('Email preferences updated');
+    } catch (error) {
+      toast.error('Failed to update preferences');
+    } finally {
+      setUpdatingPrefs(false);
+    }
+  };
 
   const fetchSubscription = async () => {
     try {
