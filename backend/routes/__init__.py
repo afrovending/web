@@ -10,6 +10,11 @@ from .bookings import router as bookings_router
 from .cart import router as cart_router
 from .coupons import router as coupons_router
 from .orders import router as orders_router
+from .admin import router as admin_router
+from .upload import router as upload_router
+from .tracking import router as tracking_router
+from .payouts import router as payouts_router
+from .subscriptions import router as subscriptions_router
 
 __all__ = [
     'auth_router',
@@ -21,4 +26,9 @@ __all__ = [
     'cart_router',
     'coupons_router',
     'orders_router',
+    'admin_router',
+    'upload_router',
+    'tracking_router',
+    'payouts_router',
+    'subscriptions_router',
 ]
