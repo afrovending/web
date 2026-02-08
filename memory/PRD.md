@@ -291,6 +291,25 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
   - Prices auto-update across all pages
   - Preference saved to localStorage and synced to user profile
 
+### IP-Based Currency Detection (NEW - Feb 8, 2026)
+- **Backend**: `/backend/routes/currency.py` (lines 303-400)
+- **Geolocation Provider**: ip-api.com (free, 45 req/min)
+- **Country Mappings**: 38 countries to 12 currencies
+  - Nigeria → NGN, Ghana → GHS, Kenya → KES, South Africa → ZAR
+  - West African CFA (8 countries) → XOF
+  - Central African CFA (6 countries) → XAF
+  - EU (11 countries) → EUR, UK → GBP
+  - Canada → CAD, Australia/NZ → AUD, India → INR
+- **API Endpoints**:
+  - GET /api/currency/detect - Detect currency from IP
+  - GET /api/currency/country-mapping - Get full mapping
+- **Frontend Behavior**:
+  - Auto-detect on first visit only
+  - Toast notification when currency auto-set (non-USD)
+  - Detection tracked via `afrovending_currency_detected` key
+  - Manual override always available
+- **Privacy**: Only detects country, no personal data stored
+
 ### Coupon/Discount System (Feb 8, 2026)
 - **Coupon Types**: Percentage or fixed amount discounts
 - **Validation Rules**: Min order amount, max discount cap, usage limits
