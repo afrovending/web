@@ -508,6 +508,211 @@ const UserDashboard = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="addresses">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-heading font-semibold text-lg">Saved Addresses</h3>
+                <Dialog open={addressDialogOpen} onOpenChange={setAddressDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      className="rounded-full" 
+                      onClick={() => handleOpenAddressDialog()}
+                      data-testid="add-address-btn"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Address
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>{editingAddress ? 'Edit Address' : 'Add New Address'}</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSaveAddress} className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="label">Address Label</Label>
+                        <Input
+                          id="label"
+                          placeholder="e.g., Home, Work, Mom's House"
+                          value={addressForm.label}
+                          onChange={(e) => setAddressForm({...addressForm, label: e.target.value})}
+                          required
+                          data-testid="address-label"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="recipient_name">Recipient Name</Label>
+                        <Input
+                          id="recipient_name"
+                          placeholder="Full name"
+                          value={addressForm.recipient_name}
+                          onChange={(e) => setAddressForm({...addressForm, recipient_name: e.target.value})}
+                          required
+                          data-testid="address-recipient"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="street_address">Street Address</Label>
+                        <Input
+                          id="street_address"
+                          placeholder="123 Main Street"
+                          value={addressForm.street_address}
+                          onChange={(e) => setAddressForm({...addressForm, street_address: e.target.value})}
+                          required
+                          data-testid="address-street"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="apartment">Apartment/Suite (optional)</Label>
+                        <Input
+                          id="apartment"
+                          placeholder="Apt 4B"
+                          value={addressForm.apartment}
+                          onChange={(e) => setAddressForm({...addressForm, apartment: e.target.value})}
+                          data-testid="address-apartment"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="city">City</Label>
+                          <Input
+                            id="city"
+                            placeholder="Lagos"
+                            value={addressForm.city}
+                            onChange={(e) => setAddressForm({...addressForm, city: e.target.value})}
+                            required
+                            data-testid="address-city"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="state">State/Province</Label>
+                          <Input
+                            id="state"
+                            placeholder="Lagos"
+                            value={addressForm.state}
+                            onChange={(e) => setAddressForm({...addressForm, state: e.target.value})}
+                            required
+                            data-testid="address-state"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="postal_code">Postal Code</Label>
+                          <Input
+                            id="postal_code"
+                            placeholder="100001"
+                            value={addressForm.postal_code}
+                            onChange={(e) => setAddressForm({...addressForm, postal_code: e.target.value})}
+                            required
+                            data-testid="address-postal"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="country">Country</Label>
+                          <Input
+                            id="country"
+                            placeholder="Nigeria"
+                            value={addressForm.country}
+                            onChange={(e) => setAddressForm({...addressForm, country: e.target.value})}
+                            required
+                            data-testid="address-country"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone Number (optional)</Label>
+                        <Input
+                          id="phone"
+                          placeholder="+234 123 456 7890"
+                          value={addressForm.phone}
+                          onChange={(e) => setAddressForm({...addressForm, phone: e.target.value})}
+                          data-testid="address-phone"
+                        />
+                      </div>
+                      <Button 
+                        type="submit" 
+                        className="w-full rounded-full" 
+                        disabled={savingAddress}
+                        data-testid="save-address-btn"
+                      >
+                        {savingAddress ? 'Saving...' : (editingAddress ? 'Update Address' : 'Save Address')}
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              {addresses.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {addresses.map((address) => (
+                    <div 
+                      key={address.id} 
+                      className={`bg-card rounded-xl p-5 border ${address.is_default ? 'border-primary' : 'border-border'} relative`}
+                      data-testid={`address-card-${address.id}`}
+                    >
+                      {address.is_default && (
+                        <Badge className="absolute -top-2 -right-2 bg-primary">Default</Badge>
+                      )}
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h4 className="font-semibold flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-primary" />
+                            {address.label}
+                          </h4>
+                          <p className="text-sm text-muted-foreground mt-1">{address.recipient_name}</p>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => handleOpenAddressDialog(address)}
+                            data-testid={`edit-address-${address.id}`}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteAddress(address.id)}
+                            data-testid={`delete-address-${address.id}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-3 text-sm text-muted-foreground">
+                        <p>{address.street_address}</p>
+                        {address.apartment && <p>{address.apartment}</p>}
+                        <p>{address.city}, {address.state} {address.postal_code}</p>
+                        <p>{address.country}</p>
+                        {address.phone && <p className="mt-1">{address.phone}</p>}
+                      </div>
+                      {!address.is_default && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="mt-3 rounded-full"
+                          onClick={() => handleSetDefaultAddress(address.id)}
+                          data-testid={`set-default-${address.id}`}
+                        >
+                          Set as Default
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-card rounded-xl border border-border">
+                  <MapPin className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+                  <h3 className="font-heading font-semibold text-lg mb-2">No saved addresses</h3>
+                  <p className="text-muted-foreground mb-4">Add your shipping addresses for faster checkout</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
           <TabsContent value="profile">
             <div className="bg-card rounded-xl p-6 border border-border">
               <h3 className="font-heading font-semibold text-lg mb-6">Profile Information</h3>
