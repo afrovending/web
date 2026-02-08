@@ -47,7 +47,15 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 8. **Order/Booking Tracking** - Timeline view with status updates
 9. **Coupon/Discount System** (NEW) - Full promo code management
 
-### Product Variants Feature (NEW)
+### Coupon/Discount System (NEW - Feb 8, 2026)
+- **Coupon Types**: Percentage or fixed amount discounts
+- **Validation Rules**: Min order amount, max discount cap, usage limits
+- **Date Constraints**: Start and expiry dates
+- **Per-User Limits**: Configurable usage per customer
+- **Cart Integration**: Apply/remove coupons, see discount in order summary
+- **Admin Management**: Full CRUD in Admin Dashboard Coupons tab
+
+### Product Variants Feature
 - **Variant Options**: Products can have Size, Color, or custom options
 - **Individual Pricing**: Each variant can have its own price
 - **Stock Management**: Each variant has its own stock count
