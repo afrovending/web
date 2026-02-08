@@ -192,6 +192,10 @@ const StorefrontEditor = ({ vendorId, products = [] }) => {
             <Link2 className="h-4 w-4 mr-2" />
             Social
           </TabsTrigger>
+          <TabsTrigger value="analytics" className="rounded-full">
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Analytics
+          </TabsTrigger>
         </TabsList>
 
         {/* Branding Tab */}
