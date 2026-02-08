@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
-import { Package, DollarSign, TrendingUp, Plus, Edit, Trash2, Eye, Store, Calendar, Clock, Briefcase, Upload, Wallet, CreditCard, BarChart3 } from 'lucide-react';
+import { Package, DollarSign, TrendingUp, Plus, Edit, Trash2, Eye, Store, Calendar, Clock, Briefcase, Upload, Wallet, CreditCard, BarChart3, Palette } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -13,6 +13,7 @@ import { ImageUpload } from '../components/ui/image-upload';
 import PayoutDashboard from '../components/PayoutDashboard';
 import SubscriptionManagement from '../components/SubscriptionManagement';
 import AnalyticsDashboard from '../components/AnalyticsDashboard';
+import StorefrontEditor from '../components/StorefrontEditor';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import axios from 'axios';
