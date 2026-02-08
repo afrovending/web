@@ -25,8 +25,24 @@ const UserDashboard = () => {
   const { user, isAuthenticated, isVendor } = useAuth();
   const [orders, setOrders] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirmingDelivery, setConfirmingDelivery] = useState(null);
+  const [addressDialogOpen, setAddressDialogOpen] = useState(false);
+  const [editingAddress, setEditingAddress] = useState(null);
+  const [addressForm, setAddressForm] = useState({
+    label: '',
+    recipient_name: '',
+    street_address: '',
+    apartment: '',
+    city: '',
+    state: '',
+    postal_code: '',
+    country: '',
+    phone: '',
+    is_default: false
+  });
+  const [savingAddress, setSavingAddress] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
