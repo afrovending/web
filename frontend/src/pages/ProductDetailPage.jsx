@@ -363,7 +363,42 @@ const ProductDetailPage = () => {
               >
                 <Heart className="h-5 w-5" />
               </Button>
+              
+              <Button
+                variant="outline"
+                size="lg"
+                className={`rounded-full ${isInCompare(product.id) ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-primary' : ''}`}
+                onClick={() => {
+                  if (isInCompare(product.id)) {
+                    removeFromCompare(product.id);
+                    toast.success('Removed from comparison');
+                  } else {
+                    const result = addToCompare(product);
+                    if (result.success) {
+                      toast.success(result.message);
+                    } else {
+                      toast.error(result.message);
+                    }
+                  }
+                }}
+                data-testid="compare-btn"
+              >
+                <GitCompare className="h-5 w-5" />
+              </Button>
             </div>
+
+            {/* Message Vendor */}
+            {vendor && (
+              <Button
+                variant="outline"
+                className="w-full rounded-full"
+                onClick={() => navigate(`/messages?vendor=${vendor.id}&product=${product.id}`)}
+                data-testid="message-vendor-btn"
+              >
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Message Vendor
+              </Button>
+            )}
 
             {/* Benefits */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-border">
