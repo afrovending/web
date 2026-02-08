@@ -23,6 +23,12 @@ import stripe
 import boto3
 from botocore.exceptions import ClientError
 
+# Import email template utilities
+from utils.email_templates import (
+    render_booking_created, render_booking_status,
+    render_payment_released, render_order_status, render_weekly_report
+)
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
