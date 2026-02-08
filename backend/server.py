@@ -125,6 +125,7 @@ api_router.include_router(subscriptions_router)
 api_router.include_router(analytics_router)
 api_router.include_router(email_reports_router)
 api_router.include_router(users_router)
+api_router.include_router(messaging_router)
 
 security = HTTPBearer()
 
