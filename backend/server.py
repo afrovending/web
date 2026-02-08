@@ -3343,18 +3343,18 @@ async def stripe_connect_return(account_id: str, request: Request):
             )
         
         # Redirect to vendor dashboard
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://emarketafrica.preview.emergentagent.com')
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://afro-paypal-test.preview.emergentagent.com')
         return RedirectResponse(url=f"{frontend_url}/vendor/dashboard?stripe=connected")
         
     except stripe.error.StripeError as e:
         logger.error(f"Stripe return error: {str(e)}")
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://emarketafrica.preview.emergentagent.com')
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://afro-paypal-test.preview.emergentagent.com')
         return RedirectResponse(url=f"{frontend_url}/vendor/dashboard?stripe=error")
 
 @api_router.get("/vendor/stripe/refresh")
 async def stripe_connect_refresh(request: Request):
     """Handle refresh from Stripe Connect (user needs to restart onboarding)"""
-    frontend_url = os.environ.get('FRONTEND_URL', 'https://emarketafrica.preview.emergentagent.com')
+    frontend_url = os.environ.get('FRONTEND_URL', 'https://afro-paypal-test.preview.emergentagent.com')
     return RedirectResponse(url=f"{frontend_url}/vendor/dashboard?stripe=refresh")
 
 @api_router.get("/vendor/stripe/status")
