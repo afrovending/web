@@ -434,6 +434,63 @@ SUBSCRIPTION_PLANS = {
     )
 }
 
+# ==================== ANALYTICS MODELS ====================
+
+class ProductViewEvent(BaseModel):
+    product_id: str
+    vendor_id: str
+    user_id: Optional[str] = None
+    session_id: str
+    source: str = "direct"  # direct, search, category, homepage
+    timestamp: str
+
+class AnalyticsDateRange(BaseModel):
+    start_date: str
+    end_date: str
+
+class SalesAnalytics(BaseModel):
+    total_revenue: float
+    total_orders: int
+    average_order_value: float
+    revenue_trend: List[Dict[str, Any]]  # Daily/weekly data points
+    orders_trend: List[Dict[str, Any]]
+
+class ProductAnalytics(BaseModel):
+    product_id: str
+    product_name: str
+    views: int
+    cart_adds: int
+    purchases: int
+    revenue: float
+    conversion_rate: float
+
+class TrafficAnalytics(BaseModel):
+    total_views: int
+    unique_visitors: int
+    views_trend: List[Dict[str, Any]]
+    top_sources: List[Dict[str, Any]]
+
+class ConversionAnalytics(BaseModel):
+    view_to_cart_rate: float
+    cart_to_purchase_rate: float
+    overall_conversion_rate: float
+    funnel_data: List[Dict[str, Any]]
+
+class CustomerAnalytics(BaseModel):
+    total_customers: int
+    new_customers: int
+    returning_customers: int
+    top_locations: List[Dict[str, Any]]
+
+class VendorAnalyticsResponse(BaseModel):
+    sales: SalesAnalytics
+    top_products: List[ProductAnalytics]
+    traffic: TrafficAnalytics
+    conversions: ConversionAnalytics
+    customers: CustomerAnalytics
+    period: str
+    has_access: bool = True
+
 class ServiceBase(BaseModel):
     name: str
     description: str
