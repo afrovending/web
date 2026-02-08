@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Star, Clock, MapPin, ChevronLeft, Calendar, User } from 'lucide-react';
+import { Star, Clock, MapPin, ChevronLeft, Calendar, User, ThumbsUp } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Textarea } from '../components/ui/textarea';
@@ -9,6 +9,7 @@ import { Label } from '../components/ui/label';
 import { Badge } from '../components/ui/badge';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
 import { Calendar as CalendarComponent } from '../components/ui/calendar';
+import { Progress } from '../components/ui/progress';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import axios from 'axios';
