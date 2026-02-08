@@ -3,13 +3,17 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
+import { CompareProvider } from './contexts/CompareContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import CompareTray from './components/CompareTray';
 
 // Pages
 import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import ComparePage from './pages/ComparePage';
+import MessagesPage from './pages/MessagesPage';
 import { LoginPage, RegisterPage } from './pages/AuthPages';
 import CartPage from './pages/CartPage';
 import CheckoutSuccessPage from './pages/CheckoutSuccessPage';
