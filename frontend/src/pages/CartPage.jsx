@@ -300,13 +300,56 @@ const CartPage = () => {
                 )}
               </div>
               
-              <Button
-                className="w-full rounded-full h-12 text-lg font-semibold"
-                onClick={handleCheckout}
-                data-testid="checkout-btn"
-              >
-                Proceed to Checkout
-              </Button>
+              {/* Payment Options */}
+              <div className="space-y-3">
+                <Button
+                  className="w-full rounded-full h-12 text-lg font-semibold"
+                  onClick={handleStripeCheckout}
+                  disabled={checkoutLoading !== null}
+                  data-testid="checkout-stripe-btn"
+                >
+                  {checkoutLoading === 'stripe' ? (
+                    <>
+                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="h-5 w-5 mr-2" />
+                      Pay with Card
+                    </>
+                  )}
+                </Button>
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">or</span>
+                  </div>
+                </div>
+                
+                <Button
+                  variant="outline"
+                  className="w-full rounded-full h-12 text-lg font-semibold bg-[#0070ba] hover:bg-[#003087] text-white border-0"
+                  onClick={handlePayPalCheckout}
+                  disabled={checkoutLoading !== null}
+                  data-testid="checkout-paypal-btn"
+                >
+                  {checkoutLoading === 'paypal' ? (
+                    <>
+                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <PayPalIcon className="h-5 w-5 mr-2" />
+                      Pay with PayPal
+                    </>
+                  )}
+                </Button>
+              </div>
               
               <p className="text-xs text-muted-foreground text-center mt-4">
                 Secure checkout powered by Stripe
