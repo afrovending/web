@@ -950,6 +950,10 @@ const VendorDashboard = () => {
             <AnalyticsDashboard />
           </TabsContent>
 
+          <TabsContent value="storefront">
+            <StorefrontEditor vendorId={vendor?.id} products={products} />
+          </TabsContent>
+
           <TabsContent value="subscription">
             <SubscriptionManagement />
           </TabsContent>
