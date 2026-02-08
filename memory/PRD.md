@@ -140,6 +140,41 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
   - VendorResponse: is_verified_seller (boolean), subscription_plan (string)
 - **Visual Design**: Blue color (#3b82f6) with BadgeCheck icon
 
+### Multiple Shipping Addresses (NEW - Feb 8, 2026)
+- **Max Addresses**: 10 per user
+- **Default Address**: Auto-set for first address, can be changed
+- **Address Fields**: Label, recipient name, street, apartment, city, state, postal code, country, phone
+- **API Endpoints**:
+  - GET /api/user/addresses - List all addresses
+  - POST /api/user/addresses - Add new address
+  - GET /api/user/addresses/:id - Get specific address
+  - PUT /api/user/addresses/:id - Update address
+  - DELETE /api/user/addresses/:id - Delete address
+  - PUT /api/user/addresses/:id/default - Set as default
+- **Frontend**: Address Book tab in User Dashboard with add/edit/delete functionality
+
+### Email Templates Refactoring (NEW - Feb 8, 2026)
+- **Template Engine**: Jinja2 with HTML autoescape
+- **Templates Directory**: /backend/templates/
+- **Templates Created**:
+  - booking_created.html - Vendor notification for new bookings
+  - booking_status.html - Customer notification for booking updates
+  - payment_released.html - Vendor notification for released payments
+  - order_status.html - Customer notification for order updates
+  - weekly_report.html - Weekly analytics email for Growth+ vendors
+- **Utility File**: /backend/utils/email_templates.py
+
+### Enhanced Review/Rating UI (NEW - Feb 8, 2026)
+- **Location**: ServiceDetailPage.jsx
+- **Features**:
+  - Overall rating display with large score
+  - Rating breakdown with progress bars (5 to 1 stars)
+  - Review cards with improved styling
+  - Helpful voting button with count
+  - Verified purchase badge
+  - Review images gallery support
+  - Empty state for no reviews
+
 ### Coupon/Discount System (Feb 8, 2026)
 - **Coupon Types**: Percentage or fixed amount discounts
 - **Validation Rules**: Min order amount, max discount cap, usage limits
