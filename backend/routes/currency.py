@@ -1,13 +1,12 @@
 """
 Currency routes and utilities for Afrovending API
-Handles multi-currency support with real-time exchange rates
+Handles multi-currency support with real-time exchange rates and IP-based detection
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from typing import Dict, Optional
 from datetime import datetime, timezone, timedelta
 from pydantic import BaseModel
 import httpx
-import asyncio
 
 from config import db, logger
 from utils.auth import get_current_user
@@ -31,6 +30,53 @@ SUPPORTED_CURRENCIES = {
 }
 
 BASE_CURRENCY = "USD"
+
+# Country to currency mapping
+COUNTRY_TO_CURRENCY = {
+    # African countries
+    "NG": "NGN",  # Nigeria
+    "GH": "GHS",  # Ghana
+    "KE": "KES",  # Kenya
+    "ZA": "ZAR",  # South Africa
+    "TZ": "KES",  # Tanzania (uses KES as close match)
+    "UG": "KES",  # Uganda
+    "RW": "KES",  # Rwanda
+    # West African CFA countries
+    "SN": "XOF",  # Senegal
+    "CI": "XOF",  # Ivory Coast
+    "ML": "XOF",  # Mali
+    "BF": "XOF",  # Burkina Faso
+    "NE": "XOF",  # Niger
+    "TG": "XOF",  # Togo
+    "BJ": "XOF",  # Benin
+    "GW": "XOF",  # Guinea-Bissau
+    # Central African CFA countries
+    "CM": "XAF",  # Cameroon
+    "CF": "XAF",  # Central African Republic
+    "TD": "XAF",  # Chad
+    "CG": "XAF",  # Congo
+    "GA": "XAF",  # Gabon
+    "GQ": "XAF",  # Equatorial Guinea
+    # European countries
+    "GB": "GBP",  # United Kingdom
+    "DE": "EUR",  # Germany
+    "FR": "EUR",  # France
+    "IT": "EUR",  # Italy
+    "ES": "EUR",  # Spain
+    "NL": "EUR",  # Netherlands
+    "BE": "EUR",  # Belgium
+    "AT": "EUR",  # Austria
+    "PT": "EUR",  # Portugal
+    "IE": "EUR",  # Ireland
+    "FI": "EUR",  # Finland
+    "GR": "EUR",  # Greece
+    # Other major countries
+    "CA": "CAD",  # Canada
+    "AU": "AUD",  # Australia
+    "NZ": "AUD",  # New Zealand (use AUD as close match)
+    "IN": "INR",  # India
+    "US": "USD",  # United States
+}
 
 # Cache for exchange rates
 _exchange_rates_cache: Dict = {
