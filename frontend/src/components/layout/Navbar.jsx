@@ -79,6 +79,9 @@ const Navbar = () => {
             <Link to="/vendors" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors" data-testid="nav-vendors">
               Vendors
             </Link>
+            <Link to="/pricing" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors" data-testid="nav-pricing">
+              Pricing
+            </Link>
           </div>
 
           {/* Actions */}
