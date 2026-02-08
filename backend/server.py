@@ -787,29 +787,7 @@ def send_booking_status_email(customer_email: str, customer_name: str, booking: 
 def send_payment_released_email(vendor_email: str, vendor_name: str, booking: dict):
     """Notify vendor that payment has been released"""
     subject = f"Payment Released: {booking['service_name']}"
-    html_content = f"""
-    <html>
-    <body style="font-family: 'Ubuntu', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: linear-gradient(135deg, #22c55e 0%, #1a1a1a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-            <h1 style="color: white; margin: 0; font-family: 'Montserrat', sans-serif;">Payment Released!</h1>
-        </div>
-        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-            <p>Hi {vendor_name},</p>
-            <p>Great news! The customer has confirmed delivery of your service, and the payment has been released to you.</p>
-            
-            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #22c55e;">
-                <h3 style="margin-top: 0; color: #1a1a1a;">{booking['service_name']}</h3>
-                <p><strong>Customer:</strong> {booking['customer_name']}</p>
-                <p><strong>Date:</strong> {booking['booking_date']}</p>
-                <p style="font-size: 24px; color: #22c55e; font-weight: bold;">Amount: ${booking['price']:.2f}</p>
-            </div>
-            
-            <p>Thank you for providing excellent service on Afrovending!</p>
-            <p style="color: #666; font-size: 12px;">This is an automated message from Afrovending.</p>
-        </div>
-    </body>
-    </html>
-    """
+    html_content = render_payment_released(vendor_name, booking)
     return send_email(vendor_email, subject, html_content)
 
 def send_order_status_email(customer_email: str, customer_name: str, order: dict, new_status: str):
