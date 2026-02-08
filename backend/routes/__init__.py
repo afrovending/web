@@ -1,1 +1,2 @@
-"""Routes package - imports all routers"""
+# Routes package
+from .auth import router as auth_router
