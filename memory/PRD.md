@@ -175,6 +175,13 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - POST /api/analytics/track-view - Track product view event
 - POST /api/analytics/track-cart-add - Track cart add event
 
+#### Email Preferences & Weekly Reports
+- GET /api/vendor/email-preferences - Get vendor's email preferences
+- PUT /api/vendor/email-preferences - Update email preferences
+- GET /api/analytics/preview-weekly-report - Preview weekly report HTML
+- POST /api/analytics/send-weekly-report/{vendor_id} - Send report to specific vendor
+- POST /api/analytics/send-all-weekly-reports - Batch send to all eligible vendors (scheduler)
+
 #### Tracking
 - GET /api/tracking
 - GET /api/tracking/:type/:id
