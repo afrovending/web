@@ -159,6 +159,7 @@ class ProductResponse(ProductBase):
     average_rating: float = 0.0
     review_count: int = 0
     created_at: str
+    is_verified_seller: bool = False  # Growth+ subscription badge
 
 class VendorBase(BaseModel):
     store_name: str
@@ -179,6 +180,8 @@ class VendorResponse(VendorBase):
     total_sales: float = 0.0
     product_count: int = 0
     created_at: str
+    is_verified_seller: bool = False  # Growth+ subscription badge
+    subscription_plan: Optional[str] = None
 
 class CartItemBase(BaseModel):
     product_id: str
