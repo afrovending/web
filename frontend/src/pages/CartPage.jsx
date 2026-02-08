@@ -270,7 +270,7 @@ const CartPage = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>${cart.subtotal.toFixed(2)}</span>
+                  <span>{displayPrice(cart.subtotal)}</span>
                 </div>
                 
                 {/* Discount Line */}
@@ -280,7 +280,7 @@ const CartPage = () => {
                       <Tag className="h-3 w-3" />
                       Discount ({cart.discount_code})
                     </span>
-                    <span>-${cart.discount.toFixed(2)}</span>
+                    <span>-{displayPrice(cart.discount)}</span>
                   </div>
                 )}
                 
@@ -293,11 +293,11 @@ const CartPage = () => {
               <div className="border-t border-border pt-4 mb-6">
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>
-                  <span className="font-accent">${cart.total.toFixed(2)}</span>
+                  <span className="font-accent">{displayPrice(cart.total)}</span>
                 </div>
                 {cart.discount > 0 && (
                   <p className="text-xs text-green-600 mt-1" data-testid="savings-message">
-                    You're saving ${cart.discount.toFixed(2)} on this order!
+                    You're saving {displayPrice(cart.discount)} on this order!
                   </p>
                 )}
               </div>
