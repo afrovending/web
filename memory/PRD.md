@@ -341,6 +341,7 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - Product Image Gallery: 100% (lightbox, zoom, keyboard nav all working)
 - Product Comparison: 100% (compare tray, page, max 4 limit, localStorage persistence)
 - Vendor Messaging: 100% (20/20 backend tests, full chat UI working)
+- WebSocket Real-time: 100% (12/12 tests, instant delivery, typing, online status)
 
 ## Prioritized Backlog
 
