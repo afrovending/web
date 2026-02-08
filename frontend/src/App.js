@@ -13,6 +13,8 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import { LoginPage, RegisterPage } from './pages/AuthPages';
 import CartPage from './pages/CartPage';
 import CheckoutSuccessPage from './pages/CheckoutSuccessPage';
+import PayPalSuccessPage from './pages/PayPalSuccessPage';
+import PayPalCancelPage from './pages/PayPalCancelPage';
 import WishlistPage from './pages/WishlistPage';
 import UserDashboard from './pages/UserDashboard';
 import { VendorDashboard, VendorSetupPage } from './pages/VendorDashboard';
