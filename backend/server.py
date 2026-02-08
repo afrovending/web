@@ -98,6 +98,7 @@ from routes.payouts import router as payouts_router
 from routes.subscriptions import router as subscriptions_router
 from routes.analytics import router as analytics_router
 from routes.email_reports import router as email_reports_router
+from routes.users import router as users_router
 
 # Register modular routers (these will take precedence over inline routes)
 api_router.include_router(auth_router)
@@ -116,6 +117,7 @@ api_router.include_router(payouts_router)
 api_router.include_router(subscriptions_router)
 api_router.include_router(analytics_router)
 api_router.include_router(email_reports_router)
+api_router.include_router(users_router)
 
 security = HTTPBearer()
 
