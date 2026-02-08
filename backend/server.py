@@ -2994,7 +2994,7 @@ async def get_all_orders(user: dict = Depends(require_admin), skip: int = 0, lim
 
 @api_router.post("/upload/image")
 async def upload_image(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
-    """Upload an image file for products or services"""
+    """Upload an image file for products or services to S3"""
     # Validate file type
     allowed_types = ["image/jpeg", "image/png", "image/webp", "image/gif"]
     if file.content_type not in allowed_types:
@@ -3006,23 +3006,44 @@ async def upload_image(file: UploadFile = File(...), user: dict = Depends(get_cu
         raise HTTPException(status_code=400, detail="File too large. Maximum size is 5MB.")
     
     # Generate unique filename
-    ext = file.filename.split('.')[-1] if '.' in file.filename else 'jpg'
-    filename = f"{uuid.uuid4()}.{ext}"
-    filepath = UPLOAD_DIR / filename
+    ext = file.filename.split('.')[-1].lower() if '.' in file.filename else 'jpg'
+    filename = f"products/{uuid.uuid4()}.{ext}"
     
-    # Save file
-    async with aiofiles.open(filepath, 'wb') as f:
-        await f.write(contents)
-    
-    # Return the URL
-    image_url = f"/api/uploads/{filename}"
-    
-    logger.info(f"Image uploaded: {filename} by user {user['id']}")
-    return {"url": image_url, "filename": filename}
+    # Check if S3 is configured
+    if s3_client and S3_BUCKET_NAME:
+        try:
+            # Upload to S3
+            s3_client.put_object(
+                Body=contents,
+                Bucket=S3_BUCKET_NAME,
+                Key=filename,
+                ContentType=file.content_type,
+                ACL='public-read'
+            )
+            
+            # Return the S3 public URL
+            image_url = f"{S3_PUBLIC_URL}/{filename}"
+            logger.info(f"Image uploaded to S3: {filename} by user {user['id']}")
+            return {"url": image_url, "filename": filename, "storage": "s3"}
+            
+        except ClientError as e:
+            logger.error(f"S3 upload failed: {e}")
+            raise HTTPException(status_code=500, detail="Failed to upload image to cloud storage")
+    else:
+        # Fallback to local storage if S3 is not configured
+        local_filename = f"{uuid.uuid4()}.{ext}"
+        filepath = UPLOAD_DIR / local_filename
+        
+        async with aiofiles.open(filepath, 'wb') as f:
+            await f.write(contents)
+        
+        image_url = f"/api/uploads/{local_filename}"
+        logger.info(f"Image uploaded locally: {local_filename} by user {user['id']}")
+        return {"url": image_url, "filename": local_filename, "storage": "local"}
 
 @api_router.get("/uploads/{filename}")
 async def get_uploaded_image(filename: str):
-    """Serve uploaded images"""
+    """Serve uploaded images from local storage (fallback)"""
     from fastapi.responses import FileResponse
     filepath = UPLOAD_DIR / filename
     if not filepath.exists():
