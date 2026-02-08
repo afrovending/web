@@ -91,6 +91,11 @@ from routes.bookings import router as bookings_router
 from routes.cart import router as cart_router
 from routes.coupons import router as coupons_router
 from routes.orders import router as orders_router
+from routes.admin import router as admin_router
+from routes.upload import router as upload_router
+from routes.tracking import router as tracking_router
+from routes.payouts import router as payouts_router
+from routes.subscriptions import router as subscriptions_router
 
 # Register modular routers (these will take precedence over inline routes)
 api_router.include_router(auth_router)
@@ -102,6 +107,11 @@ api_router.include_router(bookings_router)
 api_router.include_router(cart_router)
 api_router.include_router(coupons_router)
 api_router.include_router(orders_router)
+api_router.include_router(admin_router)
+api_router.include_router(upload_router)
+api_router.include_router(tracking_router)
+api_router.include_router(payouts_router)
+api_router.include_router(subscriptions_router)
 
 security = HTTPBearer()
 
