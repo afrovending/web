@@ -33,7 +33,7 @@ class TestShippingAddresses:
         
         if login_response.status_code == 200:
             data = login_response.json()
-            self.token = data.get("token")
+            self.token = data.get("access_token")  # API returns access_token not token
             self.session.headers.update({"Authorization": f"Bearer {self.token}"})
             self.authenticated = True
         else:
@@ -245,7 +245,7 @@ class TestShippingAddressesValidation:
         
         if login_response.status_code == 200:
             data = login_response.json()
-            self.token = data.get("token")
+            self.token = data.get("access_token")  # API returns access_token not token
             self.session.headers.update({"Authorization": f"Bearer {self.token}"})
         else:
             pytest.skip("Authentication failed")
