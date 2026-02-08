@@ -269,6 +269,28 @@ Create a full e-commerce platform for Afrovending.com - an online marketplace fo
 - **MongoDB Collections**: storefront_views, storefront_product_clicks
 - **Charts**: Line chart (views over time), Pie chart (devices), Bar chart (peak hours)
 
+### Multi-Currency Support (NEW - Feb 8, 2026)
+- **Backend**: `/backend/routes/currency.py`
+- **Frontend**: 
+  - `/contexts/CurrencyContext.js` - State management
+  - `/components/CurrencySelector.jsx` - Navbar dropdown
+- **Supported Currencies** (12 total):
+  - Major: USD, EUR, GBP, CAD, AUD, INR
+  - African: NGN, GHS, KES, ZAR, XOF, XAF
+- **Exchange Rate Source**: exchangerate-api.com (free tier)
+- **Caching**: 1 hour in MongoDB and localStorage
+- **API Endpoints**:
+  - GET /api/currency/supported
+  - GET /api/currency/rates
+  - POST /api/currency/convert
+  - GET/PUT /api/currency/preference (auth required)
+  - GET /api/currency/format/:code/:amount
+- **Frontend Features**:
+  - Globe icon currency selector in navbar
+  - Major vs African currencies grouped in dropdown
+  - Prices auto-update across all pages
+  - Preference saved to localStorage and synced to user profile
+
 ### Coupon/Discount System (Feb 8, 2026)
 - **Coupon Types**: Percentage or fixed amount discounts
 - **Validation Rules**: Min order amount, max discount cap, usage limits
