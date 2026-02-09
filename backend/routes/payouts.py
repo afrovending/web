@@ -205,19 +205,27 @@ async def stripe_connect_return(account_id: str, request: Request):
                 {"$set": {"stripe_payouts_enabled": True}}
             )
         
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://vendor-platform-go.preview.emergentagent.com')
+        # FRONTEND_URL must be set in .env for proper deployment
+        frontend_url = os.environ.get('FRONTEND_URL')
+        if not frontend_url:
+            logger.error("FRONTEND_URL not configured in environment")
+            raise HTTPException(status_code=500, detail="Server configuration error")
         return RedirectResponse(url=f"{frontend_url}/vendor/dashboard?stripe=connected")
         
     except stripe.error.StripeError as e:
         logger.error(f"Stripe return error: {str(e)}")
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://vendor-platform-go.preview.emergentagent.com')
+        frontend_url = os.environ.get('FRONTEND_URL')
+        if not frontend_url:
+            raise HTTPException(status_code=500, detail="Server configuration error")
         return RedirectResponse(url=f"{frontend_url}/vendor/dashboard?stripe=error")
 
 
 @router.get("/vendor/stripe/refresh")
 async def stripe_connect_refresh(request: Request):
     """Handle refresh from Stripe Connect"""
-    frontend_url = os.environ.get('FRONTEND_URL', 'https://vendor-platform-go.preview.emergentagent.com')
+    frontend_url = os.environ.get('FRONTEND_URL')
+    if not frontend_url:
+        raise HTTPException(status_code=500, detail="Server configuration error")
     return RedirectResponse(url=f"{frontend_url}/vendor/dashboard?stripe=refresh")
 
 
